@@ -62,7 +62,7 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
       setSelectedIdx(0);
       setActiveLetter("");
       onClose();
-    }, 250);
+    }, 300);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -86,78 +86,82 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
 
   return (
     <>
-      {/* Scrim — very subtle, just darkens left side */}
+      {/* Full-screen blur layer — the whole home screen blurs */}
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(to right, hsl(var(--background) / 0.4) 0%, hsl(var(--background) / 0.15) 50%, transparent 100%)",
-          zIndex: 45,
+          backdropFilter: isVisible ? "blur(24px) brightness(0.7)" : "blur(0px) brightness(1)",
+          WebkitBackdropFilter: isVisible ? "blur(24px) brightness(0.7)" : "blur(0px) brightness(1)",
+          zIndex: 44,
           opacity: isVisible ? 1 : 0,
-          transition: "opacity 0.25s ease-out",
+          transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
         onClick={dismiss}
       />
 
-      {/* Integrated side panel — flush right, no card appearance */}
+      {/* 
+        The launcher content — no panel, no box, no card.
+        Just text floating on the right side of the blurred screen.
+        The content itself IS the interface, not a container around it.
+      */}
       <div
         className="absolute z-50 flex flex-col"
         style={{
           top: 0,
           right: 0,
           bottom: 0,
-          width: 220,
-          /* Gradient bg: transparent on left, solid on right — blends into the screen */
-          background: `linear-gradient(to right, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0.7) 15%, hsl(var(--background) / 0.88) 40%, hsl(var(--background) / 0.94) 100%)`,
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          transform: isVisible ? "translateX(0)" : "translateX(40px)",
+          width: 200,
+          /* No background at all — content floats on the blur */
+          transform: isVisible ? "translateX(0)" : "translateX(30px)",
           opacity: isVisible ? 1 : 0,
-          transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out",
+          transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out",
         }}
         onKeyDown={handleKeyDown}
       >
-        {/* Top spacer to align with status bar area */}
-        <div className="h-12 flex-shrink-0" />
+        {/* Top spacer */}
+        <div className="h-14 flex-shrink-0" />
 
-        {/* Search — minimal, just a line */}
-        <div className="px-4 pr-3 mb-1">
+        {/* Search — just floating text input, no box */}
+        <div className="px-3 pr-2 mb-3">
           <input
             type="text"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); setActiveLetter(""); }}
             placeholder="find"
             autoFocus
-            className="w-full bg-transparent text-foreground/80 font-serif text-sm px-0 py-1 border-none outline-none placeholder:text-muted-foreground/30"
+            className="w-full bg-transparent text-foreground font-serif text-sm px-0 py-1 border-none outline-none placeholder:text-foreground/25"
           />
         </div>
 
-        {/* Pinned — subtle, just names */}
-        <div className="px-4 pr-3 pb-1">
+        {/* Pinned apps — just names, no container */}
+        <div className="px-3 pr-2 pb-2">
           {pinnedApps.map((app) => (
             <button
               key={app.name}
               onClick={() => { onOpenApp(app.name); dismiss(); }}
-              className="block w-full text-left text-[13px] text-foreground/90 font-serif py-[5px] hover:text-primary transition-colors duration-100"
+              className="block w-full text-left text-[13px] text-foreground font-serif py-[5px] hover:text-primary transition-colors duration-150"
             >
               {app.name}
             </button>
           ))}
-          {/* Faint separator */}
-          <div className="h-px bg-foreground/[0.06] mt-2 mb-1" />
+          {/* Organic separator — a gentle dot instead of a line */}
+          <div className="flex justify-center py-2">
+            <span className="text-foreground/10 text-[6px]">●</span>
+          </div>
         </div>
 
         {/* Main area: app list + scrubber */}
         <div className="flex flex-1 overflow-hidden min-h-0">
-          {/* App list */}
-          <div ref={listRef} className="flex-1 overflow-y-auto pl-4 pr-0 pb-4 hide-scrollbar">
+          {/* App list — bare text, no backgrounds */}
+          <div ref={listRef} className="flex-1 overflow-y-auto pl-3 pr-0 pb-6 hide-scrollbar">
             {filtered.length === 0 && (
-              <div className="py-8 text-center">
-                <span className="text-xs text-muted-foreground/40 font-serif">nothing</span>
+              <div className="py-8">
+                <span className="text-xs text-foreground/20 font-serif">nothing</span>
               </div>
             )}
             {grouped.map(([letter, apps]) => (
               <div key={letter} data-letter={letter}>
-                <div className="text-[8px] text-muted-foreground/30 font-serif pt-3 pb-0.5 uppercase tracking-wider">
+                <div className="text-[8px] text-foreground/20 font-serif pt-4 pb-1 uppercase tracking-[0.15em]">
                   {letter}
                 </div>
                 {apps.map((app) => {
@@ -167,10 +171,10 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
                       key={app}
                       onClick={() => { onOpenApp(app); dismiss(); setSearch(""); }}
                       onMouseEnter={() => setSelectedIdx(globalIdx)}
-                      className={`block w-full text-left font-serif py-[5px] rounded-sm transition-all duration-100 text-[13px] ${
+                      className={`block w-full text-left font-serif py-[5px] transition-all duration-150 text-[13px] ${
                         globalIdx === selectedIdx
-                          ? "text-foreground translate-x-0.5"
-                          : "text-foreground/50"
+                          ? "text-foreground"
+                          : "text-foreground/40"
                       }`}
                     >
                       {app}
@@ -181,9 +185,9 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
             ))}
           </div>
 
-          {/* Alphabet scrubber — hugging right edge */}
+          {/* Alphabet scrubber — floating on edge */}
           <div
-            className="flex flex-col items-center justify-center w-5 flex-shrink-0 select-none"
+            className="flex flex-col items-center justify-center w-4 mr-1 flex-shrink-0 select-none"
             onPointerDown={(e) => { e.stopPropagation(); handleScrubber(e); }}
             onPointerMove={(e) => { if (e.buttons > 0) handleScrubber(e); }}
             style={{ touchAction: "none" }}
@@ -193,10 +197,10 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
                 key={l}
                 className={`font-serif cursor-pointer transition-all duration-100 ${
                   l === activeLetter
-                    ? "text-[9px] leading-[12px] text-accent font-bold"
+                    ? "text-[9px] leading-[12px] text-primary font-bold"
                     : availableLetters.has(l)
-                    ? "text-[6px] leading-[10px] text-foreground/30"
-                    : "text-[6px] leading-[10px] text-foreground/[0.08]"
+                    ? "text-[6px] leading-[10px] text-foreground/25"
+                    : "text-[6px] leading-[10px] text-foreground/[0.06]"
                 }`}
               >
                 {l}
@@ -206,7 +210,7 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
         </div>
 
         {/* Bottom spacer */}
-        <div className="h-8 flex-shrink-0" />
+        <div className="h-10 flex-shrink-0" />
       </div>
     </>
   );
