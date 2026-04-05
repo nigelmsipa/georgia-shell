@@ -69,6 +69,13 @@ export const Shell: React.FC = () => {
         onOpenApp={openApp}
       />
 
+      <ControlCenter
+        open={controlCenter}
+        onClose={() => setControlCenter(false)}
+      />
+        onOpenApp={openApp}
+      />
+
       {/* App running overlay */}
       {runningApp && (
         <AppOverlay appName={runningApp} onClose={closeApp} />
