@@ -48,8 +48,8 @@ const VerticalScrubber: React.FC<{
   return (
     <div
       ref={ref}
-      className="flex flex-col items-center justify-between h-full py-2 select-none"
-      style={{ touchAction: "none", width: 28 }}
+      className="flex flex-col items-center justify-between h-full py-3 select-none"
+      style={{ touchAction: "none", width: 32 }}
       onPointerDown={(e) => {
         e.stopPropagation();
         scrub(e.clientY);
@@ -64,17 +64,18 @@ const VerticalScrubber: React.FC<{
         const isNear = dist <= 2 && dist > 0;
         const hasApps = availableLetters.has(l);
 
-        const offset = isActive ? -6 : isNear ? -3 * (1 - dist / 3) : 0;
+        // Arc offset: letters near active push left
+        const offset = isActive ? -8 : isNear ? -4 * (1 - dist / 3) : 0;
 
         return (
           <span
             key={l}
             className="font-serif cursor-pointer block text-center transition-all"
             style={{
-              fontSize: isActive ? 16 : isNear ? 9 : 7,
+              fontSize: isActive ? 18 : isNear ? 10 : 8,
               fontWeight: isActive ? 700 : 400,
               fontStyle: isActive ? "italic" : "normal",
-              lineHeight: isActive ? "18px" : "12px",
+              lineHeight: isActive ? "20px" : "13px",
               color: isActive
                 ? "hsl(var(--primary))"
                 : hasApps
@@ -117,6 +118,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
     [grouped]
   );
 
+  // Determine which apps to show
   const visibleApps = useMemo(() => {
     if (search) {
       const q = search.toLowerCase();
@@ -149,9 +151,9 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
       <div
         className="absolute inset-0"
         style={{
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          backgroundColor: "hsl(var(--background) / 0.6)",
+          backdropFilter: "blur(32px)",
+          WebkitBackdropFilter: "blur(32px)",
+          backgroundColor: "hsl(var(--background) / 0.82)",
           zIndex: 44,
           opacity: isVisible ? 1 : 0,
           transition: "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -159,33 +161,24 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
         onClick={dismiss}
       />
 
-      {/* Floating card */}
+      {/* Content — full height layout */}
       <div
-        className="absolute inset-0 z-50 flex items-center justify-center"
-        style={{ pointerEvents: isVisible ? "auto" : "none" }}
+        className="absolute inset-0 z-50 flex flex-col"
+        style={{
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? "translateY(0)" : "translateY(12px)",
+          transition:
+            "opacity 0.28s ease-out, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+          pointerEvents: isVisible ? "auto" : "none",
+        }}
         onClick={dismiss}
       >
         <div
-          className="flex flex-col"
-          style={{
-            width: "88%",
-            height: "78%",
-            backgroundColor: "hsl(var(--card) / 0.72)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            border: "1px solid hsl(var(--border) / 0.15)",
-            borderRadius: 20,
-            boxShadow: "0 16px 48px -12px hsl(var(--foreground) / 0.12)",
-            opacity: isVisible ? 1 : 0,
-            transform: isVisible ? "scale(1)" : "scale(0.96)",
-            transition:
-              "opacity 0.28s ease-out, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
-            overflow: "hidden",
-          }}
+          className="flex flex-col h-full pt-12 pb-6"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Favorites at top */}
-          <div className="flex flex-wrap gap-x-5 gap-y-2 px-6 pt-6 pb-4">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 px-8 mb-6">
             {COVER_APPS.map((app) => (
               <span
                 key={app}
@@ -195,7 +188,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                 }}
                 className="font-serif italic font-bold cursor-pointer select-none transition-all duration-200 hover:scale-[1.03]"
                 style={{
-                  fontSize: 17,
+                  fontSize: 19,
                   color: "hsl(var(--primary))",
                   textDecoration: "underline",
                   textDecorationColor: "hsl(var(--primary) / 0.3)",
@@ -209,31 +202,19 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
             ))}
           </div>
 
-          {/* Hairline */}
-          <div
-            className="mx-6"
-            style={{
-              height: 1,
-              background: "hsl(var(--border) / 0.1)",
-            }}
-          />
-
           {/* Main area: apps + scrubber */}
-          <div className="flex flex-1 min-h-0 px-6 py-4">
+          <div className="flex flex-1 min-h-0 px-8">
             {/* App display area */}
-            <div className="flex-1 flex flex-col justify-center pr-3 relative">
-              {/* Watermark letter */}
+            <div className="flex-1 flex flex-col justify-center pr-4">
+              {/* Active letter heading */}
               {activeLetter && (
                 <div
-                  className="absolute font-serif italic select-none pointer-events-none"
+                  className="font-serif italic mb-6"
                   style={{
-                    fontSize: 120,
-                    fontWeight: 800,
-                    color: "hsl(var(--primary) / 0.06)",
+                    fontSize: 48,
+                    fontWeight: 700,
+                    color: "hsl(var(--primary) / 0.12)",
                     lineHeight: 1,
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
                     transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                 >
@@ -243,9 +224,9 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
 
               {/* Apps for current letter */}
               <div
-                className="font-serif relative z-10"
+                className="font-serif"
                 style={{
-                  lineHeight: 2.2,
+                  lineHeight: 2.4,
                   transition: "all 0.2s ease",
                 }}
               >
@@ -259,7 +240,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                         }}
                         className="cursor-pointer italic select-none transition-all duration-200 hover:scale-[1.02] inline-block"
                         style={{
-                          fontSize: 17,
+                          fontSize: 18,
                           fontWeight: 500,
                           color: "hsl(var(--foreground) / 0.8)",
                           textDecoration: "underline",
@@ -275,9 +256,9 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                         <span
                           style={{
                             color: "hsl(var(--muted-foreground) / 0.25)",
-                            fontSize: 15,
+                            fontSize: 16,
                             fontStyle: "normal",
-                            margin: "0 3px",
+                            margin: "0 4px",
                           }}
                         >
                           ,{" "}
@@ -287,15 +268,15 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                   ))
                 ) : !search && !activeLetter ? (
                   <span
-                    className="font-serif italic"
-                    style={{ fontSize: 14, color: "hsl(var(--muted-foreground) / 0.2)" }}
+                    className="text-muted-foreground/20 font-serif italic"
+                    style={{ fontSize: 15 }}
                   >
                     scrub or search
                   </span>
                 ) : search ? (
                   <span
                     className="font-serif italic"
-                    style={{ fontSize: 14, color: "hsl(var(--muted-foreground) / 0.2)" }}
+                    style={{ fontSize: 15, color: "hsl(var(--muted-foreground) / 0.2)" }}
                   >
                     nothing
                   </span>
@@ -314,7 +295,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
           </div>
 
           {/* Search at bottom */}
-          <div className="px-6 pb-5">
+          <div className="px-8 mt-4">
             <input
               type="text"
               value={search}
