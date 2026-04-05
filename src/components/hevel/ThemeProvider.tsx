@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 export type ThemeScheme = "gruvbox-dark" | "gruvbox-light" | "nord" | "tokyo-night" | "solarized-dark" | "catppuccin";
 
 const SCHEME_META: Record<ThemeScheme, { label: string; colors: string[] }> = {
-  "gruvbox-dark":    { label: "gruvbox dark",    colors: ["#282828", "#3c3836", "#ebdbb2", "#d79921", "#98971a"] },
   "gruvbox-dark":    { label: "gruvbox dark",    colors: ["#282828", "#3c3836", "#ebdbb2", "#d79921", "#689d6a"] },
   "gruvbox-light":   { label: "gruvbox light",   colors: ["#fbf1c7", "#ebdbb2", "#3c3836", "#d79921", "#689d6a"] },
   "nord":            { label: "nord",             colors: ["#2e3440", "#4c566a", "#d8dee9", "#81a1c1", "#88c0d0"] },
