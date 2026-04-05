@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from "react";
-import { RECENT_APPS, ALL_APPS } from "./types";
+import { ALL_APPS } from "./types";
 
 interface Props {
   open: boolean;
@@ -13,8 +13,6 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
   const [activeLetter, setActiveLetter] = useState("");
   const [closing, setClosing] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
-
-  const pinnedApps = RECENT_APPS.slice(0, 4);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -86,13 +84,13 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
 
   return (
     <>
-      {/* Blur + dark scrim for readability */}
+      {/* Scrim */}
       <div
         className="absolute inset-0"
         style={{
           backdropFilter: "blur(32px)",
           WebkitBackdropFilter: "blur(32px)",
-          backgroundColor: "hsl(var(--background) / 0.75)",
+          backgroundColor: "hsl(var(--background) / 0.78)",
           zIndex: 44,
           opacity: isVisible ? 1 : 0,
           transition: "opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -100,7 +98,7 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
         onClick={dismiss}
       />
 
-      {/* Full-screen content */}
+      {/* Content */}
       <div
         className="absolute inset-0 z-50 flex flex-col"
         style={{
@@ -115,61 +113,30 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
           className="flex flex-col w-full h-full"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Top bar area */}
-          <div className="flex-shrink-0 pt-14 pb-4 px-8">
-            {/* Spotlight search bar */}
-            <div
-              className="rounded-xl px-4 py-3"
-              style={{
-                backgroundColor: "hsl(var(--foreground) / 0.08)",
-              }}
-            >
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); setActiveLetter(""); }}
-                placeholder="Search apps…"
-                autoFocus
-                className="w-full bg-transparent text-foreground font-serif text-base px-0 border-none outline-none placeholder:text-foreground/30"
-              />
-            </div>
+          {/* Search — just a ghost input, no container */}
+          <div className="flex-shrink-0 pt-16 pb-6 px-10">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); setActiveLetter(""); }}
+              placeholder="find"
+              autoFocus
+              className="w-full bg-transparent text-foreground/70 font-serif text-lg px-0 border-none outline-none placeholder:text-foreground/15 border-b border-foreground/[0.06] pb-2"
+              style={{ borderBottom: "1px solid hsl(var(--foreground) / 0.06)" }}
+            />
           </div>
 
-          {/* Pinned / recent row */}
-          <div className="flex-shrink-0 px-8 pb-3">
-            <div className="text-[10px] text-foreground/30 font-serif uppercase tracking-[0.15em] mb-2">
-              recent
-            </div>
-            <div className="flex flex-wrap gap-x-5 gap-y-1">
-              {pinnedApps.map((app) => (
-                <button
-                  key={app.name}
-                  onClick={() => { onOpenApp(app.name); dismiss(); }}
-                  className="text-[15px] text-foreground/80 font-serif py-1 hover:text-foreground transition-colors duration-150"
-                >
-                  {app.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Separator */}
-          <div className="px-8">
-            <div className="h-px bg-foreground/[0.08]" />
-          </div>
-
-          {/* App list + alphabet scrubber */}
+          {/* App list + scrubber */}
           <div className="flex flex-1 overflow-hidden min-h-0">
-            {/* List */}
-            <div ref={listRef} className="flex-1 overflow-y-auto px-8 pt-3 pb-10 hide-scrollbar">
+            <div ref={listRef} className="flex-1 overflow-y-auto px-10 pb-12 hide-scrollbar">
               {filtered.length === 0 && (
-                <div className="py-10 text-center">
-                  <span className="text-sm text-foreground/25 font-serif">no results</span>
+                <div className="py-12">
+                  <span className="text-sm text-foreground/15 font-serif">nothing</span>
                 </div>
               )}
               {grouped.map(([letter, apps]) => (
                 <div key={letter} data-letter={letter}>
-                  <div className="text-[11px] text-foreground/25 font-serif pt-5 pb-1.5 uppercase tracking-[0.2em]">
+                  <div className="text-[10px] text-foreground/15 font-serif pt-5 pb-1 uppercase tracking-[0.25em]">
                     {letter}
                   </div>
                   {apps.map((app) => {
@@ -179,10 +146,10 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
                         key={app}
                         onClick={() => { onOpenApp(app); dismiss(); setSearch(""); }}
                         onMouseEnter={() => setSelectedIdx(globalIdx)}
-                        className={`block w-full text-left font-serif py-2 transition-all duration-150 text-[17px] leading-snug ${
+                        className={`block w-full text-left font-serif py-2 transition-all duration-150 text-[17px] leading-relaxed ${
                           globalIdx === selectedIdx
                             ? "text-foreground"
-                            : "text-foreground/45"
+                            : "text-foreground/35"
                         }`}
                       >
                         {app}
@@ -193,9 +160,9 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
               ))}
             </div>
 
-            {/* Alphabet scrubber — properly sized, right-aligned */}
+            {/* Scrubber */}
             <div
-              className="flex flex-col items-center justify-center w-7 mr-2 flex-shrink-0 select-none"
+              className="flex flex-col items-center justify-center w-6 mr-2 flex-shrink-0 select-none"
               onPointerDown={(e) => { e.stopPropagation(); handleScrubber(e); }}
               onPointerMove={(e) => { if (e.buttons > 0) handleScrubber(e); }}
               style={{ touchAction: "none" }}
@@ -205,10 +172,10 @@ export const EdgePanel: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
                   key={l}
                   className={`font-serif cursor-pointer transition-all duration-100 block text-center w-full ${
                     l === activeLetter
-                      ? "text-[12px] leading-[16px] text-primary font-bold"
+                      ? "text-[11px] leading-[15px] text-primary"
                       : availableLetters.has(l)
-                      ? "text-[9px] leading-[14px] text-foreground/35"
-                      : "text-[9px] leading-[14px] text-foreground/10"
+                      ? "text-[8px] leading-[13px] text-foreground/25"
+                      : "text-[8px] leading-[13px] text-foreground/[0.07]"
                   }`}
                 >
                   {l}
