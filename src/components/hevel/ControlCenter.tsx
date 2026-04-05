@@ -489,23 +489,6 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
             </div>
           </div>
 
-          {/* Dormant prompt hint */}
-          <div
-            className="mt-5 flex items-center rounded-xl"
-            style={{
-              padding: "10px 14px",
-              border: "1.5px solid hsl(var(--primary) / 0.15)",
-              background: "hsl(var(--foreground) / 0.03)",
-            }}
-          >
-            <BlinkingCursor />
-            <span
-              className="text-muted-foreground"
-              style={{ fontSize: 13, letterSpacing: "0.01em" }}
-            >
-              ask anything…
-            </span>
-          </div>
         </div>
 
         {/* Drag hint */}
