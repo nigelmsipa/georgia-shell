@@ -51,7 +51,7 @@ export const Shell: React.FC = () => {
       </div>
 
       {/* Edge panel tab */}
-      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && (
+      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && (
         <button
           onClick={() => setEdgePanel(true)}
           className="absolute z-10 right-0 bg-card/80 rounded-l-sm px-1 py-6"
