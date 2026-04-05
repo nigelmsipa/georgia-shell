@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useTheme, ALL_SCHEMES } from "./ThemeProvider";
+import { useTheme, ALL_SCHEMES, type ThemeScheme } from "./ThemeProvider";
 
 interface Props {
   open: boolean;
@@ -85,23 +85,46 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           ))}
         </div>
 
-        {/* Theme picker */}
-        <div className="mt-5">
-          <span className="text-xs text-muted-foreground font-serif block mb-2">theme</span>
-          <div className="grid grid-cols-2 gap-2">
-            {ALL_SCHEMES.map(([id, label]) => (
-              <button
-                key={id}
-                onClick={() => setScheme(id)}
-                className={`py-2.5 px-3 rounded-sm text-left font-serif text-sm transition-colors duration-200 ${
-                  scheme === id
-                    ? "bg-accent text-accent-foreground"
-                    : "bg-secondary/60 text-muted-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+        {/* Theme — horizontal scroll with color previews */}
+        <div className="mt-6">
+          <span className="text-xs text-muted-foreground font-serif block mb-3">ambience</span>
+          <div
+            className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6"
+            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+          >
+            {ALL_SCHEMES.map(([id, meta]) => {
+              const active = scheme === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setScheme(id)}
+                  className={`flex-shrink-0 rounded-sm transition-all duration-250 ${
+                    active ? "ring-1 ring-foreground/30" : ""
+                  }`}
+                  style={{ scrollSnapAlign: "start", width: 100 }}
+                >
+                  {/* Color swatch strip */}
+                  <div className="flex h-14 rounded-t-sm overflow-hidden">
+                    {meta.colors.map((c, i) => (
+                      <div
+                        key={i}
+                        className="flex-1"
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                  <div className={`px-2 py-2 rounded-b-sm text-left ${
+                    active ? "bg-card" : "bg-secondary/40"
+                  }`}>
+                    <span className={`text-[10px] font-serif block leading-tight ${
+                      active ? "text-foreground" : "text-muted-foreground"
+                    }`}>
+                      {meta.label}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -150,18 +173,6 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                 volume
               </span>
             </div>
-          </div>
-        </div>
-
-        {/* Now playing */}
-        <div className="mt-6 bg-card rounded-sm p-4">
-          <span className="text-xs text-muted-foreground font-serif">now playing</span>
-          <div className="mt-2 text-foreground font-serif text-base">Everything In Its Right Place</div>
-          <div className="text-muted-foreground font-serif text-sm">Radiohead</div>
-          <div className="flex gap-6 mt-3">
-            <button className="text-sm text-muted-foreground font-serif hover:text-foreground transition-colors">prev</button>
-            <button className="text-sm text-foreground font-serif hover:text-primary transition-colors">pause</button>
-            <button className="text-sm text-muted-foreground font-serif hover:text-foreground transition-colors">next</button>
           </div>
         </div>
       </div>
