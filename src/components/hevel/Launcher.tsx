@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import { ALL_APPS } from "./types";
 
 interface Props {
@@ -11,7 +11,9 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
   const [search, setSearch] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [activeLetter, setActiveLetter] = useState("");
+  const [closing, setClosing] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const pointerStartedInPanel = useRef(false);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -28,7 +30,6 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
     setActiveLetter(letter);
     const el = listRef.current?.querySelector(`[data-letter="${letter}"]`);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    // Also select first app of that letter
     const idx = filtered.findIndex((a) => a[0].toUpperCase() === letter);
     if (idx >= 0) setSelectedIdx(idx);
   };
@@ -41,6 +42,27 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
     scrollToLetter(letters[clamped]);
   };
 
+  const dismissGracefully = useCallback(() => {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      setSearch("");
+      setSelectedIdx(0);
+      setActiveLetter("");
+      onClose();
+    }, 200);
+  }, [closing, onClose]);
+
+  const handleScrimClick = () => {
+    // Prevent dismissal if pointer started inside the panel (accidental drag)
+    if (pointerStartedInPanel.current) {
+      pointerStartedInPanel.current = false;
+      return;
+    }
+    dismissGracefully();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -50,17 +72,12 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
       setSelectedIdx((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter" && filtered[selectedIdx]) {
       onOpenApp(filtered[selectedIdx]);
-      onClose();
-      setSearch("");
-      setSelectedIdx(0);
+      dismissGracefully();
     } else if (e.key === "Escape") {
-      onClose();
-      setSearch("");
-      setSelectedIdx(0);
+      dismissGracefully();
     }
   };
 
-  // Group filtered apps by letter for display
   const grouped = useMemo(() => {
     const g: Record<string, string[]> = {};
     filtered.forEach((a) => {
@@ -71,7 +88,7 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
     return Object.entries(g).sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
 
-  if (!open) return null;
+  if (!open && !closing) return null;
 
   return (
     <>
@@ -82,8 +99,10 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
           backgroundColor: "hsl(var(--background) / 0.55)",
           backdropFilter: "blur(16px)",
           zIndex: 29,
+          opacity: closing ? 0 : 1,
+          transition: "opacity 0.2s ease-out",
         }}
-        onClick={() => { onClose(); setSearch(""); setSelectedIdx(0); }}
+        onClick={handleScrimClick}
       />
 
       {/* Floating panel */}
@@ -98,20 +117,32 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
           backdropFilter: "blur(24px)",
           borderRadius: 12,
           boxShadow: "0 16px 48px hsl(var(--background) / 0.6), 0 0 0 1px hsl(var(--border) / 0.3)",
-          transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out",
+          opacity: closing ? 0 : 1,
+          transform: closing ? "scale(0.97) translateY(8px)" : "scale(1) translateY(0)",
+          transition: "opacity 0.2s ease-out, transform 0.2s ease-out",
         }}
+        onPointerDown={() => { pointerStartedInPanel.current = true; }}
+        onPointerUp={() => { setTimeout(() => { pointerStartedInPanel.current = false; }, 50); }}
         onKeyDown={handleKeyDown}
       >
-        {/* Search */}
+        {/* Search + close hint */}
         <div className="px-4 pt-4 pb-2">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); setActiveLetter(""); }}
-            placeholder="launch"
-            autoFocus
-            className="w-full bg-transparent text-foreground font-serif text-lg px-0 py-1 border-none outline-none placeholder:text-muted-foreground/40"
-          />
+          <div className="flex items-center justify-between">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); setActiveLetter(""); }}
+              placeholder="search anything"
+              autoFocus
+              className="flex-1 bg-transparent text-foreground font-serif text-lg px-0 py-1 border-none outline-none placeholder:text-muted-foreground/40"
+            />
+            <button
+              onClick={dismissGracefully}
+              className="text-[10px] text-muted-foreground/40 font-serif hover:text-muted-foreground transition-colors ml-2 flex-shrink-0"
+            >
+              esc
+            </button>
+          </div>
           <div className="h-px bg-border/50 mt-2" />
         </div>
 
@@ -134,7 +165,7 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
                   return (
                     <button
                       key={app}
-                      onClick={() => { onOpenApp(app); onClose(); setSearch(""); setSelectedIdx(0); }}
+                      onClick={() => { onOpenApp(app); dismissGracefully(); }}
                       onMouseEnter={() => setSelectedIdx(globalIdx)}
                       className={`block w-full text-left font-serif py-2 px-2 rounded-sm transition-colors duration-100 ${
                         globalIdx === selectedIdx
@@ -182,7 +213,7 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
               {filtered.length} app{filtered.length !== 1 ? "s" : ""}
             </span>
             <span className="text-[10px] text-muted-foreground/40 font-serif">
-              tap outside to close
+              power launcher
             </span>
           </div>
         </div>
