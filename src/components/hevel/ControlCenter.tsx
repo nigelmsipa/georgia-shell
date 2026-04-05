@@ -68,27 +68,10 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pb-8" onPointerDown={(e) => e.stopPropagation()}>
-        {/* Toggle grid */}
-        <div className="grid grid-cols-2 gap-2 mt-4">
-          {toggleItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => flip(item.id)}
-              className={`py-3 px-4 rounded-sm text-left font-serif text-sm transition-colors duration-200 ${
-                toggles[item.id]
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-secondary/60 text-muted-foreground"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Ambience — compact thumbnail ribbon, hidden scrollbar */}
-        <div className="mt-5">
+        {/* Ambience — at top, inline with content, hidden scrollbar */}
+        <div className="mt-4">
           <div
-            className="flex gap-2.5 overflow-x-auto -mx-6 px-6 pb-1 hide-scrollbar"
+            className="flex gap-2.5 overflow-x-auto pb-1 hide-scrollbar"
             style={{
               scrollSnapType: "x mandatory",
               WebkitOverflowScrolling: "touch",
@@ -103,20 +86,19 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                   key={id}
                   onClick={() => setScheme(id)}
                   className="flex-shrink-0 transition-all duration-200"
-                  style={{ scrollSnapAlign: "start", width: 56 }}
+                  style={{ scrollSnapAlign: "start", width: 52 }}
                 >
                   <div
-                    className={`w-14 h-14 rounded-sm overflow-hidden transition-all duration-200 ${
+                    className={`w-[52px] h-[52px] rounded-sm overflow-hidden transition-all duration-200 ${
                       active ? "ring-2 ring-foreground/40 scale-105" : "opacity-60"
                     }`}
                     style={{
                       background: `linear-gradient(135deg, ${meta.colors[0]} 0%, ${meta.colors[0]} 40%, ${meta.colors[3]} 60%, ${meta.colors[4]} 100%)`,
                     }}
                   >
-                    {/* Foreground text color preview dot */}
                     <div className="w-full h-full flex items-center justify-center">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: meta.colors[2], opacity: 0.9 }}
                       />
                     </div>
@@ -130,6 +112,23 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
               );
             })}
           </div>
+        </div>
+
+        {/* Toggle grid */}
+        <div className="grid grid-cols-2 gap-2 mt-5">
+          {toggleItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => flip(item.id)}
+              className={`py-3 px-4 rounded-sm text-left font-serif text-sm transition-colors duration-200 ${
+                toggles[item.id]
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-secondary/60 text-muted-foreground"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
 
         {/* Brightness */}
