@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useCallback } from "react";
-import { ALL_APPS, RECENT_APPS, COVER_APPS } from "./types";
+import { ALL_APPS, COVER_APPS } from "./types";
 
 interface Props {
   open: boolean;
@@ -7,87 +7,27 @@ interface Props {
   onOpenApp: (name: string) => void;
 }
 
-/* ── Weight by recency ─────────────────────────────────────────────────── */
+/* ── Alphabetical grouping ─────────────────────────────────────────────── */
 
-type Weight = 3 | 2 | 1 | 0;
-
-const getWeight = (app: string): Weight => {
-  const recent = RECENT_APPS.find((r) => r.name === app);
-  if (!recent) return 0;
-  if (recent.lastUsed <= 10) return 3;
-  if (recent.lastUsed <= 30) return 2;
-  if (recent.lastUsed <= 120) return 1;
-  return 0;
-};
-
-/* ── Prose builder (excludes favorites) ────────────────────────────────── */
-
-interface ProseFragment {
-  before: string;
-  app: string;
-  after: string;
-}
-
-function buildProse(apps: string[], favorites: string[]): ProseFragment[][] {
+function buildGrouped(apps: string[], favorites: string[]) {
   const remaining = apps.filter((a) => !favorites.includes(a));
-  const sorted = [...remaining].sort((a, b) => {
-    const wa = getWeight(a);
-    const wb = getWeight(b);
-    if (wb !== wa) return wb - wa;
-    return a.localeCompare(b);
+  const groups: Record<string, string[]> = {};
+  remaining.forEach((a) => {
+    const l = a[0].toUpperCase();
+    if (!groups[l]) groups[l] = [];
+    groups[l].push(a);
   });
-
-  const heavy = sorted.filter((a) => getWeight(a) >= 2);
-  const medium = sorted.filter((a) => getWeight(a) === 1);
-  const light = sorted.filter((a) => getWeight(a) === 0);
-
-  const paragraphs: ProseFragment[][] = [];
-
-  if (heavy.length > 0) {
-    const p: ProseFragment[] = [];
-    p.push({ before: "You were just in ", app: heavy[0], after: "" });
-    for (let i = 1; i < heavy.length; i++) {
-      const isLast = i === heavy.length - 1;
-      p.push({ before: isLast ? " and " : ", ", app: heavy[i], after: "" });
-    }
-    p[p.length - 1].after = ".";
-    paragraphs.push(p);
-  }
-
-  if (medium.length > 0) {
-    const p: ProseFragment[] = [];
-    p.push({ before: "Maybe pick up ", app: medium[0], after: "" });
-    for (let i = 1; i < medium.length; i++) {
-      const isLast = i === medium.length - 1;
-      p.push({ before: isLast ? " or " : ", ", app: medium[i], after: "" });
-    }
-    p[p.length - 1].after = "?";
-    paragraphs.push(p);
-  }
-
-  if (light.length > 0) {
-    const p: ProseFragment[] = [];
-    p.push({ before: "Also around: ", app: light[0], after: "" });
-    for (let i = 1; i < light.length; i++) {
-      const isLast = i === light.length - 1;
-      p.push({ before: isLast ? " and " : ", ", app: light[i], after: isLast ? "." : "" });
-    }
-    if (light.length === 1) p[0].after = ".";
-    paragraphs.push(p);
-  }
-
-  return paragraphs;
+  return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
 }
 
 /* ── App Token ─────────────────────────────────────────────────────────── */
 
 const AppToken: React.FC<{
   app: string;
-  weight: Weight;
   dimmed: boolean;
   highlighted: boolean;
   onOpen: () => void;
-}> = ({ app, weight, dimmed, highlighted, onOpen }) => {
+}> = ({ app, dimmed, highlighted, onOpen }) => {
   const [flash, setFlash] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -99,43 +39,32 @@ const AppToken: React.FC<{
     }, 180);
   };
 
-  const sizes: Record<Weight, number> = { 3: 19, 2: 17, 1: 16, 0: 15 };
-  const weights: Record<Weight, number> = { 3: 700, 2: 700, 1: 600, 0: 400 };
-
   return (
     <span
       data-app={app}
       onClick={handleClick}
       className="cursor-pointer font-serif italic select-none transition-all duration-200"
       style={{
-        fontSize: sizes[weight],
-        fontWeight: weights[weight],
+        fontSize: highlighted ? 17 : 15,
+        fontWeight: highlighted ? 700 : 400,
         color: highlighted
           ? "hsl(var(--primary))"
           : dimmed
             ? "hsl(var(--muted-foreground) / 0.15)"
-            : weight >= 2
-              ? "hsl(var(--primary))"
-              : weight === 1
-                ? "hsl(var(--primary) / 0.6)"
-                : "hsl(var(--muted-foreground) / 0.7)",
+            : "hsl(var(--muted-foreground) / 0.7)",
         background: flash
           ? "hsl(var(--primary) / 0.18)"
           : highlighted
-            ? "hsl(var(--primary) / 0.1)"
-            : weight >= 2 && !dimmed
-              ? "hsl(var(--primary) / 0.08)"
-              : "transparent",
+            ? "hsl(var(--primary) / 0.08)"
+            : "transparent",
         borderRadius: 4,
-        padding: weight >= 2 || highlighted ? "1px 5px" : "0 2px",
+        padding: highlighted ? "1px 5px" : "0 2px",
         textDecoration: "underline",
         textDecorationColor: dimmed
           ? "hsl(var(--muted-foreground) / 0.06)"
           : highlighted
-            ? "hsl(var(--primary) / 0.4)"
-            : weight >= 2
-              ? "hsl(var(--primary) / 0.35)"
-              : "hsl(var(--muted-foreground) / 0.2)",
+            ? "hsl(var(--primary) / 0.35)"
+            : "hsl(var(--muted-foreground) / 0.18)",
         textDecorationStyle: "dotted" as const,
         textUnderlineOffset: 3,
         opacity: dimmed ? 0.4 : 1,
@@ -148,11 +77,11 @@ const AppToken: React.FC<{
   );
 };
 
-/* ── Horizontal Scrubber ───────────────────────────────────────────────── */
+/* ── Vertical Scrubber ─────────────────────────────────────────────────── */
 
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-const LetterScrubber: React.FC<{
+const VerticalScrubber: React.FC<{
   activeLetter: string;
   availableLetters: Set<string>;
   onSelect: (letter: string) => void;
@@ -160,11 +89,11 @@ const LetterScrubber: React.FC<{
   const ref = useRef<HTMLDivElement>(null);
 
   const scrub = useCallback(
-    (clientX: number) => {
+    (clientY: number) => {
       if (!ref.current) return;
       const rect = ref.current.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const idx = Math.floor((x / rect.width) * 26);
+      const y = clientY - rect.top;
+      const idx = Math.floor((y / rect.height) * 26);
       const clamped = Math.max(0, Math.min(25, idx));
       onSelect(LETTERS[clamped]);
     },
@@ -174,32 +103,31 @@ const LetterScrubber: React.FC<{
   return (
     <div
       ref={ref}
-      className="flex items-center justify-between px-2 select-none"
+      className="flex flex-col items-center justify-between py-2 select-none"
       style={{ touchAction: "none" }}
       onPointerDown={(e) => {
         e.stopPropagation();
-        scrub(e.clientX);
+        scrub(e.clientY);
       }}
       onPointerMove={(e) => {
-        if (e.buttons > 0) scrub(e.clientX);
+        if (e.buttons > 0) scrub(e.clientY);
       }}
-      onPointerUp={() => {}}
     >
       {LETTERS.map((l) => (
         <span
           key={l}
-          className="font-serif cursor-pointer transition-all duration-100 text-center"
+          className="font-serif cursor-pointer transition-all duration-100"
           style={{
-            fontSize: l === activeLetter ? 13 : 10,
+            fontSize: l === activeLetter ? 11 : 8,
             fontWeight: l === activeLetter ? 700 : 400,
+            lineHeight: l === activeLetter ? "14px" : "12px",
             color:
               l === activeLetter
                 ? "hsl(var(--primary))"
                 : availableLetters.has(l)
                   ? "hsl(var(--foreground) / 0.25)"
                   : "hsl(var(--foreground) / 0.06)",
-            transform: l === activeLetter ? "scale(1.3)" : "scale(1)",
-            width: "3.85%",
+            transform: l === activeLetter ? "scale(1.4)" : "scale(1)",
           }}
         >
           {l}
@@ -215,7 +143,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
   const [closing, setClosing] = useState(false);
   const [activeLetter, setActiveLetter] = useState("");
   const [search, setSearch] = useState("");
-  const proseRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   const dismiss = useCallback(() => {
     if (closing) return;
@@ -228,7 +156,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
     }, 280);
   }, [closing, onClose]);
 
-  const paragraphs = useMemo(() => buildProse(ALL_APPS, COVER_APPS), []);
+  const grouped = useMemo(() => buildGrouped(ALL_APPS, COVER_APPS), []);
 
   const nonFavApps = useMemo(
     () => ALL_APPS.filter((a) => !COVER_APPS.includes(a)),
@@ -242,12 +170,8 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
 
   const isAppDimmed = useCallback(
     (app: string) => {
-      if (search) {
-        return !app.toLowerCase().includes(search.toLowerCase());
-      }
-      if (activeLetter) {
-        return app[0].toUpperCase() !== activeLetter;
-      }
+      if (search) return !app.toLowerCase().includes(search.toLowerCase());
+      if (activeLetter) return app[0].toUpperCase() !== activeLetter;
       return false;
     },
     [search, activeLetter]
@@ -262,18 +186,14 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
     [activeLetter, search]
   );
 
-  const handleLetterSelect = useCallback(
-    (letter: string) => {
-      setActiveLetter(letter);
-      setSearch("");
-      // Scroll to first matching app in prose
-      if (proseRef.current) {
-        const el = proseRef.current.querySelector(`[data-app^="${letter}"]`);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    },
-    []
-  );
+  const handleLetterSelect = useCallback((letter: string) => {
+    setActiveLetter(letter);
+    setSearch("");
+    if (bodyRef.current) {
+      const el = bodyRef.current.querySelector(`[data-letter="${letter}"]`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, []);
 
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
@@ -312,11 +232,11 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
         onClick={dismiss}
       >
         <div
-          className="flex flex-col h-full px-8 pt-14 pb-8"
+          className="flex flex-col h-full pt-14 pb-8 pl-8 pr-2"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Zone 1: Favorites */}
-          <div className="flex flex-wrap gap-x-5 gap-y-2 mb-4">
+          {/* Favorites */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mb-6 pr-6">
             {COVER_APPS.map((app) => (
               <span
                 key={app}
@@ -340,94 +260,77 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
             ))}
           </div>
 
-          {/* Separator */}
-          <div
-            className="mb-5"
-            style={{
-              height: 1,
-              background: "hsl(var(--primary) / 0.1)",
-            }}
-          />
-
-          {/* Zone 2: Prose body (scrollable) */}
-          <div
-            ref={proseRef}
-            className="flex-1 overflow-y-auto hide-scrollbar"
-            style={{ minHeight: 0 }}
-          >
+          {/* Body + Scrubber side by side */}
+          <div className="flex flex-1 min-h-0">
+            {/* Comma-separated alphabetical body */}
             <div
-              className="font-serif text-foreground"
-              style={{ lineHeight: 2, letterSpacing: "-0.01em" }}
+              ref={bodyRef}
+              className="flex-1 overflow-y-auto hide-scrollbar pr-3"
             >
-              {paragraphs.map((fragments, pi) => (
-                <p key={pi} className="mb-5">
-                  {fragments.map((f, fi) => {
-                    const dimmed = isAppDimmed(f.app);
-                    const highlighted = isAppHighlighted(f.app);
-                    return (
-                      <React.Fragment key={fi}>
-                        <span
-                          className="text-muted-foreground transition-opacity duration-200"
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 400,
-                            fontStyle: "normal",
-                            opacity: dimmed ? 0.15 : 1,
-                          }}
-                        >
-                          {f.before}
-                        </span>
-                        <AppToken
-                          app={f.app}
-                          weight={getWeight(f.app)}
-                          dimmed={dimmed}
-                          highlighted={highlighted}
-                          onOpen={() => {
-                            onOpenApp(f.app);
-                            dismiss();
-                          }}
-                        />
-                        {f.after && (
-                          <span
-                            className="text-muted-foreground transition-opacity duration-200"
-                            style={{
-                              fontSize: 15,
-                              fontWeight: 400,
-                              fontStyle: "normal",
-                              opacity: dimmed ? 0.15 : 1,
+              <div
+                className="font-serif text-foreground"
+                style={{ lineHeight: 2.1, letterSpacing: "-0.01em" }}
+              >
+                {grouped.map(([letter, apps]) => (
+                  <span key={letter} data-letter={letter}>
+                    {apps.map((app, i) => {
+                      const dimmed = isAppDimmed(app);
+                      const highlighted = isAppHighlighted(app);
+                      const isLast = i === apps.length - 1;
+                      return (
+                        <React.Fragment key={app}>
+                          <AppToken
+                            app={app}
+                            dimmed={dimmed}
+                            highlighted={highlighted}
+                            onOpen={() => {
+                              onOpenApp(app);
+                              dismiss();
                             }}
-                          >
-                            {f.after}
-                          </span>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </p>
-              ))}
+                          />
+                          {!isLast && (
+                            <span
+                              className="text-muted-foreground transition-opacity duration-200"
+                              style={{
+                                fontSize: 14,
+                                fontStyle: "normal",
+                                opacity: dimmed ? 0.15 : 0.35,
+                              }}
+                            >
+                              ,{" "}
+                            </span>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                    <span style={{ display: "inline", marginRight: 12 }} />
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Vertical scrubber on the right */}
+            <div className="w-5 flex-shrink-0 flex items-center">
+              <VerticalScrubber
+                activeLetter={activeLetter}
+                availableLetters={availableLetters}
+                onSelect={handleLetterSelect}
+              />
             </div>
           </div>
 
-          {/* Zone 3: Scrubber + Search */}
-          <div className="mt-auto pt-4">
-            <LetterScrubber
-              activeLetter={activeLetter}
-              availableLetters={availableLetters}
-              onSelect={handleLetterSelect}
+          {/* Search */}
+          <div className="mt-4 pr-6">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="search..."
+              className="w-full bg-transparent font-serif text-sm text-foreground/70 placeholder:text-foreground/15 border-none outline-none pb-1"
+              style={{
+                borderBottom: "1px solid hsl(var(--foreground) / 0.06)",
+              }}
             />
-
-            <div className="mt-4 px-1">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="search..."
-                className="w-full bg-transparent font-serif text-sm text-foreground/70 placeholder:text-foreground/15 border-none outline-none pb-1"
-                style={{
-                  borderBottom: "1px solid hsl(var(--foreground) / 0.06)",
-                }}
-              />
-            </div>
           </div>
         </div>
       </div>
