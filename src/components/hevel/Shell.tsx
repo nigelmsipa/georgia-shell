@@ -67,7 +67,7 @@ export const Shell: React.FC = () => {
       )}
 
       {/* Three launcher triggers — left edge, stacked vertically */}
-      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && (
+      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && (
         <div
           className="absolute z-10 left-0 flex flex-col gap-3"
           style={{ top: "42%", transform: "translateY(-50%)" }}
@@ -103,6 +103,17 @@ export const Shell: React.FC = () => {
               style={{ fontSize: 8, writingMode: "vertical-rl" }}
             >
               dots
+            </span>
+          </button>
+          <button
+            onClick={() => setProseLauncher(true)}
+            className="bg-card/80 rounded-r-sm px-1 py-3"
+          >
+            <span
+              className="text-muted-foreground font-serif"
+              style={{ fontSize: 8, writingMode: "vertical-rl" }}
+            >
+              prose
             </span>
           </button>
         </div>
@@ -153,6 +164,12 @@ export const Shell: React.FC = () => {
       <DotsLauncher
         open={dotsLauncher}
         onClose={() => setDotsLauncher(false)}
+        onOpenApp={openApp}
+      />
+
+      <ProseLauncher
+        open={proseLauncher}
+        onClose={() => setProseLauncher(false)}
         onOpenApp={openApp}
       />
 
