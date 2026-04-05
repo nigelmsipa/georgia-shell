@@ -33,7 +33,7 @@ export const HomeScreen: React.FC<Props> = ({
   onOpenSwitcher,
   onOpenControlCenter,
 }) => {
-  const { toggle, theme } = useTheme();
+  const { scheme } = useTheme();
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });
 
