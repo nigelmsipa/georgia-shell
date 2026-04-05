@@ -7,6 +7,7 @@ import { EdgePanel } from "./EdgePanel";
 import { AppOverlay } from "./AppOverlay";
 import { ControlCenter } from "./ControlCenter";
 import { TypographicLauncher } from "./TypographicLauncher";
+import { ProseLauncher } from "./ProseLauncher";
 import { MonogramLauncher } from "./MonogramLauncher";
 import { DotsLauncher } from "./DotsLauncher";
 
