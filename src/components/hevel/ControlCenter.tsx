@@ -49,19 +49,34 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
   if (!open) return null;
 
   return (
+    <>
+      {/* Dimmed scrim */}
+      <div
+        className="absolute inset-0 z-39"
+        style={{
+          backgroundColor: "hsl(var(--background) / 0.3)",
+          zIndex: 39,
+          transition: "opacity 0.3s ease-out",
+        }}
+        onClick={onClose}
+      />
     <div
-      className="absolute inset-0 z-40 flex flex-col"
+      className="absolute left-0 right-0 top-0 z-40 flex flex-col"
       style={{
-        backgroundColor: "hsl(var(--background) / 0.94)",
-        backdropFilter: "blur(16px)",
-        transition: "opacity 0.3s ease-out",
+        backgroundColor: "hsl(var(--background) / 0.96)",
+        backdropFilter: "blur(20px)",
+        borderBottomLeftRadius: 16,
+        borderBottomRightRadius: 16,
+        maxHeight: "75%",
+        transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out",
+        boxShadow: "0 8px 32px hsl(var(--background) / 0.4)",
       }}
       onPointerDown={handleDragStart}
       onPointerUp={handleDragEnd}
     >
       {/* Header */}
       <div className="px-6 pt-14 pb-2 flex justify-between items-center">
-        <span className="text-xl text-foreground font-serif">control center</span>
+        <span className="text-lg text-foreground font-serif">control center</span>
         <button onClick={onClose} className="text-sm text-muted-foreground font-serif">
           done
         </button>
@@ -181,9 +196,10 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
       </div>
 
       {/* Drag hint */}
-      <div className="flex justify-center pb-6">
-        <span className="text-xs text-muted-foreground/50 font-serif">swipe down to dismiss</span>
+      <div className="flex justify-center py-4">
+        <div className="w-10 h-1 rounded-full bg-muted-foreground opacity-25" />
       </div>
     </div>
+    </>
   );
 };
