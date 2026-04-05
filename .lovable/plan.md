@@ -1,73 +1,67 @@
 
 
-# Prose App Launcher — Reimagined
+# Prose Launcher — Overlay Style
 
-## The Vision
+## The Problem
+The current full-screen prose launcher takes over everything but feels sparse — lots of empty space with just a few comma-separated app names and a scrubber. It doesn't earn the real estate it claims.
 
-A launcher with three clear zones, all rendered in the project's serif-driven, text-first aesthetic. No icons. No grids. Just typography with purpose.
+## The Idea
+Make it an **overlay panel** instead of full-screen. A compact, floating card that sits over the home screen (similar to how the Control Center works as a prose overlay). The scrubber and app content live in a tighter, more intentional space where every element feels purposeful rather than lost.
 
 ```text
-┌─────────────────────────┐
-│                         │
-│  ★ Firefox  Terminal    │  ← Favorites (persistent top row)
-│    Signal   Notes       │
-│                         │
-│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│
-│                         │
-│  Also around:           │  ← Prose body (contextual text
-│  Calendar, Camera,      │     with launchable app tokens,
-│  Clock, Contacts,       │     weighted by recency)
-│  Files, Gallery...      │
-│                         │
-│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│
-│                         │
-│  A B C D E F G H I ... │  ← Horizontal letter scrubber
-│  ──────●────────────    │     (drag/tap to jump)
-│                         │
-│        search...        │  ← Ghost search input
-└─────────────────────────┘
+┌──────────────────────────────┐
+│  Home screen (blurred)       │
+│                              │
+│   ┌────────────────────┐     │
+│   │ Firefox  Signal    │     │  ← Favorites row
+│   │ Terminal Notes     │     │
+│   │                    │     │
+│   │       C            │  A  │  ← Big ghost letter + scrubber
+│   │  Calendar,         │  B  │
+│   │  Camera,           │  C● │
+│   │  Clock,            │  D  │
+│   │  Contacts          │  E  │
+│   │                    │  …  │
+│   │  search...         │     │
+│   └────────────────────┘     │
+│                              │
+└──────────────────────────────┘
 ```
 
-## Three Zones
+## What Changes
 
-### 1. Favorites Strip (top)
-- A small cluster of 3-4 pinned apps displayed as bold, slightly larger serif tokens — styled like the Control Center's `Token` component but as app names.
-- Uses `COVER_APPS` from types.ts as the favorites list.
-- Subtle separator (hairline, `primary / 0.1`) below.
+### Layout shift: full-screen → floating card
+- Replace `absolute inset-0` content with a centered/positioned card panel
+- Card gets `backdrop-filter: blur(20px)`, subtle border, rounded corners (20px)
+- Background scrim stays but content is contained in a ~85% height, ~88% width card
+- This makes the launcher feel like a tool you summon, not a mode you enter
 
-### 2. Prose App Body (middle, scrollable)
-- Reuse the existing `buildProse` logic that weaves remaining apps into natural sentences ("Also around: Calendar, Camera, Clock...").
-- Each app name is an interactive `AppToken` — tappable, with the flash effect, italic serif, dotted underline.
-- When the scrubber is active, the prose body scrolls/highlights to show apps starting with that letter. Apps matching the active letter get emphasized (full opacity), others dim.
-- When search is active, non-matching apps fade out in-place rather than disappearing — the prose structure stays intact but irrelevant tokens become ghostly.
+### Tighter composition inside the card
+- **Favorites**: Same bold serif tokens at top, but with less padding (px-6 instead of px-8)
+- **App area + scrubber**: Scrubber stays on the right edge of the card. App display area uses the remaining space. The large ghost letter sits behind the app names as a watermark
+- **Search**: Stays at the bottom of the card, same ghost input style
 
-### 3. Horizontal Letter Scrubber (bottom)
-- A single horizontal row of A-Z letters in small serif text.
-- Letters with available apps are brighter; unavailable letters are nearly invisible.
-- Tap a letter: scrolls the prose body and highlights matching apps.
-- Drag across: scrubs through letters continuously (using `onPointerMove` with `buttons > 0`, same pattern as the existing vertical scrubber in `Launcher.tsx`).
-- Active letter gets a subtle scale bump and primary color.
-- Below the scrubber, a minimal ghost search input (hairline underline, no border, serif placeholder "search...").
+### Keep everything else
+- Same VerticalScrubber with arc animation
+- Same single-letter-at-a-time display
+- Same dismiss/close behavior
+- Same app token styling
 
 ## Technical Plan
 
-### File: `src/components/hevel/ProseLauncher.tsx` (rewrite)
+### File: `src/components/hevel/ProseLauncher.tsx`
 
-1. **State**: Add `activeLetter`, `search`, `closing` state. Keep `buildProse` but modify it to exclude favorites from the prose paragraphs (they're shown separately at top).
+1. **Scrim**: Keep the blurred backdrop but reduce opacity slightly since the card itself has blur
+2. **Content wrapper**: Change from `absolute inset-0` full layout to a centered card:
+   - `mx-auto my-auto` or absolute positioning with insets
+   - Width: ~92% of container, max reasonable width
+   - Height: ~82% of container
+   - Background: `hsl(var(--card) / 0.7)` with `backdrop-filter: blur(20px)`
+   - Border: `1px solid hsl(var(--border) / 0.15)`
+   - Border-radius: 20px
+   - Subtle shadow for depth
+3. **Internal layout**: Same flex-col structure but everything is more compact within the card boundaries
+4. **Entry animation**: Card scales from 0.96 → 1 and fades in (instead of translateY)
 
-2. **Favorites section**: Render `COVER_APPS` as a horizontal wrap of bold `AppToken` components at the top of the panel, separated by thin hairline from the prose body.
-
-3. **Prose body**: Keep the existing fragment-based rendering. Add a `data-app` attribute to each `AppToken` wrapper so the scrubber can scroll to it. When `activeLetter` is set, tokens not starting with that letter get `opacity: 0.15`. When `search` is active, non-matching tokens get the same dim treatment.
-
-4. **Horizontal scrubber**: Render `A-Z` in a horizontal flex row with `touch-action: none`. Use `onPointerDown` and `onPointerMove` (same pattern as existing scrubbers) to calculate which letter is under the pointer based on x-position. Set `activeLetter` on scrub, and scroll the first matching `[data-app]` element into view.
-
-5. **Search input**: A ghost-style input below the scrubber — transparent background, serif font, hairline underline, placeholder "search...". Typing filters which tokens are highlighted in the prose (dimming non-matches rather than removing them).
-
-6. **Overlay styling**: Keep the existing blurred scrim (`blur(32px)`, `background / 0.82`) and the centered content layout. The content area gets `overflow-y: auto` on the prose section only, with favorites and scrubber fixed.
-
-### File: `src/components/hevel/types.ts`
-- No changes needed. `COVER_APPS` already serves as the favorites list; `ALL_APPS` and `RECENT_APPS` provide the data.
-
-### File: `src/components/hevel/Shell.tsx`
-- No structural changes — the `prose` trigger tab already exists and wires to `ProseLauncher`.
+No changes to Shell.tsx or types.ts.
 
