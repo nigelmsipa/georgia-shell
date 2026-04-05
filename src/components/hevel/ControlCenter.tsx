@@ -82,7 +82,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pb-8" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="overflow-y-auto px-6 pb-4" onPointerDown={(e) => e.stopPropagation()}>
         {/* Ambience — at top, inline with content, hidden scrollbar */}
         <div className="mt-4">
           <div
