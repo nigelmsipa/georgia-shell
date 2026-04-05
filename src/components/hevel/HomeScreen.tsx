@@ -1,6 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "./ThemeProvider";
-import { COVER_APPS, COVER_COLORS } from "./types";
+import { COVER_APPS } from "./types";
+import screenshotFirefox from "@/assets/screenshot-firefox.jpg";
+import screenshotTerminal from "@/assets/screenshot-terminal.jpg";
+import screenshotSignal from "@/assets/screenshot-signal.jpg";
+import screenshotNotes from "@/assets/screenshot-notes.jpg";
+
+const COVER_SCREENSHOTS = [screenshotFirefox, screenshotTerminal, screenshotSignal, screenshotNotes];
 
 interface Props {
   onOpenLauncher: () => void;
@@ -88,11 +94,13 @@ export const HomeScreen: React.FC<Props> = ({
             <button
               key={app}
               onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-              className={`${COVER_COLORS[i]} aspect-[4/3] rounded-sm flex items-end p-3 transition-transform duration-200 active:scale-95`}
+              className="relative aspect-[4/3] rounded-sm overflow-hidden transition-transform duration-200 active:scale-95"
             >
-              <span className="text-sm font-serif" style={{ color: "hsl(0 0% 16%)" }}>
-                {app}
-              </span>
+              <img
+                src={COVER_SCREENSHOTS[i]}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             </button>
           ))}
         </div>
