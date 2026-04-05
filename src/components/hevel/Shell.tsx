@@ -20,14 +20,23 @@ export const Shell: React.FC = () => {
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* Base layer: Home */}
-      <HomeScreen
-        onOpenLauncher={() => setLauncher(true)}
-        onOpenApp={openApp}
-        onSwipeToNotifications={() => setNotifications(true)}
-        onOpenSwitcher={() => setSwitcher(true)}
-        onOpenControlCenter={() => setControlCenter(true)}
-      />
+      {/* Base layer: Home — blurs when control center is open */}
+      <div
+        className="absolute inset-0 transition-all duration-350"
+        style={{
+          filter: controlCenter ? "blur(12px) brightness(0.7)" : "none",
+          transform: controlCenter ? "scale(1.02)" : "scale(1)",
+          transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
+        <HomeScreen
+          onOpenLauncher={() => setLauncher(true)}
+          onOpenApp={openApp}
+          onSwipeToNotifications={() => setNotifications(true)}
+          onOpenSwitcher={() => setSwitcher(true)}
+          onOpenControlCenter={() => setControlCenter(true)}
+        />
+      </div>
 
       {/* Edge panel tab */}
       {!edgePanel && !launcher && !switcher && !runningApp && (
