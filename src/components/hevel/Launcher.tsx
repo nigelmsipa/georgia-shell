@@ -142,10 +142,8 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
         </div>
       </div>
 
-      {/* Drag-down hint */}
-      <div className="flex justify-center pb-6">
-        <div className="w-10 h-1 rounded-full bg-muted-foreground opacity-40" />
-      </div>
     </div>
+    </>
+  );
   );
 };
