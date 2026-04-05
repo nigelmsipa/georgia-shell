@@ -10,12 +10,36 @@ interface Props {
 export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
   const [search, setSearch] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [activeLetter, setActiveLetter] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return ALL_APPS.filter((a) => a.toLowerCase().includes(q));
   }, [search]);
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const availableLetters = useMemo(
+    () => new Set(filtered.map((a) => a[0].toUpperCase())),
+    [filtered]
+  );
+
+  const scrollToLetter = (letter: string) => {
+    setActiveLetter(letter);
+    const el = listRef.current?.querySelector(`[data-letter="${letter}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Also select first app of that letter
+    const idx = filtered.findIndex((a) => a[0].toUpperCase() === letter);
+    if (idx >= 0) setSelectedIdx(idx);
+  };
+
+  const handleScrubber = (e: React.PointerEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const idx = Math.floor((y / rect.height) * 26);
+    const clamped = Math.max(0, Math.min(25, idx));
+    scrollToLetter(letters[clamped]);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
@@ -36,11 +60,22 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
     }
   };
 
+  // Group filtered apps by letter for display
+  const grouped = useMemo(() => {
+    const g: Record<string, string[]> = {};
+    filtered.forEach((a) => {
+      const l = a[0].toUpperCase();
+      if (!g[l]) g[l] = [];
+      g[l].push(a);
+    });
+    return Object.entries(g).sort(([a], [b]) => a.localeCompare(b));
+  }, [filtered]);
+
   if (!open) return null;
 
   return (
     <>
-      {/* Scrim — full blurred backdrop */}
+      {/* Scrim */}
       <div
         className="absolute inset-0"
         style={{
@@ -51,14 +86,14 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
         onClick={() => { onClose(); setSearch(""); setSelectedIdx(0); }}
       />
 
-      {/* Floating rofi-style panel */}
+      {/* Floating panel */}
       <div
         className="absolute z-30 flex flex-col"
         style={{
-          top: "12%",
-          left: 24,
-          right: 24,
-          maxHeight: "72%",
+          top: "10%",
+          left: 20,
+          right: 20,
+          maxHeight: "76%",
           backgroundColor: "hsl(var(--background) / 0.95)",
           backdropFilter: "blur(24px)",
           borderRadius: 12,
@@ -67,12 +102,12 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
         }}
         onKeyDown={handleKeyDown}
       >
-        {/* Search input */}
+        {/* Search */}
         <div className="px-4 pt-4 pb-2">
           <input
             type="text"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); }}
+            onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); setActiveLetter(""); }}
             placeholder="launch"
             autoFocus
             className="w-full bg-transparent text-foreground font-serif text-lg px-0 py-1 border-none outline-none placeholder:text-muted-foreground/40"
@@ -80,30 +115,66 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
           <div className="h-px bg-border/50 mt-2" />
         </div>
 
-        {/* Results list */}
-        <div ref={listRef} className="flex-1 overflow-y-auto px-2 pb-3 hide-scrollbar">
-          {filtered.length === 0 && (
-            <div className="px-2 py-6 text-center">
-              <span className="text-sm text-muted-foreground font-serif">no match</span>
-            </div>
-          )}
-          {filtered.map((app, i) => (
-            <button
-              key={app}
-              onClick={() => { onOpenApp(app); onClose(); setSearch(""); setSelectedIdx(0); }}
-              onMouseEnter={() => setSelectedIdx(i)}
-              className={`block w-full text-left font-serif py-2.5 px-3 rounded-sm transition-colors duration-100 ${
-                i === selectedIdx
-                  ? "bg-accent/20 text-foreground"
-                  : "text-foreground/70 hover:text-foreground"
-              }`}
-            >
-              <span className="text-base">{app}</span>
-            </button>
-          ))}
+        {/* App list + alphabet scrubber */}
+        <div className="flex flex-1 overflow-hidden min-h-0">
+          {/* List */}
+          <div ref={listRef} className="flex-1 overflow-y-auto pl-4 pr-1 pb-2 hide-scrollbar">
+            {filtered.length === 0 && (
+              <div className="px-2 py-6 text-center">
+                <span className="text-sm text-muted-foreground font-serif">no match</span>
+              </div>
+            )}
+            {grouped.map(([letter, apps]) => (
+              <div key={letter} data-letter={letter}>
+                <div className="text-[10px] text-muted-foreground/50 font-serif pt-3 pb-0.5 px-1">
+                  {letter}
+                </div>
+                {apps.map((app) => {
+                  const globalIdx = filtered.indexOf(app);
+                  return (
+                    <button
+                      key={app}
+                      onClick={() => { onOpenApp(app); onClose(); setSearch(""); setSelectedIdx(0); }}
+                      onMouseEnter={() => setSelectedIdx(globalIdx)}
+                      className={`block w-full text-left font-serif py-2 px-2 rounded-sm transition-colors duration-100 ${
+                        globalIdx === selectedIdx
+                          ? "bg-accent/20 text-foreground"
+                          : "text-foreground/70"
+                      }`}
+                    >
+                      <span className="text-base">{app}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Alphabet scrubber rail */}
+          <div
+            className="flex flex-col items-center justify-center w-5 mr-1 select-none flex-shrink-0"
+            onPointerDown={(e) => { e.stopPropagation(); handleScrubber(e); }}
+            onPointerMove={(e) => { if (e.buttons > 0) handleScrubber(e); }}
+            style={{ touchAction: "none" }}
+          >
+            {letters.map((l) => (
+              <span
+                key={l}
+                className={`text-[7px] leading-[11px] font-serif cursor-pointer transition-colors duration-100 ${
+                  l === activeLetter
+                    ? "text-accent font-bold scale-125"
+                    : availableLetters.has(l)
+                    ? "text-muted-foreground/60"
+                    : "text-muted-foreground/15"
+                }`}
+              >
+                {l}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Footer hint */}
+        {/* Footer */}
         <div className="px-4 pb-3 pt-1">
           <div className="h-px bg-border/50 mb-2" />
           <div className="flex justify-between">
