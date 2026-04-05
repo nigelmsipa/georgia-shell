@@ -63,7 +63,7 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
       {/* Scrim */}
       <div
         className="absolute inset-0"
-        style={{ backgroundColor: "hsl(var(--background) / 0.25)", zIndex: 29 }}
+        style={{ backgroundColor: "hsl(var(--background) / 0.6)", zIndex: 29, backdropFilter: "blur(8px)" }}
         onClick={() => { onClose(); setSearch(""); }}
       />
     <div
