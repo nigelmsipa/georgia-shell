@@ -85,11 +85,10 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           ))}
         </div>
 
-        {/* Theme — horizontal scroll with color previews */}
-        <div className="mt-6">
-          <span className="text-xs text-muted-foreground font-serif block mb-3">ambience</span>
+        {/* Ambience — compact thumbnail ribbon */}
+        <div className="mt-5">
           <div
-            className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6"
+            className="flex gap-2 overflow-x-auto -mx-6 px-6 pb-1"
             style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
           >
             {ALL_SCHEMES.map(([id, meta]) => {
@@ -98,30 +97,25 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                 <button
                   key={id}
                   onClick={() => setScheme(id)}
-                  className={`flex-shrink-0 rounded-sm transition-all duration-250 ${
-                    active ? "ring-1 ring-foreground/30" : ""
-                  }`}
-                  style={{ scrollSnapAlign: "start", width: 100 }}
+                  className="flex-shrink-0 relative transition-all duration-200"
+                  style={{ scrollSnapAlign: "start", width: 56 }}
                 >
-                  {/* Color swatch strip */}
-                  <div className="flex h-14 rounded-t-sm overflow-hidden">
-                    {meta.colors.map((c, i) => (
-                      <div
-                        key={i}
-                        className="flex-1"
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
+                  {/* Mosaic swatch — 2x2 + accent bar */}
+                  <div
+                    className={`w-14 h-14 rounded-sm overflow-hidden grid grid-cols-2 grid-rows-2 transition-all duration-200 ${
+                      active ? "ring-2 ring-foreground/40 scale-105" : "opacity-70"
+                    }`}
+                  >
+                    <div style={{ backgroundColor: meta.colors[0] }} />
+                    <div style={{ backgroundColor: meta.colors[1] }} />
+                    <div style={{ backgroundColor: meta.colors[3] }} />
+                    <div style={{ backgroundColor: meta.colors[4] }} />
                   </div>
-                  <div className={`px-2 py-2 rounded-b-sm text-left ${
-                    active ? "bg-card" : "bg-secondary/40"
+                  <span className={`text-[8px] font-serif block mt-1 text-center leading-tight truncate ${
+                    active ? "text-foreground" : "text-muted-foreground/60"
                   }`}>
-                    <span className={`text-[10px] font-serif block leading-tight ${
-                      active ? "text-foreground" : "text-muted-foreground"
-                    }`}>
-                      {meta.label}
-                    </span>
-                  </div>
+                    {meta.label.split(" ")[0]}
+                  </span>
                 </button>
               );
             })}
