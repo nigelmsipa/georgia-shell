@@ -6,6 +6,9 @@ import { NotificationsPane } from "./NotificationsPane";
 import { EdgePanel } from "./EdgePanel";
 import { AppOverlay } from "./AppOverlay";
 import { ControlCenter } from "./ControlCenter";
+import { TypographicLauncher } from "./TypographicLauncher";
+import { MonogramLauncher } from "./MonogramLauncher";
+import { DotsLauncher } from "./DotsLauncher";
 
 export const Shell: React.FC = () => {
   const [launcher, setLauncher] = useState(false);
@@ -15,17 +18,24 @@ export const Shell: React.FC = () => {
   const [controlCenter, setControlCenter] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
 
+  // New launchers
+  const [typoLauncher, setTypoLauncher] = useState(false);
+  const [monoLauncher, setMonoLauncher] = useState(false);
+  const [dotsLauncher, setDotsLauncher] = useState(false);
+
   const openApp = (name: string) => setRunningApp(name);
   const closeApp = () => setRunningApp(null);
 
+  const anyOverlay = controlCenter || launcher || typoLauncher || monoLauncher || dotsLauncher;
+
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* Base layer: Home — blurs when control center is open */}
+      {/* Base layer: Home */}
       <div
         className="absolute inset-0 transition-all duration-350"
         style={{
-          filter: (controlCenter || launcher) ? "blur(12px) brightness(0.7)" : "none",
-          transform: (controlCenter || launcher) ? "scale(1.02)" : "scale(1)",
+          filter: anyOverlay ? "blur(12px) brightness(0.7)" : "none",
+          transform: anyOverlay ? "scale(1.02)" : "scale(1)",
           transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
@@ -39,7 +49,7 @@ export const Shell: React.FC = () => {
       </div>
 
       {/* Edge panel tab */}
-      {!edgePanel && !launcher && !switcher && !runningApp && (
+      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && (
         <button
           onClick={() => setEdgePanel(true)}
           className="absolute z-10 right-0 bg-card/80 rounded-l-sm px-1 py-6"
@@ -52,6 +62,48 @@ export const Shell: React.FC = () => {
             apps
           </span>
         </button>
+      )}
+
+      {/* Three launcher triggers — left edge, stacked vertically */}
+      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && (
+        <div
+          className="absolute z-10 left-0 flex flex-col gap-3"
+          style={{ top: "42%", transform: "translateY(-50%)" }}
+        >
+          <button
+            onClick={() => setTypoLauncher(true)}
+            className="bg-card/80 rounded-r-sm px-1 py-3"
+          >
+            <span
+              className="text-muted-foreground font-serif"
+              style={{ fontSize: 8, writingMode: "vertical-rl" }}
+            >
+              typo
+            </span>
+          </button>
+          <button
+            onClick={() => setMonoLauncher(true)}
+            className="bg-card/80 rounded-r-sm px-1 py-3"
+          >
+            <span
+              className="text-muted-foreground font-serif"
+              style={{ fontSize: 8, writingMode: "vertical-rl" }}
+            >
+              mono
+            </span>
+          </button>
+          <button
+            onClick={() => setDotsLauncher(true)}
+            className="bg-card/80 rounded-r-sm px-1 py-3"
+          >
+            <span
+              className="text-muted-foreground font-serif"
+              style={{ fontSize: 8, writingMode: "vertical-rl" }}
+            >
+              dots
+            </span>
+          </button>
+        </div>
       )}
 
       {/* Layers */}
@@ -81,6 +133,25 @@ export const Shell: React.FC = () => {
       <ControlCenter
         open={controlCenter}
         onClose={() => setControlCenter(false)}
+      />
+
+      {/* New launchers */}
+      <TypographicLauncher
+        open={typoLauncher}
+        onClose={() => setTypoLauncher(false)}
+        onOpenApp={openApp}
+      />
+
+      <MonogramLauncher
+        open={monoLauncher}
+        onClose={() => setMonoLauncher(false)}
+        onOpenApp={openApp}
+      />
+
+      <DotsLauncher
+        open={dotsLauncher}
+        onClose={() => setDotsLauncher(false)}
+        onOpenApp={openApp}
       />
 
       {/* App running overlay */}
