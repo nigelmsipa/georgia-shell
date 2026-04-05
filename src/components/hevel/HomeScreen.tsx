@@ -33,7 +33,7 @@ export const HomeScreen: React.FC<Props> = ({
   onOpenSwitcher,
   onOpenControlCenter,
 }) => {
-  const { toggle, theme } = useTheme();
+  const { scheme } = useTheme();
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });
 
@@ -73,9 +73,9 @@ export const HomeScreen: React.FC<Props> = ({
         <button onClick={onOpenSwitcher} className="text-[10px] text-muted-foreground font-serif">
           recent
         </button>
-        <button onClick={toggle} className="text-[10px] text-muted-foreground font-serif">
-          {theme === "dark" ? "light" : "dark"}
-        </button>
+        <span className="text-[10px] text-muted-foreground font-serif">
+          {scheme.replace("-", " ")}
+        </span>
       </div>
 
       {/* Clock + date — generous breathing room */}

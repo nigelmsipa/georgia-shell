@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useTheme } from "./ThemeProvider";
+import { useTheme, ALL_SCHEMES } from "./ThemeProvider";
 
 interface Props {
   open: boolean;
@@ -16,7 +16,7 @@ const toggleItems = [
 ];
 
 export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
-  const { theme, toggle: toggleTheme } = useTheme();
+  const { scheme, setScheme } = useTheme();
   const [toggles, setToggles] = useState<Record<string, boolean>>(
     Object.fromEntries(toggleItems.map((t) => [t.id, t.defaultOn]))
   );
@@ -85,13 +85,25 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           ))}
         </div>
 
-        {/* Theme */}
-        <button
-          onClick={toggleTheme}
-          className="mt-4 w-full py-3 px-4 rounded-sm text-left font-serif text-sm bg-secondary/60 text-foreground transition-colors duration-200"
-        >
-          theme: {theme}
-        </button>
+        {/* Theme picker */}
+        <div className="mt-5">
+          <span className="text-xs text-muted-foreground font-serif block mb-2">theme</span>
+          <div className="grid grid-cols-2 gap-2">
+            {ALL_SCHEMES.map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setScheme(id)}
+                className={`py-2.5 px-3 rounded-sm text-left font-serif text-sm transition-colors duration-200 ${
+                  scheme === id
+                    ? "bg-accent text-accent-foreground"
+                    : "bg-secondary/60 text-muted-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Brightness */}
         <div className="mt-6">

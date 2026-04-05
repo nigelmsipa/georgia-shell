@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Gruvbox Light */
+  /* ===== GRUVBOX LIGHT ===== */
+  :root, .gruvbox-light {
     --background: 47 76% 88%;
     --foreground: 30 12% 23%;
     --card: 43 42% 81%;
@@ -25,8 +25,6 @@
     --input: 37 36% 73%;
     --ring: 42 75% 49%;
     --radius: 0.375rem;
-
-    /* Gruvbox accent colors */
     --gruvbox-yellow: 42 75% 49%;
     --gruvbox-orange: 22 87% 45%;
     --gruvbox-green: 64 72% 35%;
@@ -36,7 +34,6 @@
     --gruvbox-bg0: 47 76% 88%;
     --gruvbox-bg1: 43 42% 81%;
     --gruvbox-bg2: 37 36% 73%;
-
     --sidebar-background: 43 42% 81%;
     --sidebar-foreground: 30 12% 23%;
     --sidebar-primary: 42 75% 49%;
@@ -47,8 +44,8 @@
     --sidebar-ring: 42 75% 49%;
   }
 
-  .dark {
-    /* Gruvbox Dark */
+  /* ===== GRUVBOX DARK ===== */
+  .dark, .gruvbox-dark {
     --background: 0 0% 16%;
     --foreground: 43 42% 81%;
     --card: 30 5% 22%;
@@ -68,11 +65,9 @@
     --border: 30 7% 29%;
     --input: 30 7% 29%;
     --ring: 42 75% 49%;
-
     --gruvbox-bg0: 0 0% 16%;
     --gruvbox-bg1: 30 5% 22%;
     --gruvbox-bg2: 30 7% 29%;
-
     --sidebar-background: 30 5% 22%;
     --sidebar-foreground: 43 42% 81%;
     --sidebar-primary: 42 75% 49%;
@@ -81,6 +76,110 @@
     --sidebar-accent-foreground: 43 42% 81%;
     --sidebar-border: 30 7% 29%;
     --sidebar-ring: 42 75% 49%;
+  }
+
+  /* ===== NORD ===== */
+  .nord {
+    --background: 220 16% 22%;
+    --foreground: 219 28% 88%;
+    --card: 220 17% 27%;
+    --card-foreground: 219 28% 88%;
+    --popover: 220 17% 27%;
+    --popover-foreground: 219 28% 88%;
+    --primary: 210 34% 63%;
+    --primary-foreground: 220 16% 22%;
+    --secondary: 220 17% 32%;
+    --secondary-foreground: 219 28% 88%;
+    --muted: 220 17% 32%;
+    --muted-foreground: 219 14% 61%;
+    --accent: 179 25% 65%;
+    --accent-foreground: 220 16% 22%;
+    --destructive: 354 42% 56%;
+    --destructive-foreground: 219 28% 88%;
+    --border: 220 17% 32%;
+    --input: 220 17% 32%;
+    --ring: 210 34% 63%;
+    --gruvbox-bg0: 220 16% 22%;
+    --gruvbox-bg1: 220 17% 27%;
+    --gruvbox-bg2: 220 17% 32%;
+  }
+
+  /* ===== TOKYO NIGHT ===== */
+  .tokyo-night {
+    --background: 235 21% 15%;
+    --foreground: 231 27% 78%;
+    --card: 235 19% 19%;
+    --card-foreground: 231 27% 78%;
+    --popover: 235 19% 19%;
+    --popover-foreground: 231 27% 78%;
+    --primary: 220 91% 72%;
+    --primary-foreground: 235 21% 15%;
+    --secondary: 235 17% 24%;
+    --secondary-foreground: 231 27% 78%;
+    --muted: 235 17% 24%;
+    --muted-foreground: 233 14% 50%;
+    --accent: 269 70% 73%;
+    --accent-foreground: 235 21% 15%;
+    --destructive: 348 80% 62%;
+    --destructive-foreground: 231 27% 78%;
+    --border: 235 17% 24%;
+    --input: 235 17% 24%;
+    --ring: 220 91% 72%;
+    --gruvbox-bg0: 235 21% 15%;
+    --gruvbox-bg1: 235 19% 19%;
+    --gruvbox-bg2: 235 17% 24%;
+  }
+
+  /* ===== SOLARIZED DARK ===== */
+  .solarized-dark {
+    --background: 192 100% 11%;
+    --foreground: 44 87% 94%;
+    --card: 192 81% 14%;
+    --card-foreground: 44 87% 94%;
+    --popover: 192 81% 14%;
+    --popover-foreground: 44 87% 94%;
+    --primary: 45 100% 35%;
+    --primary-foreground: 192 100% 11%;
+    --secondary: 194 60% 18%;
+    --secondary-foreground: 44 87% 94%;
+    --muted: 194 60% 18%;
+    --muted-foreground: 186 8% 55%;
+    --accent: 175 59% 40%;
+    --accent-foreground: 192 100% 11%;
+    --destructive: 1 71% 52%;
+    --destructive-foreground: 44 87% 94%;
+    --border: 194 60% 18%;
+    --input: 194 60% 18%;
+    --ring: 45 100% 35%;
+    --gruvbox-bg0: 192 100% 11%;
+    --gruvbox-bg1: 192 81% 14%;
+    --gruvbox-bg2: 194 60% 18%;
+  }
+
+  /* ===== CATPPUCCIN (Mocha) ===== */
+  .catppuccin {
+    --background: 240 21% 15%;
+    --foreground: 226 64% 88%;
+    --card: 240 21% 19%;
+    --card-foreground: 226 64% 88%;
+    --popover: 240 21% 19%;
+    --popover-foreground: 226 64% 88%;
+    --primary: 267 84% 81%;
+    --primary-foreground: 240 21% 15%;
+    --secondary: 240 18% 24%;
+    --secondary-foreground: 226 64% 88%;
+    --muted: 240 18% 24%;
+    --muted-foreground: 228 24% 55%;
+    --accent: 170 57% 73%;
+    --accent-foreground: 240 21% 15%;
+    --destructive: 347 87% 68%;
+    --destructive-foreground: 226 64% 88%;
+    --border: 240 18% 24%;
+    --input: 240 18% 24%;
+    --ring: 267 84% 81%;
+    --gruvbox-bg0: 240 21% 15%;
+    --gruvbox-bg1: 240 21% 19%;
+    --gruvbox-bg2: 240 18% 24%;
   }
 }
 
