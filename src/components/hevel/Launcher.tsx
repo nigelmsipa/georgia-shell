@@ -145,5 +145,4 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
     </div>
     </>
   );
-  );
 };
