@@ -85,11 +85,16 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           ))}
         </div>
 
-        {/* Ambience — compact thumbnail ribbon */}
+        {/* Ambience — compact thumbnail ribbon, hidden scrollbar */}
         <div className="mt-5">
           <div
-            className="flex gap-2 overflow-x-auto -mx-6 px-6 pb-1"
-            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+            className="flex gap-2.5 overflow-x-auto -mx-6 px-6 pb-1"
+            style={{
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
           >
             {ALL_SCHEMES.map(([id, meta]) => {
               const active = scheme === id;
@@ -97,22 +102,27 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                 <button
                   key={id}
                   onClick={() => setScheme(id)}
-                  className="flex-shrink-0 relative transition-all duration-200"
+                  className="flex-shrink-0 transition-all duration-200"
                   style={{ scrollSnapAlign: "start", width: 56 }}
                 >
-                  {/* Mosaic swatch — 2x2 + accent bar */}
                   <div
-                    className={`w-14 h-14 rounded-sm overflow-hidden grid grid-cols-2 grid-rows-2 transition-all duration-200 ${
-                      active ? "ring-2 ring-foreground/40 scale-105" : "opacity-70"
+                    className={`w-14 h-14 rounded-sm overflow-hidden transition-all duration-200 ${
+                      active ? "ring-2 ring-foreground/40 scale-105" : "opacity-60"
                     }`}
+                    style={{
+                      background: `linear-gradient(135deg, ${meta.colors[0]} 0%, ${meta.colors[0]} 40%, ${meta.colors[3]} 60%, ${meta.colors[4]} 100%)`,
+                    }}
                   >
-                    <div style={{ backgroundColor: meta.colors[0] }} />
-                    <div style={{ backgroundColor: meta.colors[1] }} />
-                    <div style={{ backgroundColor: meta.colors[3] }} />
-                    <div style={{ backgroundColor: meta.colors[4] }} />
+                    {/* Foreground text color preview dot */}
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: meta.colors[2], opacity: 0.9 }}
+                      />
+                    </div>
                   </div>
                   <span className={`text-[8px] font-serif block mt-1 text-center leading-tight truncate ${
-                    active ? "text-foreground" : "text-muted-foreground/60"
+                    active ? "text-foreground" : "text-muted-foreground/50"
                   }`}>
                     {meta.label.split(" ")[0]}
                   </span>
