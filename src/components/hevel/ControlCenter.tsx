@@ -88,7 +88,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
         {/* Ambience — compact thumbnail ribbon, hidden scrollbar */}
         <div className="mt-5">
           <div
-            className="flex gap-2.5 overflow-x-auto -mx-6 px-6 pb-1"
+            className="flex gap-2.5 overflow-x-auto -mx-6 px-6 pb-1 hide-scrollbar"
             style={{
               scrollSnapType: "x mandatory",
               WebkitOverflowScrolling: "touch",
