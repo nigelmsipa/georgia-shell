@@ -23,11 +23,12 @@ export const Shell: React.FC = () => {
   const [typoLauncher, setTypoLauncher] = useState(false);
   const [monoLauncher, setMonoLauncher] = useState(false);
   const [dotsLauncher, setDotsLauncher] = useState(false);
+  const [proseLauncher, setProseLauncher] = useState(false);
 
   const openApp = (name: string) => setRunningApp(name);
   const closeApp = () => setRunningApp(null);
 
-  const anyOverlay = controlCenter || launcher || typoLauncher || monoLauncher || dotsLauncher;
+  const anyOverlay = controlCenter || launcher || typoLauncher || monoLauncher || dotsLauncher || proseLauncher;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
