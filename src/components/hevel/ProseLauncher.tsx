@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { ALL_APPS, RECENT_APPS } from "./types";
+import React, { useState, useRef, useMemo, useCallback } from "react";
+import { ALL_APPS, RECENT_APPS, COVER_APPS } from "./types";
 
 interface Props {
   open: boolean;
@@ -20,7 +20,7 @@ const getWeight = (app: string): Weight => {
   return 0;
 };
 
-/* ── Prose fragments that weave apps into sentences ────────────────────── */
+/* ── Prose builder (excludes favorites) ────────────────────────────────── */
 
 interface ProseFragment {
   before: string;
@@ -28,9 +28,9 @@ interface ProseFragment {
   after: string;
 }
 
-function buildProse(apps: string[]): ProseFragment[][] {
-  // Sort by weight descending, then alphabetical
-  const sorted = [...apps].sort((a, b) => {
+function buildProse(apps: string[], favorites: string[]): ProseFragment[][] {
+  const remaining = apps.filter((a) => !favorites.includes(a));
+  const sorted = [...remaining].sort((a, b) => {
     const wa = getWeight(a);
     const wb = getWeight(b);
     if (wb !== wa) return wb - wa;
@@ -43,95 +43,51 @@ function buildProse(apps: string[]): ProseFragment[][] {
 
   const paragraphs: ProseFragment[][] = [];
 
-  // ¶1 — recent / heavy apps as a conversational opener
   if (heavy.length > 0) {
     const p: ProseFragment[] = [];
     p.push({ before: "You were just in ", app: heavy[0], after: "" });
-    if (heavy.length > 1) {
-      for (let i = 1; i < heavy.length; i++) {
-        const isLast = i === heavy.length - 1;
-        p.push({
-          before: isLast ? " and " : ", ",
-          app: heavy[i],
-          after: "",
-        });
-      }
+    for (let i = 1; i < heavy.length; i++) {
+      const isLast = i === heavy.length - 1;
+      p.push({ before: isLast ? " and " : ", ", app: heavy[i], after: "" });
     }
-    // Append the period to the last fragment
     p[p.length - 1].after = ".";
     paragraphs.push(p);
   }
 
-  // ¶2 — medium recency as suggestions
   if (medium.length > 0) {
     const p: ProseFragment[] = [];
     p.push({ before: "Maybe pick up ", app: medium[0], after: "" });
     for (let i = 1; i < medium.length; i++) {
       const isLast = i === medium.length - 1;
-      p.push({
-        before: isLast ? " or " : ", ",
-        app: medium[i],
-        after: "",
-      });
+      p.push({ before: isLast ? " or " : ", ", app: medium[i], after: "" });
     }
     p[p.length - 1].after = "?";
     paragraphs.push(p);
   }
 
-  // ¶3 — light / unused as available
   if (light.length > 0) {
     const p: ProseFragment[] = [];
-    // Group them more casually
-    const first3 = light.slice(0, 3);
-    const rest = light.slice(3);
-
-    p.push({ before: "Also around: ", app: first3[0], after: "" });
-    for (let i = 1; i < first3.length; i++) {
-      p.push({ before: ", ", app: first3[i], after: "" });
+    p.push({ before: "Also around: ", app: light[0], after: "" });
+    for (let i = 1; i < light.length; i++) {
+      const isLast = i === light.length - 1;
+      p.push({ before: isLast ? " and " : ", ", app: light[i], after: isLast ? "." : "" });
     }
-
-    if (rest.length > 0) {
-      for (let i = 0; i < rest.length; i++) {
-        const isLast = i === rest.length - 1;
-        p.push({
-          before: ", ",
-          app: rest[i],
-          after: isLast ? "." : "",
-        });
-      }
-    } else {
-      p[p.length - 1].after = ".";
-    }
-
+    if (light.length === 1) p[0].after = ".";
     paragraphs.push(p);
   }
 
   return paragraphs;
 }
 
-/* ── Weight → style ────────────────────────────────────────────────────── */
-
-const WEIGHT_STYLES: Record<Weight, React.CSSProperties> = {
-  3: { fontWeight: 700, fontSize: 19 },
-  2: { fontWeight: 700, fontSize: 17 },
-  1: { fontWeight: 600, fontSize: 16 },
-  0: { fontWeight: 400, fontSize: 15 },
-};
-
-const WEIGHT_COLORS: Record<Weight, string> = {
-  3: "hsl(var(--primary))",
-  2: "hsl(var(--primary) / 0.85)",
-  1: "hsl(var(--primary) / 0.6)",
-  0: "hsl(var(--muted-foreground) / 0.7)",
-};
-
 /* ── App Token ─────────────────────────────────────────────────────────── */
 
 const AppToken: React.FC<{
   app: string;
   weight: Weight;
+  dimmed: boolean;
+  highlighted: boolean;
   onOpen: () => void;
-}> = ({ app, weight, onOpen }) => {
+}> = ({ app, weight, dimmed, highlighted, onOpen }) => {
   const [flash, setFlash] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -143,30 +99,47 @@ const AppToken: React.FC<{
     }, 180);
   };
 
-  const style = WEIGHT_STYLES[weight];
-  const color = WEIGHT_COLORS[weight];
+  const sizes: Record<Weight, number> = { 3: 19, 2: 17, 1: 16, 0: 15 };
+  const weights: Record<Weight, number> = { 3: 700, 2: 700, 1: 600, 0: 400 };
 
   return (
     <span
+      data-app={app}
       onClick={handleClick}
-      className="cursor-pointer font-serif italic select-none transition-all duration-200 hover:scale-[1.03]"
+      className="cursor-pointer font-serif italic select-none transition-all duration-200"
       style={{
-        ...style,
-        color,
+        fontSize: sizes[weight],
+        fontWeight: weights[weight],
+        color: highlighted
+          ? "hsl(var(--primary))"
+          : dimmed
+            ? "hsl(var(--muted-foreground) / 0.15)"
+            : weight >= 2
+              ? "hsl(var(--primary))"
+              : weight === 1
+                ? "hsl(var(--primary) / 0.6)"
+                : "hsl(var(--muted-foreground) / 0.7)",
         background: flash
           ? "hsl(var(--primary) / 0.18)"
-          : weight >= 2
-            ? "hsl(var(--primary) / 0.08)"
-            : "transparent",
+          : highlighted
+            ? "hsl(var(--primary) / 0.1)"
+            : weight >= 2 && !dimmed
+              ? "hsl(var(--primary) / 0.08)"
+              : "transparent",
         borderRadius: 4,
-        padding: weight >= 2 ? "1px 5px" : "0 2px",
+        padding: weight >= 2 || highlighted ? "1px 5px" : "0 2px",
         textDecoration: "underline",
-        textDecorationColor:
-          weight >= 2
-            ? "hsl(var(--primary) / 0.35)"
-            : "hsl(var(--muted-foreground) / 0.2)",
-        textDecorationStyle: "dotted",
+        textDecorationColor: dimmed
+          ? "hsl(var(--muted-foreground) / 0.06)"
+          : highlighted
+            ? "hsl(var(--primary) / 0.4)"
+            : weight >= 2
+              ? "hsl(var(--primary) / 0.35)"
+              : "hsl(var(--muted-foreground) / 0.2)",
+        textDecorationStyle: "dotted" as const,
         textUnderlineOffset: 3,
+        opacity: dimmed ? 0.4 : 1,
+        transition: "all 0.2s ease",
         WebkitTapHighlightColor: "transparent",
       }}
     >
@@ -175,21 +148,137 @@ const AppToken: React.FC<{
   );
 };
 
+/* ── Horizontal Scrubber ───────────────────────────────────────────────── */
+
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+const LetterScrubber: React.FC<{
+  activeLetter: string;
+  availableLetters: Set<string>;
+  onSelect: (letter: string) => void;
+}> = ({ activeLetter, availableLetters, onSelect }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const scrub = useCallback(
+    (clientX: number) => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const idx = Math.floor((x / rect.width) * 26);
+      const clamped = Math.max(0, Math.min(25, idx));
+      onSelect(LETTERS[clamped]);
+    },
+    [onSelect]
+  );
+
+  return (
+    <div
+      ref={ref}
+      className="flex items-center justify-between px-2 select-none"
+      style={{ touchAction: "none" }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        scrub(e.clientX);
+      }}
+      onPointerMove={(e) => {
+        if (e.buttons > 0) scrub(e.clientX);
+      }}
+      onPointerUp={() => {}}
+    >
+      {LETTERS.map((l) => (
+        <span
+          key={l}
+          className="font-serif cursor-pointer transition-all duration-100 text-center"
+          style={{
+            fontSize: l === activeLetter ? 13 : 10,
+            fontWeight: l === activeLetter ? 700 : 400,
+            color:
+              l === activeLetter
+                ? "hsl(var(--primary))"
+                : availableLetters.has(l)
+                  ? "hsl(var(--foreground) / 0.25)"
+                  : "hsl(var(--foreground) / 0.06)",
+            transform: l === activeLetter ? "scale(1.3)" : "scale(1)",
+            width: "3.85%",
+          }}
+        >
+          {l}
+        </span>
+      ))}
+    </div>
+  );
+};
+
 /* ── Component ─────────────────────────────────────────────────────────── */
 
 export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
   const [closing, setClosing] = useState(false);
+  const [activeLetter, setActiveLetter] = useState("");
+  const [search, setSearch] = useState("");
+  const proseRef = useRef<HTMLDivElement>(null);
 
   const dismiss = useCallback(() => {
     if (closing) return;
     setClosing(true);
     setTimeout(() => {
       setClosing(false);
+      setActiveLetter("");
+      setSearch("");
       onClose();
     }, 280);
   }, [closing, onClose]);
 
-  const paragraphs = useMemo(() => buildProse(ALL_APPS), []);
+  const paragraphs = useMemo(() => buildProse(ALL_APPS, COVER_APPS), []);
+
+  const nonFavApps = useMemo(
+    () => ALL_APPS.filter((a) => !COVER_APPS.includes(a)),
+    []
+  );
+
+  const availableLetters = useMemo(
+    () => new Set(nonFavApps.map((a) => a[0].toUpperCase())),
+    [nonFavApps]
+  );
+
+  const isAppDimmed = useCallback(
+    (app: string) => {
+      if (search) {
+        return !app.toLowerCase().includes(search.toLowerCase());
+      }
+      if (activeLetter) {
+        return app[0].toUpperCase() !== activeLetter;
+      }
+      return false;
+    },
+    [search, activeLetter]
+  );
+
+  const isAppHighlighted = useCallback(
+    (app: string) => {
+      if (activeLetter && app[0].toUpperCase() === activeLetter) return true;
+      if (search && app.toLowerCase().includes(search.toLowerCase())) return true;
+      return false;
+    },
+    [activeLetter, search]
+  );
+
+  const handleLetterSelect = useCallback(
+    (letter: string) => {
+      setActiveLetter(letter);
+      setSearch("");
+      // Scroll to first matching app in prose
+      if (proseRef.current) {
+        const el = proseRef.current.querySelector(`[data-app^="${letter}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    },
+    []
+  );
+
+  const handleSearch = useCallback((val: string) => {
+    setSearch(val);
+    setActiveLetter("");
+  }, []);
 
   if (!open && !closing) return null;
   const isVisible = open && !closing;
@@ -212,53 +301,133 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
 
       {/* Content */}
       <div
-        className="absolute inset-0 z-50 flex items-center justify-center"
+        className="absolute inset-0 z-50 flex flex-col"
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? "translateY(0)" : "translateY(12px)",
-          transition: "opacity 0.28s ease-out, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+          transition:
+            "opacity 0.28s ease-out, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
           pointerEvents: isVisible ? "auto" : "none",
         }}
         onClick={dismiss}
       >
         <div
-          className="px-8 py-10 max-w-full max-h-[75%] overflow-y-auto hide-scrollbar"
+          className="flex flex-col h-full px-8 pt-14 pb-8"
           onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="font-serif text-foreground"
-            style={{ lineHeight: 2, letterSpacing: "-0.01em" }}
-          >
-            {paragraphs.map((fragments, pi) => (
-              <p key={pi} className="mb-5">
-                {fragments.map((f, fi) => (
-                  <React.Fragment key={fi}>
-                    <span
-                      className="text-muted-foreground"
-                      style={{ fontSize: 15, fontWeight: 400, fontStyle: "normal" }}
-                    >
-                      {f.before}
-                    </span>
-                    <AppToken
-                      app={f.app}
-                      weight={getWeight(f.app)}
-                      onOpen={() => {
-                        onOpenApp(f.app);
-                        dismiss();
-                      }}
-                    />
-                    {f.after && (
-                      <span
-                        className="text-muted-foreground"
-                        style={{ fontSize: 15, fontWeight: 400, fontStyle: "normal" }}
-                      >
-                        {f.after}
-                      </span>
-                    )}
-                  </React.Fragment>
-                ))}
-              </p>
+          {/* Zone 1: Favorites */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mb-4">
+            {COVER_APPS.map((app) => (
+              <span
+                key={app}
+                onClick={() => {
+                  onOpenApp(app);
+                  dismiss();
+                }}
+                className="font-serif italic font-bold cursor-pointer select-none transition-all duration-200 hover:scale-[1.03]"
+                style={{
+                  fontSize: 20,
+                  color: "hsl(var(--primary))",
+                  textDecoration: "underline",
+                  textDecorationColor: "hsl(var(--primary) / 0.3)",
+                  textDecorationStyle: "dotted" as const,
+                  textUnderlineOffset: 4,
+                  WebkitTapHighlightColor: "transparent",
+                }}
+              >
+                {app}
+              </span>
             ))}
+          </div>
+
+          {/* Separator */}
+          <div
+            className="mb-5"
+            style={{
+              height: 1,
+              background: "hsl(var(--primary) / 0.1)",
+            }}
+          />
+
+          {/* Zone 2: Prose body (scrollable) */}
+          <div
+            ref={proseRef}
+            className="flex-1 overflow-y-auto hide-scrollbar"
+            style={{ minHeight: 0 }}
+          >
+            <div
+              className="font-serif text-foreground"
+              style={{ lineHeight: 2, letterSpacing: "-0.01em" }}
+            >
+              {paragraphs.map((fragments, pi) => (
+                <p key={pi} className="mb-5">
+                  {fragments.map((f, fi) => {
+                    const dimmed = isAppDimmed(f.app);
+                    const highlighted = isAppHighlighted(f.app);
+                    return (
+                      <React.Fragment key={fi}>
+                        <span
+                          className="text-muted-foreground transition-opacity duration-200"
+                          style={{
+                            fontSize: 15,
+                            fontWeight: 400,
+                            fontStyle: "normal",
+                            opacity: dimmed ? 0.15 : 1,
+                          }}
+                        >
+                          {f.before}
+                        </span>
+                        <AppToken
+                          app={f.app}
+                          weight={getWeight(f.app)}
+                          dimmed={dimmed}
+                          highlighted={highlighted}
+                          onOpen={() => {
+                            onOpenApp(f.app);
+                            dismiss();
+                          }}
+                        />
+                        {f.after && (
+                          <span
+                            className="text-muted-foreground transition-opacity duration-200"
+                            style={{
+                              fontSize: 15,
+                              fontWeight: 400,
+                              fontStyle: "normal",
+                              opacity: dimmed ? 0.15 : 1,
+                            }}
+                          >
+                            {f.after}
+                          </span>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          {/* Zone 3: Scrubber + Search */}
+          <div className="mt-auto pt-4">
+            <LetterScrubber
+              activeLetter={activeLetter}
+              availableLetters={availableLetters}
+              onSelect={handleLetterSelect}
+            />
+
+            <div className="mt-4 px-1">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="search..."
+                className="w-full bg-transparent font-serif text-sm text-foreground/70 placeholder:text-foreground/15 border-none outline-none pb-1"
+                style={{
+                  borderBottom: "1px solid hsl(var(--foreground) / 0.06)",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
