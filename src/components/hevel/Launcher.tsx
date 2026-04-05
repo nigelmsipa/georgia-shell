@@ -59,18 +59,33 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
   if (!open) return null;
 
   return (
+    <>
+      {/* Scrim */}
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: "hsl(var(--background) / 0.25)", zIndex: 29 }}
+        onClick={() => { onClose(); setSearch(""); }}
+      />
     <div
-      className="absolute inset-0 z-30 flex flex-col"
+      className="absolute left-0 right-0 bottom-0 z-30 flex flex-col"
       style={{
-        backgroundColor: "hsl(var(--background) / 0.92)",
-        backdropFilter: "blur(12px)",
-        transition: "opacity 0.35s ease-out",
+        backgroundColor: "hsl(var(--background) / 0.96)",
+        backdropFilter: "blur(20px)",
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        maxHeight: "82%",
+        transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+        boxShadow: "0 -8px 32px hsl(var(--background) / 0.4)",
       }}
       onPointerDown={handleDragDown}
       onPointerUp={handleDragEnd}
     >
+      {/* Drag handle */}
+      <div className="flex justify-center pt-3 pb-1">
+        <div className="w-10 h-1 rounded-full bg-muted-foreground opacity-30" />
+      </div>
       {/* Search */}
-      <div className="px-6 pt-14 pb-3">
+      <div className="px-6 pb-3 pt-2">
         <input
           type="text"
           value={search}
