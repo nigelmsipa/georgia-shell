@@ -9,50 +9,30 @@ interface Props {
 
 export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
   const [search, setSearch] = useState("");
-  const [activeLetterIdx, setActiveLetterIdx] = useState(-1);
+  const [selectedIdx, setSelectedIdx] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef({ startY: 0 });
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return ALL_APPS.filter((a) => a.toLowerCase().includes(q));
   }, [search]);
 
-  const grouped = useMemo(() => {
-    const g: Record<string, string[]> = {};
-    filtered.forEach((a) => {
-      const letter = a[0].toUpperCase();
-      if (!g[letter]) g[letter] = [];
-      g[letter].push(a);
-    });
-    return Object.entries(g).sort(([a], [b]) => a.localeCompare(b));
-  }, [filtered]);
-
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  const availableLetters = new Set(grouped.map(([l]) => l));
-
-  const scrollToLetter = (letter: string) => {
-    const el = listRef.current?.querySelector(`[data-letter="${letter}"]`);
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const handleScrubber = (e: React.PointerEvent) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const idx = Math.floor((y / rect.height) * 26);
-    const clamped = Math.max(0, Math.min(25, idx));
-    setActiveLetterIdx(clamped);
-    scrollToLetter(letters[clamped]);
-  };
-
-  const handleDragDown = (e: React.PointerEvent) => {
-    dragRef.current.startY = e.clientY;
-  };
-
-  const handleDragEnd = (e: React.PointerEvent) => {
-    if (e.clientY - dragRef.current.startY > 80) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIdx((i) => Math.min(i + 1, filtered.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIdx((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && filtered[selectedIdx]) {
+      onOpenApp(filtered[selectedIdx]);
       onClose();
       setSearch("");
+      setSelectedIdx(0);
+    } else if (e.key === "Escape") {
+      onClose();
+      setSearch("");
+      setSelectedIdx(0);
     }
   };
 
@@ -60,89 +40,82 @@ export const Launcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
 
   return (
     <>
-      {/* Scrim */}
+      {/* Scrim — full blurred backdrop */}
       <div
         className="absolute inset-0"
-        style={{ backgroundColor: "hsl(var(--background) / 0.6)", zIndex: 29, backdropFilter: "blur(8px)" }}
-        onClick={() => { onClose(); setSearch(""); }}
+        style={{
+          backgroundColor: "hsl(var(--background) / 0.55)",
+          backdropFilter: "blur(16px)",
+          zIndex: 29,
+        }}
+        onClick={() => { onClose(); setSearch(""); setSelectedIdx(0); }}
       />
-    <div
-      className="absolute left-0 right-0 bottom-0 z-30 flex flex-col"
-      style={{
-        backgroundColor: "hsl(var(--background) / 0.96)",
-        backdropFilter: "blur(20px)",
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-        maxHeight: "82%",
-        transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-        boxShadow: "0 -8px 32px hsl(var(--background) / 0.4)",
-      }}
-      onPointerDown={handleDragDown}
-      onPointerUp={handleDragEnd}
-    >
-      {/* Drag handle */}
-      <div className="flex justify-center pt-3 pb-1">
-        <div className="w-10 h-1 rounded-full bg-muted-foreground opacity-30" />
-      </div>
-      {/* Search */}
-      <div className="px-6 pb-3 pt-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="search"
-          className="w-full bg-secondary/60 text-foreground font-serif text-base px-4 py-3 rounded-sm border-none outline-none placeholder:text-muted-foreground"
-          onPointerDown={(e) => e.stopPropagation()}
-        />
-      </div>
 
-      {/* App list + scrubber */}
-      <div className="flex flex-1 overflow-hidden">
-        <div ref={listRef} className="flex-1 overflow-y-auto px-6 pb-20">
-          {grouped.map(([letter, apps]) => (
-            <div key={letter} data-letter={letter}>
-              <div className="text-xs text-muted-foreground font-serif pt-4 pb-1">
-                {letter}
-              </div>
-              {apps.map((app) => (
-                <button
-                  key={app}
-                  onClick={() => { onOpenApp(app); onClose(); setSearch(""); }}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  className="block w-full text-left text-lg text-foreground font-serif py-2 hover:text-primary transition-colors duration-150"
-                >
-                  {app}
-                </button>
-              ))}
-            </div>
-          ))}
+      {/* Floating rofi-style panel */}
+      <div
+        className="absolute z-30 flex flex-col"
+        style={{
+          top: "12%",
+          left: 24,
+          right: 24,
+          maxHeight: "72%",
+          backgroundColor: "hsl(var(--background) / 0.95)",
+          backdropFilter: "blur(24px)",
+          borderRadius: 12,
+          boxShadow: "0 16px 48px hsl(var(--background) / 0.6), 0 0 0 1px hsl(var(--border) / 0.3)",
+          transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out",
+        }}
+        onKeyDown={handleKeyDown}
+      >
+        {/* Search input */}
+        <div className="px-4 pt-4 pb-2">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setSelectedIdx(0); }}
+            placeholder="launch"
+            autoFocus
+            className="w-full bg-transparent text-foreground font-serif text-lg px-0 py-1 border-none outline-none placeholder:text-muted-foreground/40"
+          />
+          <div className="h-px bg-border/50 mt-2" />
         </div>
 
-        {/* Alphabet scrubber */}
-        <div
-          className="flex flex-col items-center justify-center w-6 mr-1 select-none"
-          onPointerDown={(e) => { e.stopPropagation(); handleScrubber(e); }}
-          onPointerMove={(e) => { if (e.buttons > 0) handleScrubber(e); }}
-          style={{ touchAction: "none" }}
-        >
-          {letters.map((l, i) => (
-            <span
-              key={l}
-              className={`text-[9px] leading-[14px] font-serif cursor-pointer transition-colors duration-100 ${
-                i === activeLetterIdx
-                  ? "text-accent font-bold"
-                  : availableLetters.has(l)
-                  ? "text-muted-foreground"
-                  : "text-muted-foreground/30"
+        {/* Results list */}
+        <div ref={listRef} className="flex-1 overflow-y-auto px-2 pb-3 hide-scrollbar">
+          {filtered.length === 0 && (
+            <div className="px-2 py-6 text-center">
+              <span className="text-sm text-muted-foreground font-serif">no match</span>
+            </div>
+          )}
+          {filtered.map((app, i) => (
+            <button
+              key={app}
+              onClick={() => { onOpenApp(app); onClose(); setSearch(""); setSelectedIdx(0); }}
+              onMouseEnter={() => setSelectedIdx(i)}
+              className={`block w-full text-left font-serif py-2.5 px-3 rounded-sm transition-colors duration-100 ${
+                i === selectedIdx
+                  ? "bg-accent/20 text-foreground"
+                  : "text-foreground/70 hover:text-foreground"
               }`}
             >
-              {l}
-            </span>
+              <span className="text-base">{app}</span>
+            </button>
           ))}
         </div>
-      </div>
 
-    </div>
+        {/* Footer hint */}
+        <div className="px-4 pb-3 pt-1">
+          <div className="h-px bg-border/50 mb-2" />
+          <div className="flex justify-between">
+            <span className="text-[10px] text-muted-foreground/40 font-serif">
+              {filtered.length} app{filtered.length !== 1 ? "s" : ""}
+            </span>
+            <span className="text-[10px] text-muted-foreground/40 font-serif">
+              tap outside to close
+            </span>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
