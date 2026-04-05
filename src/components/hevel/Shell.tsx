@@ -5,12 +5,14 @@ import { AppSwitcher } from "./AppSwitcher";
 import { NotificationsPane } from "./NotificationsPane";
 import { EdgePanel } from "./EdgePanel";
 import { AppOverlay } from "./AppOverlay";
+import { ControlCenter } from "./ControlCenter";
 
 export const Shell: React.FC = () => {
   const [launcher, setLauncher] = useState(false);
   const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [edgePanel, setEdgePanel] = useState(false);
+  const [controlCenter, setControlCenter] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
 
   const openApp = (name: string) => setRunningApp(name);
@@ -24,6 +26,7 @@ export const Shell: React.FC = () => {
         onOpenApp={openApp}
         onSwipeToNotifications={() => setNotifications(true)}
         onOpenSwitcher={() => setSwitcher(true)}
+        onOpenControlCenter={() => setControlCenter(true)}
       />
 
       {/* Edge panel tab */}
@@ -64,6 +67,11 @@ export const Shell: React.FC = () => {
         open={edgePanel}
         onClose={() => setEdgePanel(false)}
         onOpenApp={openApp}
+      />
+
+      <ControlCenter
+        open={controlCenter}
+        onClose={() => setControlCenter(false)}
       />
 
       {/* App running overlay */}

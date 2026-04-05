@@ -7,6 +7,7 @@ interface Props {
   onOpenApp: (name: string) => void;
   onSwipeToNotifications: () => void;
   onOpenSwitcher: () => void;
+  onOpenControlCenter: () => void;
 }
 
 export const HomeScreen: React.FC<Props> = ({
@@ -14,6 +15,7 @@ export const HomeScreen: React.FC<Props> = ({
   onOpenApp,
   onSwipeToNotifications,
   onOpenSwitcher,
+  onOpenControlCenter,
 }) => {
   const { toggle, theme } = useTheme();
   const [time, setTime] = useState(new Date());
@@ -39,6 +41,8 @@ export const HomeScreen: React.FC<Props> = ({
 
     if (dy > 80) {
       onOpenLauncher();
+    } else if (dy < -60) {
+      onOpenControlCenter();
     } else if (dx > 60) {
       onSwipeToNotifications();
     }
