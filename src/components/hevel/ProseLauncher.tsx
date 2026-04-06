@@ -35,13 +35,14 @@ const BlinkCursor: React.FC = () => {
     <span
       className="inline-block"
       style={{
-        width: 2,
-        height: 14,
+        width: 3,
+        height: 18,
         backgroundColor: "hsl(var(--primary))",
-        opacity: v ? 0.7 : 0,
+        opacity: v ? 0.9 : 0,
         transition: "opacity 0.08s",
         marginLeft: 2,
         verticalAlign: "middle",
+        borderRadius: 1,
       }}
     />
   );
@@ -251,6 +252,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
   }, []);
 
   const favApps = COVER_APPS;
+  const isScrubbing = !!letter;
   const showFavs = !letter && !search.trim();
   const showLetter = !!letter && !search.trim();
   const showSearch = !!search.trim();
@@ -290,38 +292,48 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
           className="flex flex-col h-full pt-10 pb-4"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* ── Favorites ── */}
-          <div className="px-6 mb-1">
-            <div
-              className="font-serif italic mb-3"
-              style={{
-                fontSize: 10,
-                letterSpacing: "0.08em",
-                color: "hsl(var(--muted-foreground) / 0.35)",
-                textTransform: "lowercase",
-              }}
-            >
-              favorites
-            </div>
-            <div className="flex flex-wrap gap-x-5 gap-y-1">
-              {favApps.map((app) => (
-                <span
-                  key={app}
-                  onClick={() => {
-                    onOpenApp(app);
-                    dismiss();
-                  }}
-                  className="font-serif italic font-bold cursor-pointer select-none"
-                  style={{
-                    fontSize: 21,
-                    color: "hsl(var(--primary))",
-                    lineHeight: 1.5,
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                >
-                  {app}
-                </span>
-              ))}
+          {/* ── Favorites (slides out when scrubbing) ── */}
+          <div
+            style={{
+              overflow: "hidden",
+              maxHeight: isScrubbing || showSearch ? 0 : 200,
+              opacity: isScrubbing || showSearch ? 0 : 1,
+              transform: isScrubbing || showSearch ? "translateY(-12px)" : "translateY(0)",
+              transition: "max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <div className="px-6 mb-1">
+              <div
+                className="font-serif italic mb-3"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.08em",
+                  color: "hsl(var(--muted-foreground) / 0.35)",
+                  textTransform: "lowercase",
+                }}
+              >
+                favorites
+              </div>
+              <div className="flex flex-wrap gap-x-5 gap-y-1">
+                {favApps.map((app) => (
+                  <span
+                    key={app}
+                    onClick={() => {
+                      onOpenApp(app);
+                      dismiss();
+                    }}
+                    className="font-serif italic font-bold cursor-pointer select-none"
+                    style={{
+                      fontSize: 21,
+                      color: "hsl(var(--primary))",
+                      lineHeight: 1.5,
+                      WebkitTapHighlightColor: "transparent",
+                    }}
+                  >
+                    {app}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -334,11 +346,11 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                 <div
                   className="font-serif italic"
                   style={{
-                    fontSize: 56,
+                    fontSize: 64,
                     fontWeight: 700,
-                    color: "hsl(var(--primary) / 0.1)",
+                    color: "hsl(var(--primary) / 0.12)",
                     lineHeight: 1,
-                    marginBottom: 8,
+                    marginBottom: 12,
                     transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                 >
@@ -374,7 +386,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                   />
                 ))}
 
-                {/* Empty states */}
+                {/* Resting hint */}
                 {showFavs && visibleApps.length === 0 && (
                   <div
                     className="font-serif italic mt-8"
