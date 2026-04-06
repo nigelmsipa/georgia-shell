@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useTheme } from "./ThemeProvider";
+import React, { useState, useEffect } from "react";
 
 interface Props {
   onUnlock: () => void;
@@ -8,12 +7,21 @@ interface Props {
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+const PIN = "1234";
+const PIN_LENGTH = 4;
+
+const KEYS = [
+  ["1", "2", "3"],
+  ["4", "5", "6"],
+  ["7", "8", "9"],
+  ["", "0", "delete"],
+];
+
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
-  const { scheme } = useTheme();
   const [time, setTime] = useState(new Date());
-  const [dragY, setDragY] = useState(0);
-  const [unlocking, setUnlocking] = useState(false);
-  const dragRef = useRef({ startY: 0, active: false });
+  const [entered, setEntered] = useState("");
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -23,61 +31,58 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const hours = time.getHours();
   const minutes = time.getMinutes().toString().padStart(2, "0");
   const dateStr = `${DAYS[time.getDay()]}, ${MONTHS[time.getMonth()]} ${time.getDate()}`;
-
-  // Use 12-hour with no leading zero
   const displayHour = hours % 12 || 12;
   const ampm = hours >= 12 ? "pm" : "am";
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    dragRef.current = { startY: e.clientY, active: true };
-  };
+  const handleKey = (key: string) => {
+    if (success) return;
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current.active) return;
-    const dy = dragRef.current.startY - e.clientY;
-    if (dy > 0) setDragY(Math.min(dy, 200));
-  };
+    if (key === "delete") {
+      setEntered((p) => p.slice(0, -1));
+      setError(false);
+      return;
+    }
 
-  const handlePointerUp = () => {
-    dragRef.current.active = false;
-    if (dragY > 100) {
-      setUnlocking(true);
-      setTimeout(onUnlock, 350);
-    } else {
-      setDragY(0);
+    if (entered.length >= PIN_LENGTH) return;
+
+    const next = entered + key;
+    setEntered(next);
+
+    if (next.length === PIN_LENGTH) {
+      if (next === PIN) {
+        setSuccess(true);
+        setTimeout(onUnlock, 400);
+      } else {
+        setError(true);
+        setTimeout(() => {
+          setEntered("");
+          setError(false);
+        }, 500);
+      }
     }
   };
-
-  const progress = Math.min(dragY / 140, 1);
 
   return (
     <div
       className="absolute inset-0 z-[60] flex flex-col bg-background select-none"
       style={{
-        touchAction: "none",
-        opacity: unlocking ? 0 : 1,
-        transform: unlocking ? "translateY(-100%)" : `translateY(${-dragY * 0.3}px)`,
-        transition: unlocking
+        opacity: success ? 0 : 1,
+        transform: success ? "translateY(-100%)" : "none",
+        transition: success
           ? "opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 0.9, 0.36, 1)"
-          : dragRef.current.active
-            ? "none"
-            : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          : "none",
       }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
     >
       {/* Top spacer */}
-      <div className="flex-1" />
+      <div className="flex-[0.6]" />
 
-      {/* Time — large, centered, breathing */}
+      {/* Time */}
       <div className="px-8 flex flex-col items-center">
         <div className="flex items-baseline gap-1">
           <span
             className="font-serif"
             style={{
-              fontSize: 96,
+              fontSize: 80,
               fontWeight: 300,
               lineHeight: 1,
               letterSpacing: "-0.04em",
@@ -89,10 +94,9 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           <span
             className="font-serif"
             style={{
-              fontSize: 96,
+              fontSize: 80,
               fontWeight: 300,
               lineHeight: 1,
-              letterSpacing: "-0.04em",
               color: "hsl(var(--foreground) / 0.3)",
             }}
           >
@@ -101,7 +105,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           <span
             className="font-serif"
             style={{
-              fontSize: 96,
+              fontSize: 80,
               fontWeight: 300,
               lineHeight: 1,
               letterSpacing: "-0.04em",
@@ -113,23 +117,22 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           <span
             className="font-serif italic"
             style={{
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: 400,
               color: "hsl(var(--muted-foreground) / 0.4)",
               marginLeft: 4,
               alignSelf: "flex-end",
-              marginBottom: 8,
+              marginBottom: 6,
             }}
           >
             {ampm}
           </span>
         </div>
 
-        {/* Date */}
         <span
-          className="font-serif italic mt-3"
+          className="font-serif italic mt-2"
           style={{
-            fontSize: 15,
+            fontSize: 14,
             color: "hsl(var(--muted-foreground) / 0.4)",
             letterSpacing: "0.02em",
           }}
@@ -138,50 +141,83 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         </span>
       </div>
 
-      {/* Bottom spacer + unlock hint */}
-      <div className="flex-1 flex flex-col items-center justify-end pb-10">
-        {/* Swipe indicator */}
-        <div
-          className="flex flex-col items-center gap-2"
-          style={{
-            opacity: 1 - progress * 2,
-            transform: `translateY(${-dragY * 0.2}px)`,
-            transition: dragRef.current.active ? "none" : "all 0.4s ease",
-          }}
-        >
-          {/* Animated chevrons */}
-          <div className="flex flex-col items-center" style={{ animation: "breathe 2.5s ease-in-out infinite" }}>
-            <span
-              className="font-serif"
-              style={{
-                fontSize: 18,
-                color: "hsl(var(--muted-foreground) / 0.15)",
-                lineHeight: 0.8,
-              }}
-            >
-              ›
-            </span>
-            <span
-              className="font-serif"
-              style={{
-                fontSize: 18,
-                color: "hsl(var(--muted-foreground) / 0.25)",
-                lineHeight: 0.8,
-                transform: "rotate(-90deg)",
-              }}
-            >
-              ›
-            </span>
-          </div>
-        </div>
+      {/* PIN dots */}
+      <div className="flex items-center justify-center gap-4 mt-10">
+        {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-200"
+            style={{
+              width: 10,
+              height: 10,
+              backgroundColor:
+                i < entered.length
+                  ? error
+                    ? "hsl(var(--destructive))"
+                    : "hsl(var(--foreground))"
+                  : "hsl(var(--muted-foreground) / 0.15)",
+              transform: error ? `translateX(${i % 2 === 0 ? -4 : 4}px)` : "none",
+              transition: error
+                ? "transform 0.08s ease"
+                : "all 0.2s ease",
+            }}
+          />
+        ))}
       </div>
 
-      <style>{`
-        @keyframes breathe {
-          0%, 100% { opacity: 0.4; transform: translateY(0); }
-          50% { opacity: 1; transform: translateY(-4px); }
-        }
-      `}</style>
+      {/* Spacer */}
+      <div className="flex-[0.3]" />
+
+      {/* Keypad */}
+      <div className="flex flex-col items-center gap-3 pb-8">
+        {KEYS.map((row, ri) => (
+          <div key={ri} className="flex items-center gap-5">
+            {row.map((key, ci) => {
+              if (key === "") {
+                return <div key={ci} style={{ width: 60, height: 60 }} />;
+              }
+
+              const isDelete = key === "delete";
+
+              return (
+                <button
+                  key={ci}
+                  onClick={() => handleKey(key)}
+                  className="flex items-center justify-center rounded-full transition-colors active:bg-muted"
+                  style={{
+                    width: 60,
+                    height: 60,
+                    backgroundColor: isDelete ? "transparent" : "hsl(var(--muted) / 0.5)",
+                  }}
+                >
+                  {isDelete ? (
+                    <span
+                      className="font-serif italic"
+                      style={{
+                        fontSize: 13,
+                        color: "hsl(var(--muted-foreground) / 0.5)",
+                      }}
+                    >
+                      ‹
+                    </span>
+                  ) : (
+                    <span
+                      className="font-serif"
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 300,
+                        color: "hsl(var(--foreground))",
+                      }}
+                    >
+                      {key}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
