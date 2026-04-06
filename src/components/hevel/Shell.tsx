@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { HomeScreen } from "./HomeScreen";
-import { Launcher } from "./Launcher";
 import { AppSwitcher } from "./AppSwitcher";
 import { NotificationsPane } from "./NotificationsPane";
 import { AppOverlay } from "./AppOverlay";
@@ -11,7 +10,6 @@ import { SettingsApp } from "./SettingsApp";
 
 export const Shell: React.FC = () => {
   const [locked, setLocked] = useState(true);
-  const [launcher, setLauncher] = useState(false);
   const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
@@ -23,7 +21,7 @@ export const Shell: React.FC = () => {
   };
   const closeApp = () => setRunningApp(null);
 
-  const anyOverlay = controlCenter || launcher || proseLauncher;
+  const anyOverlay = controlCenter || proseLauncher;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -37,7 +35,7 @@ export const Shell: React.FC = () => {
         }}
       >
         <HomeScreen
-          onOpenLauncher={() => setLauncher(true)}
+          onOpenLauncher={() => setProseLauncher(true)}
           onOpenApp={openApp}
           onSwipeToNotifications={() => setNotifications(true)}
           onOpenSwitcher={() => setSwitcher(true)}
@@ -45,32 +43,10 @@ export const Shell: React.FC = () => {
         />
       </div>
 
-      {/* Prose launcher trigger — left edge */}
-      {!launcher && !switcher && !runningApp && !proseLauncher && !locked && (
-        <button
-          onClick={() => setProseLauncher(true)}
-          className="absolute z-10 left-0 bg-card/80 rounded-r-sm px-1 py-6"
-          style={{ top: "50%", transform: "translateY(-50%)" }}
-        >
-          <span
-            className="text-muted-foreground font-serif"
-            style={{ fontSize: 9, writingMode: "vertical-rl" }}
-          >
-            apps
-          </span>
-        </button>
-      )}
-
       {/* Layers */}
       <NotificationsPane
         open={notifications}
         onClose={() => setNotifications(false)}
-      />
-
-      <Launcher
-        open={launcher}
-        onClose={() => setLauncher(false)}
-        onOpenApp={openApp}
       />
 
       <AppSwitcher
