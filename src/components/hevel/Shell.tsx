@@ -14,26 +14,16 @@ export const Shell: React.FC = () => {
   const [launcher, setLauncher] = useState(false);
   const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  const [edgePanel, setEdgePanel] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
+  const [proseLauncher, setProseLauncher] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
 
-  // New launchers
-  const [typoLauncher, setTypoLauncher] = useState(false);
-  const [monoLauncher, setMonoLauncher] = useState(false);
-  const [dotsLauncher, setDotsLauncher] = useState(false);
-  const [proseLauncher, setProseLauncher] = useState(false);
-
   const openApp = (name: string) => {
-    if (name === "Settings") {
-      setRunningApp("Settings");
-    } else {
-      setRunningApp(name);
-    }
+    setRunningApp(name);
   };
   const closeApp = () => setRunningApp(null);
 
-  const anyOverlay = controlCenter || launcher || typoLauncher || monoLauncher || dotsLauncher || proseLauncher;
+  const anyOverlay = controlCenter || launcher || proseLauncher;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -55,11 +45,11 @@ export const Shell: React.FC = () => {
         />
       </div>
 
-      {/* Edge panel tab */}
-      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && !locked && (
+      {/* Prose launcher trigger — left edge */}
+      {!launcher && !switcher && !runningApp && !proseLauncher && !locked && (
         <button
-          onClick={() => setEdgePanel(true)}
-          className="absolute z-10 right-0 bg-card/80 rounded-l-sm px-1 py-6"
+          onClick={() => setProseLauncher(true)}
+          className="absolute z-10 left-0 bg-card/80 rounded-r-sm px-1 py-6"
           style={{ top: "50%", transform: "translateY(-50%)" }}
         >
           <span
@@ -69,59 +59,6 @@ export const Shell: React.FC = () => {
             apps
           </span>
         </button>
-      )}
-
-      {/* Three launcher triggers — left edge, stacked vertically */}
-      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && !locked && (
-        <div
-          className="absolute z-10 left-0 flex flex-col gap-3"
-          style={{ top: "42%", transform: "translateY(-50%)" }}
-        >
-          <button
-            onClick={() => setTypoLauncher(true)}
-            className="bg-card/80 rounded-r-sm px-1 py-3"
-          >
-            <span
-              className="text-muted-foreground font-serif"
-              style={{ fontSize: 8, writingMode: "vertical-rl" }}
-            >
-              typo
-            </span>
-          </button>
-          <button
-            onClick={() => setMonoLauncher(true)}
-            className="bg-card/80 rounded-r-sm px-1 py-3"
-          >
-            <span
-              className="text-muted-foreground font-serif"
-              style={{ fontSize: 8, writingMode: "vertical-rl" }}
-            >
-              mono
-            </span>
-          </button>
-          <button
-            onClick={() => setDotsLauncher(true)}
-            className="bg-card/80 rounded-r-sm px-1 py-3"
-          >
-            <span
-              className="text-muted-foreground font-serif"
-              style={{ fontSize: 8, writingMode: "vertical-rl" }}
-            >
-              dots
-            </span>
-          </button>
-          <button
-            onClick={() => setProseLauncher(true)}
-            className="bg-card/80 rounded-r-sm px-1 py-3"
-          >
-            <span
-              className="text-muted-foreground font-serif"
-              style={{ fontSize: 8, writingMode: "vertical-rl" }}
-            >
-              prose
-            </span>
-          </button>
-        </div>
       )}
 
       {/* Layers */}
@@ -142,34 +79,9 @@ export const Shell: React.FC = () => {
         onOpenApp={openApp}
       />
 
-      <EdgePanel
-        open={edgePanel}
-        onClose={() => setEdgePanel(false)}
-        onOpenApp={openApp}
-      />
-
       <ControlCenter
         open={controlCenter}
         onClose={() => setControlCenter(false)}
-      />
-
-      {/* New launchers */}
-      <TypographicLauncher
-        open={typoLauncher}
-        onClose={() => setTypoLauncher(false)}
-        onOpenApp={openApp}
-      />
-
-      <MonogramLauncher
-        open={monoLauncher}
-        onClose={() => setMonoLauncher(false)}
-        onOpenApp={openApp}
-      />
-
-      <DotsLauncher
-        open={dotsLauncher}
-        onClose={() => setDotsLauncher(false)}
-        onOpenApp={openApp}
       />
 
       <ProseLauncher
