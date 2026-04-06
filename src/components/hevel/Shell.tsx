@@ -10,8 +10,11 @@ import { TypographicLauncher } from "./TypographicLauncher";
 import { ProseLauncher } from "./ProseLauncher";
 import { MonogramLauncher } from "./MonogramLauncher";
 import { DotsLauncher } from "./DotsLauncher";
+import { LockScreen } from "./LockScreen";
+import { SettingsApp } from "./SettingsApp";
 
 export const Shell: React.FC = () => {
+  const [locked, setLocked] = useState(true);
   const [launcher, setLauncher] = useState(false);
   const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
@@ -25,7 +28,13 @@ export const Shell: React.FC = () => {
   const [dotsLauncher, setDotsLauncher] = useState(false);
   const [proseLauncher, setProseLauncher] = useState(false);
 
-  const openApp = (name: string) => setRunningApp(name);
+  const openApp = (name: string) => {
+    if (name === "Settings") {
+      setRunningApp("Settings");
+    } else {
+      setRunningApp(name);
+    }
+  };
   const closeApp = () => setRunningApp(null);
 
   const anyOverlay = controlCenter || launcher || typoLauncher || monoLauncher || dotsLauncher || proseLauncher;
@@ -51,7 +60,7 @@ export const Shell: React.FC = () => {
       </div>
 
       {/* Edge panel tab */}
-      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && (
+      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && !locked && (
         <button
           onClick={() => setEdgePanel(true)}
           className="absolute z-10 right-0 bg-card/80 rounded-l-sm px-1 py-6"
@@ -67,7 +76,7 @@ export const Shell: React.FC = () => {
       )}
 
       {/* Three launcher triggers — left edge, stacked vertically */}
-      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && (
+      {!edgePanel && !launcher && !switcher && !runningApp && !typoLauncher && !monoLauncher && !dotsLauncher && !proseLauncher && !locked && (
         <div
           className="absolute z-10 left-0 flex flex-col gap-3"
           style={{ top: "42%", transform: "translateY(-50%)" }}
@@ -173,10 +182,16 @@ export const Shell: React.FC = () => {
         onOpenApp={openApp}
       />
 
-      {/* App running overlay */}
-      {runningApp && (
+      {/* App running overlay — Settings gets its own component */}
+      {runningApp && runningApp === "Settings" && (
+        <SettingsApp onClose={closeApp} />
+      )}
+      {runningApp && runningApp !== "Settings" && (
         <AppOverlay appName={runningApp} onClose={closeApp} />
       )}
+
+      {/* Lock screen — topmost layer */}
+      {locked && <LockScreen onUnlock={() => setLocked(false)} />}
     </div>
   );
 };
