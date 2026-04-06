@@ -110,3 +110,21 @@ export const SAMPLE_NOTIFICATIONS: ProseNotification[] = [
     timeAgo: "3h",
   },
 ];
+
+export const RECENT_APPS: AppEntry[] = [
+  { name: "Firefox", lastUsed: 2 },
+  { name: "Terminal", lastUsed: 8 },
+  { name: "Signal", lastUsed: 15 },
+  { name: "Notes", lastUsed: 34 },
+  { name: "Spotify", lastUsed: 60 },
+  { name: "Maps", lastUsed: 120 },
+];
+
+export const COVER_APPS = ["Firefox", "Terminal", "Signal", "Notes"];
+
+export const COVER_COLORS = [
+  "bg-gruvbox-orange",
+  "bg-gruvbox-green",
+  "bg-gruvbox-teal",
+  "bg-gruvbox-yellow",
+];
