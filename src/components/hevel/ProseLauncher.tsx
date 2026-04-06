@@ -252,6 +252,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
   }, []);
 
   const favApps = COVER_APPS;
+  const isScrubbing = !!letter;
   const showFavs = !letter && !search.trim();
   const showLetter = !!letter && !search.trim();
   const showSearch = !!search.trim();
