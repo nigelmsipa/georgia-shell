@@ -35,13 +35,14 @@ const BlinkCursor: React.FC = () => {
     <span
       className="inline-block"
       style={{
-        width: 2,
-        height: 14,
+        width: 3,
+        height: 18,
         backgroundColor: "hsl(var(--primary))",
-        opacity: v ? 0.7 : 0,
+        opacity: v ? 0.9 : 0,
         transition: "opacity 0.08s",
         marginLeft: 2,
         verticalAlign: "middle",
+        borderRadius: 1,
       }}
     />
   );
