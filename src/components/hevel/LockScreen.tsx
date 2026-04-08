@@ -124,12 +124,19 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
     }
   };
 
-  // The entire surface translates: at scrollY=0 we see the clock page,
-  // at scrollY=1 we see the PIN page. Each "page" is 100% of the viewport.
-  const translatePx = containerRef.current
-    ? -scrollY * containerRef.current.clientHeight
-    : -scrollY * 600;
+  const [containerH, setContainerH] = useState(600);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => setContainerH(el.clientHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const translatePx = -scrollY * containerH;
   const isAnimating = !dragRef.current.active;
 
   return (
@@ -161,7 +168,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         {/* ── Page 1: Clock ── */}
         <div
           className="flex flex-col items-center justify-center"
-          style={{ height: containerRef.current?.clientHeight || "100vh" }}
+          style={{ height: containerH, position: "relative" }}
         >
           <div className="flex flex-col items-center">
             {/* Time */}
@@ -221,7 +228,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         {/* ── Page 2: PIN ── */}
         <div
           className="flex flex-col items-center justify-center"
-          style={{ height: containerRef.current?.clientHeight || "100vh" }}
+          style={{ height: containerH }}
         >
           {/* Prose prompt */}
           <span
