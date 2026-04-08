@@ -203,25 +203,24 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             </span>
           </div>
 
-          {/* Swipe hint */}
+          {/* Swipe hint — prose, not icons */}
           <div
-            className="absolute bottom-12 flex flex-col items-center"
+            className="absolute bottom-12 animate-breathe"
             style={{
-              opacity: Math.max(0, 0.25 - scrollY * 2),
+              opacity: Math.max(0, 0.3 - scrollY * 2),
               transition: isAnimating ? "opacity 0.6s ease" : "none",
             }}
           >
-            <div className="animate-breathe">
-              <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
-                <path
-                  d="M2 8L10 2L18 8"
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
+            <span
+              className="font-serif italic"
+              style={{
+                fontSize: 12,
+                color: "hsl(var(--muted-foreground) / 0.5)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              swipe up
+            </span>
           </div>
         </div>
 
