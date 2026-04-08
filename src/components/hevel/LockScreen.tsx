@@ -19,14 +19,21 @@ const KEYS = [
 
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const [time, setTime] = useState(new Date());
-  const [phase, setPhase] = useState<"clock" | "pin">("clock");
   const [entered, setEntered] = useState("");
   const [error, setError] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
 
-  // Swipe state with velocity
-  const [dragY, setDragY] = useState(0);
-  const dragRef = useRef({ startY: 0, lastY: 0, lastTime: 0, velocity: 0, active: false });
+  // Continuous vertical scroll position (0 = clock visible, 1 = PIN visible)
+  const [scrollY, setScrollY] = useState(0);
+  const dragRef = useRef({
+    startY: 0,
+    startScrollY: 0,
+    lastY: 0,
+    lastTime: 0,
+    velocity: 0,
+    active: false,
+  });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -35,59 +42,69 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
   const hours = time.getHours();
   const minutes = time.getMinutes().toString().padStart(2, "0");
-  const dateStr = `${DAYS[time.getDay()]}, ${MONTHS[time.getMonth()]} ${time.getDate()}`;
   const displayHour = hours % 12 || 12;
-  const ampm = hours >= 12 ? "PM" : "AM";
+  const ampm = hours >= 12 ? "pm" : "am";
+  const dateStr = `${DAYS[time.getDay()]}, ${MONTHS[time.getMonth()]} ${time.getDate()}`;
 
-  // --- Swipe handlers with velocity tracking ---
+  // --- Continuous drag handlers ---
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (phase !== "clock") return;
-    dragRef.current = { startY: e.clientY, lastY: e.clientY, lastTime: Date.now(), velocity: 0, active: true };
+    if (unlocking) return;
+    dragRef.current = {
+      startY: e.clientY,
+      startScrollY: scrollY,
+      lastY: e.clientY,
+      lastTime: Date.now(),
+      velocity: 0,
+      active: true,
+    };
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current.active || phase !== "clock") return;
+    if (!dragRef.current.active || unlocking) return;
+    const containerHeight = containerRef.current?.clientHeight || 600;
     const now = Date.now();
     const dt = now - dragRef.current.lastTime;
-    const dy = dragRef.current.startY - e.clientY;
+    const rawDy = dragRef.current.startY - e.clientY;
 
     if (dt > 0) {
-      const instantVelocity = (dragRef.current.lastY - e.clientY) / dt;
-      dragRef.current.velocity = instantVelocity * 0.7 + dragRef.current.velocity * 0.3;
+      const instantV = (dragRef.current.lastY - e.clientY) / dt;
+      dragRef.current.velocity = instantV * 0.7 + dragRef.current.velocity * 0.3;
     }
     dragRef.current.lastY = e.clientY;
     dragRef.current.lastTime = now;
 
-    if (dy > 0) {
-      // Rubber-band feel
-      setDragY(Math.pow(dy, 0.85));
-    }
+    // Map drag distance to 0..1 with rubber-banding at edges
+    let next = dragRef.current.startScrollY + rawDy / containerHeight;
+    if (next < 0) next = next * 0.3; // rubber band top
+    if (next > 1) next = 1 + (next - 1) * 0.3; // rubber band bottom
+    setScrollY(next);
   };
 
   const handlePointerUp = () => {
-    if (phase !== "clock") return;
-    const { velocity } = dragRef.current;
+    if (!dragRef.current.active || unlocking) return;
     dragRef.current.active = false;
 
-    // Transition if dragged far enough OR flicked fast
-    if (dragY > 60 || velocity > 0.5) {
-      setPhase("pin");
-      setDragY(0);
+    const { velocity } = dragRef.current;
+    // Snap to nearest phase, biased by velocity
+    let target: number;
+    if (velocity > 0.4) {
+      target = 1; // flicked up → PIN
+    } else if (velocity < -0.4) {
+      target = 0; // flicked down → clock
     } else {
-      setDragY(0);
+      target = scrollY > 0.4 ? 1 : 0;
     }
+    setScrollY(target);
   };
 
   // --- PIN handlers ---
   const handleKey = (key: string) => {
     if (unlocking) return;
-
     if (key === "delete") {
       setEntered((p) => p.slice(0, -1));
       setError(false);
       return;
     }
-
     if (entered.length >= PIN_LENGTH) return;
 
     const next = entered + key;
@@ -96,7 +113,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
     if (next.length === PIN_LENGTH) {
       if (next === PIN) {
         setUnlocking(true);
-        // Brief success state before sliding away
         setTimeout(onUnlock, 600);
       } else {
         setError(true);
@@ -108,11 +124,18 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
     }
   };
 
-  const progress = Math.min(dragY / 100, 1);
+  // The entire surface translates: at scrollY=0 we see the clock page,
+  // at scrollY=1 we see the PIN page. Each "page" is 100% of the viewport.
+  const translatePx = containerRef.current
+    ? -scrollY * containerRef.current.clientHeight
+    : -scrollY * 600;
+
+  const isAnimating = !dragRef.current.active;
 
   return (
     <div
-      className="absolute inset-0 z-[60] flex flex-col bg-background select-none overflow-hidden"
+      ref={containerRef}
+      className="absolute inset-0 z-[60] overflow-hidden select-none bg-background"
       style={{
         touchAction: "none",
         opacity: unlocking ? 0 : 1,
@@ -126,196 +149,172 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
-      {/* ── Clock face ── */}
+      {/* Continuous vertical surface: two viewport-height sections stacked */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center"
         style={{
-          opacity: phase === "pin" ? 0 : 1,
-          transform:
-            phase === "pin"
-              ? "translateY(-80px) scale(0.9)"
-              : `translateY(${-dragY * 0.3}px) scale(${1 - progress * 0.03})`,
-          transition:
-            phase === "pin"
-              ? "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
-              : dragRef.current.active
-                ? "none"
-                : "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-          pointerEvents: phase === "pin" ? "none" : "auto",
+          transform: `translateY(${translatePx}px)`,
+          transition: isAnimating
+            ? "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)"
+            : "none",
         }}
       >
-        <div className="flex flex-col items-center">
-          <span
-            className="font-serif"
-            style={{
-              fontSize: 88,
-              fontWeight: 300,
-              lineHeight: 1,
-              letterSpacing: "-0.04em",
-              color: "hsl(var(--foreground))",
-            }}
-          >
-            {displayHour}:{minutes}
-          </span>
-
-          <span
-            className="font-serif italic mt-2"
-            style={{
-              fontSize: 13,
-              fontWeight: 400,
-              letterSpacing: "0.08em",
-              color: "hsl(var(--muted-foreground) / 0.35)",
-            }}
-          >
-            {ampm}
-          </span>
-
-          <span
-            className="font-serif italic mt-4"
-            style={{
-              fontSize: 14,
-              color: "hsl(var(--muted-foreground) / 0.3)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            {dateStr}
-          </span>
-        </div>
-
-        {/* Swipe hint — subtle chevron */}
+        {/* ── Page 1: Clock ── */}
         <div
-          className="absolute bottom-10 flex flex-col items-center"
-          style={{
-            opacity: 1 - progress * 3,
-            transform: `translateY(${-dragY * 0.15}px)`,
-            transition: dragRef.current.active ? "none" : "all 0.5s ease",
-          }}
+          className="flex flex-col items-center justify-center"
+          style={{ height: containerRef.current?.clientHeight || "100vh" }}
         >
-          <div className="animate-breathe">
-            <svg
-              width="20"
-              height="10"
-              viewBox="0 0 20 10"
-              fill="none"
-              style={{ opacity: 0.2 }}
+          <div className="flex flex-col items-center">
+            {/* Time */}
+            <span
+              className="font-serif"
+              style={{
+                fontSize: 84,
+                fontWeight: 300,
+                lineHeight: 1,
+                letterSpacing: "-0.04em",
+                color: "hsl(var(--foreground))",
+                opacity: 1 - scrollY * 0.6,
+                transform: `scale(${1 - scrollY * 0.08})`,
+                transition: isAnimating ? "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)" : "none",
+              }}
             >
-              <path
-                d="M2 8L10 2L18 8"
-                stroke="hsl(var(--muted-foreground))"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+              {displayHour}:{minutes}
+            </span>
+
+            {/* Date & AM/PM as a prose line */}
+            <span
+              className="font-serif italic mt-4"
+              style={{
+                fontSize: 14,
+                color: "hsl(var(--muted-foreground) / 0.35)",
+                letterSpacing: "0.02em",
+                opacity: 1 - scrollY * 1.5,
+                transition: isAnimating ? "opacity 0.6s ease" : "none",
+              }}
+            >
+              {dateStr}, {displayHour}:{minutes} {ampm}
+            </span>
+          </div>
+
+          {/* Swipe hint */}
+          <div
+            className="absolute bottom-12 flex flex-col items-center"
+            style={{
+              opacity: Math.max(0, 0.25 - scrollY * 2),
+              transition: isAnimating ? "opacity 0.6s ease" : "none",
+            }}
+          >
+            <div className="animate-breathe">
+              <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
+                <path
+                  d="M2 8L10 2L18 8"
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ── PIN entry ── */}
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-center"
-        style={{
-          opacity: phase === "pin" ? 1 : 0,
-          transform: phase === "pin" ? "none" : "translateY(60px)",
-          transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-          pointerEvents: phase === "pin" ? "auto" : "none",
-        }}
-      >
-        {/* Label */}
-        <span
-          className="font-serif italic"
-          style={{
-            fontSize: 14,
-            color: "hsl(var(--muted-foreground) / 0.4)",
-            letterSpacing: "0.04em",
-          }}
-        >
-          Enter Passcode
-        </span>
-
-        {/* PIN dots */}
+        {/* ── Page 2: PIN ── */}
         <div
-          className={`flex items-center justify-center gap-5 mt-8 ${error ? "animate-shake" : ""}`}
+          className="flex flex-col items-center justify-center"
+          style={{ height: containerRef.current?.clientHeight || "100vh" }}
         >
-          {Array.from({ length: PIN_LENGTH }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full transition-all duration-200"
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor:
-                  i < entered.length
-                    ? error
-                      ? "hsl(var(--destructive))"
-                      : "hsl(var(--foreground))"
-                    : "hsl(var(--muted-foreground) / 0.12)",
-                transform:
-                  unlocking && i < entered.length
-                    ? "scale(1.4)"
-                    : "scale(1)",
-                opacity: unlocking ? 0 : 1,
-                transition: unlocking
-                  ? `all 0.3s ease ${i * 0.05}s`
-                  : "all 0.2s ease",
-              }}
-            />
-          ))}
-        </div>
+          {/* Prose prompt */}
+          <span
+            className="font-serif italic"
+            style={{
+              fontSize: 14,
+              color: "hsl(var(--muted-foreground) / 0.4)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            enter passcode
+          </span>
 
-        {/* Keypad */}
-        <div className="flex flex-col items-center gap-3 mt-10">
-          {KEYS.map((row, ri) => (
-            <div key={ri} className="flex items-center gap-5">
-              {row.map((key, ci) => {
-                if (key === "") {
-                  return <div key={ci} style={{ width: 68, height: 68 }} />;
-                }
+          {/* PIN dots */}
+          <div
+            className={`flex items-center justify-center gap-5 mt-8 ${error ? "animate-shake" : ""}`}
+          >
+            {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-full transition-all duration-200"
+                style={{
+                  width: 12,
+                  height: 12,
+                  backgroundColor:
+                    i < entered.length
+                      ? error
+                        ? "hsl(var(--destructive))"
+                        : "hsl(var(--foreground))"
+                      : "hsl(var(--muted-foreground) / 0.12)",
+                  transform:
+                    unlocking && i < entered.length ? "scale(1.4)" : "scale(1)",
+                  opacity: unlocking ? 0 : 1,
+                  transition: unlocking
+                    ? `all 0.3s ease ${i * 0.05}s`
+                    : "all 0.2s ease",
+                }}
+              />
+            ))}
+          </div>
 
-                const isDelete = key === "delete";
-
-                return (
-                  <button
-                    key={ci}
-                    onClick={() => handleKey(key)}
-                    className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
-                    style={{
-                      width: 68,
-                      height: 68,
-                      backgroundColor: isDelete
-                        ? "transparent"
-                        : "hsl(var(--foreground) / 0.06)",
-                    }}
-                  >
-                    {isDelete ? (
-                      <span
-                        className="font-serif italic"
-                        style={{
-                          fontSize: 12,
-                          color: "hsl(var(--muted-foreground) / 0.4)",
-                          letterSpacing: "0.03em",
-                        }}
-                      >
-                        delete
-                      </span>
-                    ) : (
-                      <span
-                        className="font-serif"
-                        style={{
-                          fontSize: 26,
-                          fontWeight: 300,
-                          letterSpacing: "0.02em",
-                          color: "hsl(var(--foreground))",
-                        }}
-                      >
-                        {key}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+          {/* Keypad */}
+          <div className="flex flex-col items-center gap-3 mt-10">
+            {KEYS.map((row, ri) => (
+              <div key={ri} className="flex items-center gap-5">
+                {row.map((key, ci) => {
+                  if (key === "") {
+                    return <div key={ci} style={{ width: 68, height: 68 }} />;
+                  }
+                  const isDelete = key === "delete";
+                  return (
+                    <button
+                      key={ci}
+                      onClick={() => handleKey(key)}
+                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      style={{
+                        width: 68,
+                        height: 68,
+                        backgroundColor: isDelete
+                          ? "transparent"
+                          : "hsl(var(--foreground) / 0.06)",
+                      }}
+                    >
+                      {isDelete ? (
+                        <span
+                          className="font-serif italic"
+                          style={{
+                            fontSize: 12,
+                            color: "hsl(var(--muted-foreground) / 0.4)",
+                            letterSpacing: "0.03em",
+                          }}
+                        >
+                          delete
+                        </span>
+                      ) : (
+                        <span
+                          className="font-serif"
+                          style={{
+                            fontSize: 26,
+                            fontWeight: 300,
+                            letterSpacing: "0.02em",
+                            color: "hsl(var(--foreground))",
+                          }}
+                        >
+                          {key}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
