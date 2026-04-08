@@ -168,7 +168,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         {/* ── Page 1: Clock ── */}
         <div
           className="flex flex-col items-center justify-center"
-          style={{ height: containerRef.current?.clientHeight || "100vh" }}
+          style={{ height: containerH, position: "relative" }}
         >
           <div className="flex flex-col items-center">
             {/* Time */}
