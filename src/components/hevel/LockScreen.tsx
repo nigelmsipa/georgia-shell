@@ -228,7 +228,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         {/* ── Page 2: PIN ── */}
         <div
           className="flex flex-col items-center justify-center"
-          style={{ height: containerRef.current?.clientHeight || "100vh" }}
+          style={{ height: containerH }}
         >
           {/* Prose prompt */}
           <span
