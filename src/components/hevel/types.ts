@@ -120,7 +120,7 @@ export const RECENT_APPS: AppEntry[] = [
   { name: "Maps", lastUsed: 120 },
 ];
 
-export const COVER_APPS = ["Firefox", "Terminal", "Signal", "Notes"];
+export const COVER_APPS = ["Signal", "Terminal", "Firefox", "Notes", "Messages", "Music"];
 
 export const COVER_COLORS = [
   "bg-gruvbox-orange",
