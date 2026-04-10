@@ -1,22 +1,31 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useTheme } from "./ThemeProvider";
 import { COVER_APPS } from "./types";
-import screenshotFirefox from "@/assets/screenshot-firefox.jpg";
-import screenshotTerminal from "@/assets/screenshot-terminal.jpg";
 import screenshotSignal from "@/assets/screenshot-signal.jpg";
+import screenshotTerminal from "@/assets/screenshot-terminal.jpg";
+import screenshotFirefox from "@/assets/screenshot-firefox.jpg";
 import screenshotNotes from "@/assets/screenshot-notes.jpg";
+import screenshotMessages from "@/assets/screenshot-messages.jpg";
+import screenshotMusic from "@/assets/screenshot-music.jpg";
 
-const COVER_SCREENSHOTS = [screenshotFirefox, screenshotTerminal, screenshotSignal, screenshotNotes];
-
-const COVER_META: Record<string, string> = {
-  Firefox: "3 tabs",
-  Terminal: "active",
-  Signal: "2 unread",
-  Notes: "4m ago",
+const COVER_SCREENSHOTS: Record<string, string> = {
+  Signal: screenshotSignal,
+  Terminal: screenshotTerminal,
+  Firefox: screenshotFirefox,
+  Notes: screenshotNotes,
+  Messages: screenshotMessages,
+  Music: screenshotMusic,
 };
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// Grid layout: row 1 has 3 cards, row 2 has 3 cards
+// Varying heights to create masonry feel
+const CARD_STYLES: Record<string, string> = {
+  Signal: "row-span-2",    // tall
+  Terminal: "row-span-2",  // tall
+  Firefox: "row-span-2",  // tall
+  Notes: "row-span-3",     // taller
+  Messages: "row-span-2",  // medium
+  Music: "row-span-2",     // medium
+};
 
 interface Props {
   onOpenLauncher: () => void;
@@ -33,7 +42,6 @@ export const HomeScreen: React.FC<Props> = ({
   onOpenSwitcher,
   onOpenControlCenter,
 }) => {
-  const { scheme } = useTheme();
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });
 
@@ -44,7 +52,6 @@ export const HomeScreen: React.FC<Props> = ({
 
   const hours = time.getHours().toString().padStart(2, "0");
   const minutes = time.getMinutes().toString().padStart(2, "0");
-  const dateStr = `${DAYS[time.getDay()]}, ${MONTHS[time.getMonth()]} ${time.getDate()}`;
 
   const handlePointerDown = (e: React.PointerEvent) => {
     dragRef.current = { startY: e.clientY, startX: e.clientX, dragging: true };
@@ -61,6 +68,9 @@ export const HomeScreen: React.FC<Props> = ({
     else if (dx > 60) onSwipeToNotifications();
   };
 
+  const topRow = COVER_APPS.slice(0, 3);
+  const bottomRow = COVER_APPS.slice(3, 6);
+
   return (
     <div
       className="absolute inset-0 flex flex-col bg-background select-none"
@@ -68,46 +78,55 @@ export const HomeScreen: React.FC<Props> = ({
       onPointerUp={handlePointerUp}
       style={{ touchAction: "none" }}
     >
-      {/* Top bar */}
-      <div className="flex justify-between items-center px-6 pt-14">
-        <button onClick={onOpenSwitcher} className="text-[10px] text-muted-foreground font-serif">
-          recent
-        </button>
-        <span className="text-[10px] text-muted-foreground font-serif">
-          {scheme.replace("-", " ")}
-        </span>
-      </div>
-
-      {/* Clock + date — generous breathing room */}
-      <div className="px-6 pt-10 pb-8">
-        <span className="text-5xl font-serif text-foreground tracking-tight leading-none block">
+      {/* Status bar */}
+      <div className="flex justify-between items-center px-6 pt-14 pb-2">
+        <span className="text-sm font-serif text-foreground tracking-tight">
           {hours}:{minutes}
         </span>
-        <span className="text-base font-serif text-muted-foreground mt-2 block">
-          {dateStr}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-serif text-muted-foreground tracking-wider">
+            ▲▲
+          </span>
+          <span className="text-xs font-serif text-muted-foreground">
+            78%
+          </span>
+        </div>
       </div>
 
       {/* Cover cards */}
-      <div className="flex-1 px-6">
-        <div className="grid grid-cols-2 gap-4">
-          {COVER_APPS.map((app, i) => (
+      <div className="flex-1 px-4 pt-6 pb-2 overflow-hidden">
+        {/* Top row — 3 cards */}
+        <div className="grid grid-cols-3 gap-3 mb-3" style={{ gridAutoRows: "1fr" }}>
+          {topRow.map((app) => (
             <button
               key={app}
               onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-              className="relative flex flex-col rounded-sm overflow-hidden transition-transform duration-200 active:scale-[0.97]"
+              className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
+              style={{ aspectRatio: "3/4" }}
             >
-              <div className="relative aspect-[3/4]">
-                <img
-                  src={COVER_SCREENSHOTS[i]}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex justify-between items-baseline px-1 pt-2 pb-1">
-                <span className="text-xs text-foreground font-serif">{app}</span>
-                <span className="text-[10px] text-muted-foreground font-serif">{COVER_META[app]}</span>
-              </div>
+              <img
+                src={COVER_SCREENSHOTS[app]}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Bottom row — 3 cards, varied heights */}
+        <div className="grid grid-cols-3 gap-3">
+          {bottomRow.map((app, i) => (
+            <button
+              key={app}
+              onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
+              className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
+              style={{ aspectRatio: i === 0 ? "2/3" : i === 1 ? "3/4" : "3/4" }}
+            >
+              <img
+                src={COVER_SCREENSHOTS[app]}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             </button>
           ))}
         </div>
