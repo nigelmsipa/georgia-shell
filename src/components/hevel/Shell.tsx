@@ -8,13 +8,35 @@ import { ProseLauncher } from "./ProseLauncher";
 import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 
-export const Shell: React.FC = () => {
+export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const [locked, setLocked] = useState(true);
   const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
   const [proseLauncher, setProseLauncher] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
+
+  // React to external navigation
+  React.useEffect(() => {
+    if (!navigateTo) return;
+    // Reset everything first
+    setLocked(false);
+    setSwitcher(false);
+    setNotifications(false);
+    setControlCenter(false);
+    setProseLauncher(false);
+    setRunningApp(null);
+
+    switch (navigateTo) {
+      case "Lock": setLocked(true); break;
+      case "Launcher": setProseLauncher(true); break;
+      case "Notifications": setNotifications(true); break;
+      case "Switcher": setSwitcher(true); break;
+      case "Control Center": setControlCenter(true); break;
+      case "Settings": setRunningApp("Settings"); break;
+      case "Home": break; // already reset to home
+    }
+  }, [navigateTo]);
 
   const openApp = (name: string) => {
     setRunningApp(name);
