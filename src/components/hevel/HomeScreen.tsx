@@ -95,32 +95,13 @@ export const HomeScreen: React.FC<Props> = ({
 
       {/* Cover cards */}
       <div className="flex-1 px-4 pt-6 pb-2 overflow-hidden">
-        {/* Top row — 3 cards */}
-        <div className="grid grid-cols-3 gap-3 mb-3" style={{ gridAutoRows: "1fr" }}>
-          {topRow.map((app) => (
+        <div className="grid grid-cols-3 gap-3">
+          {COVER_APPS.map((app) => (
             <button
               key={app}
               onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
               className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
               style={{ aspectRatio: "3/4" }}
-            >
-              <img
-                src={COVER_SCREENSHOTS[app]}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
-
-        {/* Bottom row — 3 cards, varied heights */}
-        <div className="grid grid-cols-3 gap-3">
-          {bottomRow.map((app, i) => (
-            <button
-              key={app}
-              onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-              className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
-              style={{ aspectRatio: i === 0 ? "2/3" : i === 1 ? "3/4" : "3/4" }}
             >
               <img
                 src={COVER_SCREENSHOTS[app]}
