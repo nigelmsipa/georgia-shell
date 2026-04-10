@@ -1,30 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { COVER_APPS } from "./types";
-import screenshotSignal from "@/assets/screenshot-signal.jpg";
-import screenshotTerminal from "@/assets/screenshot-terminal.jpg";
-import screenshotFirefox from "@/assets/screenshot-firefox.jpg";
-import screenshotNotes from "@/assets/screenshot-notes.jpg";
-import screenshotMessages from "@/assets/screenshot-messages.jpg";
-import screenshotMusic from "@/assets/screenshot-music.jpg";
+import { SignalCover } from "./covers/SignalCover";
+import { TerminalCover } from "./covers/TerminalCover";
+import { FirefoxCover } from "./covers/FirefoxCover";
+import { NotesCover } from "./covers/NotesCover";
+import { MessagesCover } from "./covers/MessagesCover";
+import { MusicCover } from "./covers/MusicCover";
 
-const COVER_SCREENSHOTS: Record<string, string> = {
-  Signal: screenshotSignal,
-  Terminal: screenshotTerminal,
-  Firefox: screenshotFirefox,
-  Notes: screenshotNotes,
-  Messages: screenshotMessages,
-  Music: screenshotMusic,
-};
-
-// Grid layout: row 1 has 3 cards, row 2 has 3 cards
-// Varying heights to create masonry feel
-const CARD_STYLES: Record<string, string> = {
-  Signal: "row-span-2",    // tall
-  Terminal: "row-span-2",  // tall
-  Firefox: "row-span-2",  // tall
-  Notes: "row-span-3",     // taller
-  Messages: "row-span-2",  // medium
-  Music: "row-span-2",     // medium
+const COVER_COMPONENTS: Record<string, React.FC> = {
+  Signal: SignalCover,
+  Terminal: TerminalCover,
+  Firefox: FirefoxCover,
+  Notes: NotesCover,
+  Messages: MessagesCover,
+  Music: MusicCover,
 };
 
 interface Props {
@@ -68,9 +57,6 @@ export const HomeScreen: React.FC<Props> = ({
     else if (dx > 60) onSwipeToNotifications();
   };
 
-  const topRow = COVER_APPS.slice(0, 3);
-  const bottomRow = COVER_APPS.slice(3, 6);
-
   return (
     <div
       className="absolute inset-0 flex flex-col bg-background select-none"
@@ -96,20 +82,19 @@ export const HomeScreen: React.FC<Props> = ({
       {/* Cover cards */}
       <div className="flex-1 px-4 pt-6 pb-2 overflow-hidden">
         <div className="grid grid-cols-3 gap-3">
-          {COVER_APPS.map((app) => (
-            <button
-              key={app}
-              onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-              className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
-              style={{ aspectRatio: "3/4" }}
-            >
-              <img
-                src={COVER_SCREENSHOTS[app]}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </button>
-          ))}
+          {COVER_APPS.map((app) => {
+            const Cover = COVER_COMPONENTS[app];
+            return (
+              <button
+                key={app}
+                onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
+                className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
+                style={{ aspectRatio: "3/4" }}
+              >
+                {Cover && <Cover />}
+              </button>
+            );
+          })}
         </div>
       </div>
 
