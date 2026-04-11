@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { COVER_APPS } from "./types";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { COVER_APPS, ALL_APPS } from "./types";
 import { SignalCover } from "./covers/SignalCover";
 import { TerminalCover } from "./covers/TerminalCover";
 import { FirefoxCover } from "./covers/FirefoxCover";
@@ -15,6 +15,8 @@ const COVER_COMPONENTS: Record<string, React.FC> = {
   Messages: MessagesCover,
   Music: MusicCover,
 };
+
+const SORTED_APPS = [...ALL_APPS].sort();
 
 interface Props {
   onOpenLauncher: () => void;
@@ -33,6 +35,12 @@ export const HomeScreen: React.FC<Props> = ({
 }) => {
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });
+
+  // Scrubber state
+  const [scrubbing, setScrubbing] = useState(false);
+  const [scrubIndex, setScrubIndex] = useState(-1);
+  const [fadingOut, setFadingOut] = useState(false);
+  const scrubZoneRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -57,6 +65,48 @@ export const HomeScreen: React.FC<Props> = ({
     else if (dx > 60) onSwipeToNotifications();
   };
 
+  // Scrubber handlers
+  const calcIndex = useCallback((clientY: number) => {
+    const zone = scrubZoneRef.current;
+    if (!zone) return -1;
+    const rect = zone.getBoundingClientRect();
+    const y = clientY - rect.top;
+    const ratio = y / rect.height;
+    return Math.max(0, Math.min(SORTED_APPS.length - 1, Math.floor(ratio * SORTED_APPS.length)));
+  }, []);
+
+  const handleScrubStart = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setScrubbing(true);
+    setFadingOut(false);
+    setScrubIndex(calcIndex(e.clientY));
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleScrubMove = (e: React.PointerEvent) => {
+    if (!scrubbing) return;
+    const newIdx = calcIndex(e.clientY);
+    if (newIdx !== scrubIndex) {
+      setScrubIndex(newIdx);
+    }
+  };
+
+  const handleScrubEnd = () => {
+    if (!scrubbing) return;
+    if (scrubIndex >= 0 && scrubIndex < SORTED_APPS.length) {
+      onOpenApp(SORTED_APPS[scrubIndex]);
+    }
+    setFadingOut(true);
+    setTimeout(() => {
+      setScrubbing(false);
+      setFadingOut(false);
+      setScrubIndex(-1);
+    }, 200);
+  };
+
+  const scrubActive = scrubbing && !fadingOut;
+
   return (
     <div
       className="absolute inset-0 flex flex-col bg-background select-none"
@@ -65,7 +115,7 @@ export const HomeScreen: React.FC<Props> = ({
       style={{ touchAction: "none" }}
     >
       {/* Status bar */}
-      <div className="flex justify-between items-center px-6 pt-14 pb-2">
+      <div className="flex justify-between items-center px-6 pt-14 pb-2 relative z-10">
         <span className="text-sm font-serif text-foreground tracking-tight">
           {hours}:{minutes}
         </span>
@@ -79,8 +129,15 @@ export const HomeScreen: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Cover cards */}
-      <div className="flex-1 px-4 pt-6 pb-2 overflow-hidden">
+      {/* Cover cards — shifts left & blurs when scrubbing */}
+      <div
+        className="flex-1 px-4 pt-6 pb-2 overflow-hidden"
+        style={{
+          filter: scrubActive ? "blur(8px) brightness(0.7)" : "none",
+          transform: scrubActive ? "translateX(-20px) scale(0.97)" : "translateX(0) scale(1)",
+          transition: "filter 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+        }}
+      >
         <div className="grid grid-cols-3 gap-3">
           {COVER_APPS.map((app) => {
             const Cover = COVER_COMPONENTS[app];
@@ -88,7 +145,7 @@ export const HomeScreen: React.FC<Props> = ({
               <button
                 key={app}
                 onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-                className="relative rounded-lg overflow-hidden transition-transform duration-200 active:scale-[0.97]"
+                className="relative rounded-[24px] overflow-hidden transition-transform duration-200 active:scale-[0.97]"
                 style={{ aspectRatio: "3/4" }}
               >
                 {Cover && <Cover />}
@@ -99,9 +156,77 @@ export const HomeScreen: React.FC<Props> = ({
       </div>
 
       {/* Drag hint */}
-      <div className="flex justify-center py-6">
+      <div
+        className="flex justify-center py-6"
+        style={{
+          opacity: scrubActive ? 0 : 1,
+          transition: "opacity 0.2s ease",
+        }}
+      >
         <div className="w-10 h-1 rounded-full bg-muted-foreground opacity-25" />
       </div>
+
+      {/* Scrubber touch zone — always present, invisible */}
+      <div
+        ref={scrubZoneRef}
+        className="absolute right-0 top-16 bottom-16 w-10 z-30"
+        style={{ touchAction: "none" }}
+        onPointerDown={handleScrubStart}
+        onPointerMove={handleScrubMove}
+        onPointerUp={handleScrubEnd}
+        onPointerCancel={handleScrubEnd}
+      />
+
+      {/* Scrubber overlay list */}
+      {(scrubbing) && (
+        <div
+          className="absolute right-0 top-16 bottom-16 w-48 z-20 flex flex-col justify-center"
+          style={{
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            background: "hsl(var(--background) / 0.6)",
+            borderLeft: "1px solid hsl(var(--border) / 0.3)",
+            borderRadius: "16px 0 0 16px",
+            opacity: fadingOut ? 0 : 1,
+            transform: fadingOut ? "translateX(12px)" : "translateX(0)",
+            transition: "opacity 0.2s ease, transform 0.2s ease",
+          }}
+        >
+          <div className="flex flex-col items-start py-2 px-1 overflow-hidden h-full justify-center">
+            {SORTED_APPS.map((app, i) => {
+              const isActive = i === scrubIndex;
+              // Show a window of items around the active index for readability
+              const dist = Math.abs(i - scrubIndex);
+              const opacity = dist === 0 ? 1 : dist <= 2 ? 0.6 : dist <= 4 ? 0.3 : 0.12;
+
+              return (
+                <div
+                  key={app}
+                  className="w-full px-3 flex items-center shrink-0"
+                  style={{
+                    height: isActive ? "28px" : "22px",
+                    opacity,
+                    transition: "all 0.12s ease-out",
+                  }}
+                >
+                  <span
+                    className={`font-serif truncate ${
+                      isActive
+                        ? "text-primary text-base font-semibold"
+                        : "text-foreground text-xs"
+                    }`}
+                    style={{
+                      transition: "all 0.12s ease-out",
+                    }}
+                  >
+                    {app}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
