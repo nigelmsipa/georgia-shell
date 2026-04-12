@@ -7,6 +7,7 @@ import { ControlCenter } from "./ControlCenter";
 import { ProseLauncher } from "./ProseLauncher";
 import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
+import { AtmosphericBg } from "./AtmosphericBg";
 
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const [locked, setLocked] = useState(true);
@@ -42,7 +43,8 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const anyOverlay = controlCenter || proseLauncher;
 
   return (
-    <div className="relative w-full h-full overflow-hidden atmospheric-bg">
+    <div className="relative w-full h-full overflow-hidden">
+      <AtmosphericBg />
       {/* Base layer: Home */}
       <div
         className="absolute inset-0 transition-all duration-350"

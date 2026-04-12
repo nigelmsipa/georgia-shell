@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { AtmosphericBg } from "./AtmosphericBg";
 
 interface Props {
   onUnlock: () => void;
@@ -137,7 +138,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-[60] overflow-hidden select-none atmospheric-bg"
+      className="absolute inset-0 z-[60] overflow-hidden select-none"
       style={{
         touchAction: "none",
         opacity: unlocking ? 0 : 1,
@@ -151,6 +152,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
+      <AtmosphericBg />
       <div
         style={{
           transform: `translateY(${translatePx}px)`,

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { AtmosphericBg } from "./AtmosphericBg";
 import { SAMPLE_NOTIFICATIONS, type ProseNotification, type NoteToken } from "./types";
 
 interface Props {
@@ -169,11 +170,12 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <div
-      className="absolute inset-0 z-20 flex flex-col atmospheric-bg"
+      className="absolute inset-0 z-20 flex flex-col"
       style={{ touchAction: "none" }}
       onPointerDown={handlePaneSwipe}
       onPointerUp={handlePaneSwipeEnd}
     >
+      <AtmosphericBg />
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
         <span

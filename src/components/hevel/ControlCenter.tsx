@@ -279,14 +279,15 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
 
       {/* Panel */}
       <div
-        className="absolute left-0 right-0 top-0 z-40 flex flex-col glass-surface"
+        className="absolute left-0 right-0 top-0 z-40 flex flex-col"
         style={{
+          background: "rgba(40, 40, 36, 0.92)",
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
-          borderBottomLeftRadius: 16,
-          borderBottomRightRadius: 16,
+          border: "1px solid var(--glass-border)",
           borderTop: "none",
           borderRadius: "0 0 16px 16px",
+          boxShadow: "inset 0 -1px 0 0 var(--glass-highlight), 0 8px 32px rgba(0,0,0,0.4)",
           maxHeight: "80%",
           transition:
             "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out",
