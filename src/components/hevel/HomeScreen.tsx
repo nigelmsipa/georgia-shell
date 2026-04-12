@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { COVER_APPS, ALL_APPS } from "./types";
 import { AtmosphericBg } from "./AtmosphericBg";
+import { SignalCover } from "./covers/SignalCover";
 import { TerminalCover } from "./covers/TerminalCover";
 import { FirefoxCover } from "./covers/FirefoxCover";
 import { NotesCover } from "./covers/NotesCover";
