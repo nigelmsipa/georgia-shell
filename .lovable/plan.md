@@ -1,52 +1,107 @@
 
 
-# Lock Screen Polish
+# Gruvbox Glass Restyle
 
-## Current Issues
+## Overview
+Restyle the entire Hevel prototype to achieve a warm, translucent "Gruvbox Glass" aesthetic with atmospheric depth, soft glows, and tinted glass surfaces — while preserving the existing interaction model, text-first philosophy, and component structure.
 
-1. **Clock face** — The swipe hint uses crude `›` characters with a confusing rotated second one. The breathing animation is visually noisy.
-2. **Time display** — The colon is rendered as a separate span with reduced opacity, creating visual weight imbalance. The am/pm indicator floats awkwardly.
-3. **Clock-to-PIN transition** — The clock phase uses a raw drag offset that can feel janky. The threshold (80px) is arbitrary and the spring-back has no momentum.
-4. **PIN screen** — The compact time at top is redundant visual clutter. The dots are small (10px) and the error shake is a crude alternating translateX. The keypad buttons use `hsl(var(--muted) / 0.5)` which looks washed out. The delete key is a tiny `‹` character.
-5. **Spacing** — The keypad is pushed to the bottom with a full `flex-1` spacer, leaving the dots stranded near the top. The overall composition feels top-heavy.
-6. **Inline `<style>` tag** — The breathe keyframe is injected as raw CSS inside the component.
+## What Changes
 
-## Plan
+### 1. CSS Foundation — `src/index.css`
+- Replace the flat `--background` with layered CSS: a base dark gradient (`#1d2021` to `#282828`), plus two radial glow zones (warm gold at top-left, cool blue-green at bottom-right) at very low opacity (~0.08).
+- Add new CSS custom properties under `.gruvbox-dark` for glass surfaces:
+  - `--glass-bg`: `rgba(40, 40, 36, 0.55)` — translucent card fill
+  - `--glass-border`: `rgba(235, 219, 178, 0.08)` — soft 1px border
+  - `--glass-highlight`: `rgba(235, 219, 178, 0.04)` — inner top highlight
+  - `--glass-blur`: `12px` — backdrop blur amount
+  - `--glow-gold`: `rgba(215, 153, 33, 0.06)` — accent glow
+  - `--glow-blue`: `rgba(69, 133, 136, 0.05)` — cool counterpoint
+  - `--grain-opacity`: `0.03` — subtle noise/grain overlay
+- Add a reusable `.glass-surface` utility class combining these tokens.
+- Ensure all other themes (nord, tokyo-night, etc.) get sensible glass token fallbacks.
 
-### Phase 1: Clock Face
+### 2. Atmospheric Background — `HomeScreen.tsx`
+- Replace the flat `bg-background` with a layered div stack:
+  - Base: linear gradient `#1d2021 → #282828 → #32302f`
+  - Glow layer 1: radial gradient (gold, top-left, 40% spread, ~6% opacity)
+  - Glow layer 2: radial gradient (blue, bottom-right, 35% spread, ~4% opacity)
+  - Grain layer: a CSS pseudo-element with a subtle noise texture via SVG filter or repeating pattern at 3% opacity
+- This same background treatment will be extracted as a reusable component (`AtmosphericBg`) used by Shell, LockScreen, etc.
 
-- Simplify time to a single clean render: `{displayHour}:{minutes}` as one span, removing the separate colon element
-- Move am/pm to a new line below the time, smaller and lighter, not crammed inline
-- Replace the `›` swipe hint with a single subtle upward chevron (CSS-drawn `∧` or a thin line) that breathes gently
-- Add the breathe keyframe to `tailwind.config.ts` instead of inline `<style>`
+### 3. Glass Cover Cards — `HomeScreen.tsx`
+- Wrap each cover card button in glass styling:
+  - `background: var(--glass-bg)` with `backdrop-filter: blur(var(--glass-blur))`
+  - `border: 1px solid var(--glass-border))`
+  - Inner highlight: `box-shadow: inset 0 1px 0 0 var(--glass-highlight)`
+  - Outer depth: `box-shadow: 0 8px 32px rgba(0,0,0,0.3)`
+  - Keep `rounded-[24px]` and `overflow-hidden`
+- Each cover component (Signal, Terminal, Firefox, Notes, Messages, Music) gets its colors muted into the Gruvbox palette — lower saturation, warmer tones, with slight transparency so the glass shows through.
 
-### Phase 2: Swipe Gesture
+### 4. Cover Component Palette Muting
+Update each cover in `src/components/hevel/covers/`:
+- **SignalCover**: Darken to `#32302f` base, use `#458588` for sent bubbles, `#3c3836` for received
+- **TerminalCover**: Already close; adjust to exact `#1d2021` bg with `#98971a` green text
+- **FirefoxCover**: Dark tab bar (`#282828`), `#458588` accent links
+- **NotesCover**: Warm parchment becomes muted `#3c3836` with `#ebdbb2` text
+- **MessagesCover**: Dark base with `#b16286` purple accents
+- **MusicCover**: Gradient shifts to `#3c3836 → #32302f` with `#d79921` progress bar
 
-- Add velocity tracking — if the user flicks fast, transition even with less distance
-- Smooth the drag with a rubber-band feel: `Math.pow(dy, 0.85)` for diminishing returns
-- Add a subtle scale-down on the clock as the user drags (parallax depth)
+### 5. Typography Refinements — across all components
+- App names in launcher: Georgia italic, `color: rgba(235, 219, 178, 0.85)`, not bold-shouty
+- Active/highlighted text: `#d79921` gold accent
+- Muted/secondary text: `#a89984` at reduced opacity (~0.4-0.6)
+- Status bar text: lighter, more atmospheric presence
 
-### Phase 3: PIN Screen
+### 6. Launcher-Focus State — `ProseLauncher.tsx`
+- Replace the opaque `0.88` scrim with a translucent glass haze: `rgba(29, 32, 33, 0.7)` + `backdrop-filter: blur(32px)`
+- Add subtle warm glow behind the active content area
+- The favorites section gets glass-pill treatment with `var(--glass-bg)` background
+- Letter heading watermark uses `#d79921` at ~8% opacity instead of `--primary / 0.12`
+- Search bar at bottom: glass-bordered input with warm caret color `#d79921`
+- The scrubber letters use the gold accent for active state, with smoother opacity falloff
 
-- Remove the compact time/date header — unnecessary once you've just seen the clock
-- Replace with a simple centered label: "Enter Passcode" in serif italic, very light
-- Vertically center the dots + keypad as a cohesive unit instead of spacer-separated
-- Increase dot size to 12px with more generous spacing (20px gap)
-- Improve error animation: use a proper CSS keyframe shake (translateX oscillation over 4 frames) instead of the static alternating offset
-- Keypad: increase button size to 68px, use a subtler background (`hsl(var(--foreground) / 0.06)`), add a scale-down active state
-- Delete key: use the word "delete" in small italic serif instead of `‹`
-- Add subtle letter-spacing to digit labels for a cleaner feel
+### 7. Scrubber Overlay — `HomeScreen.tsx`
+- The right-side scrubber overlay gets glass treatment: `var(--glass-bg)` + blur + soft border
+- Active app name highlighted in `#d79921`
+- Smoother opacity gradients for distance-based items
 
-### Phase 4: Unlock Transition
+### 8. Lock Screen — `LockScreen.tsx`
+- Apply atmospheric background (same layered gradients)
+- PIN pad circles: glass-styled buttons with `var(--glass-bg)` and subtle borders
+- Clock text gets a very subtle text-shadow glow: `0 0 40px rgba(215, 153, 33, 0.1)`
 
-- On correct PIN, briefly scale dots up and fade them before the screen lifts
-- Add a slight delay (200ms) before the screen slides away, so the success state registers visually
+### 9. Shell & Overlays — `Shell.tsx`, `ControlCenter.tsx`, `NotificationsPane.tsx`, `AppOverlay.tsx`
+- All overlays and panels inherit the atmospheric background
+- Control Center toggles and sliders get glass surface treatment
+- Notifications pane uses glass-bordered notification rows
+- AppOverlay placeholder gets atmospheric bg
 
-### Technical Details
+### 10. PhoneFrame — `PhoneFrame.tsx`
+- Phone border becomes a subtle glass rim: darker border with inner glow
+- Outer page background uses the darkest Gruvbox tone
 
-**Files modified:** 
-- `src/components/hevel/LockScreen.tsx` — full rewrite of the component
-- `tailwind.config.ts` — add `breathe` and `shake` keyframes
+## Files Modified
+1. `src/index.css` — new glass tokens, atmospheric utility classes
+2. `src/components/hevel/HomeScreen.tsx` — atmospheric bg, glass cards, scrubber glass
+3. `src/components/hevel/covers/SignalCover.tsx` — Gruvbox palette
+4. `src/components/hevel/covers/TerminalCover.tsx` — palette tweak
+5. `src/components/hevel/covers/FirefoxCover.tsx` — Gruvbox palette
+6. `src/components/hevel/covers/NotesCover.tsx` — warm muted tones
+7. `src/components/hevel/covers/MessagesCover.tsx` — Gruvbox palette
+8. `src/components/hevel/covers/MusicCover.tsx` — Gruvbox palette
+9. `src/components/hevel/ProseLauncher.tsx` — glass scrim, warm accents
+10. `src/components/hevel/LockScreen.tsx` — atmospheric bg, glass PIN pad
+11. `src/components/hevel/Shell.tsx` — atmospheric base layer
+12. `src/components/hevel/ControlCenter.tsx` — glass surfaces
+13. `src/components/hevel/NotificationsPane.tsx` — glass borders
+14. `src/components/hevel/AppOverlay.tsx` — atmospheric bg
+15. `src/components/hevel/PhoneFrame.tsx` — refined frame
 
-**No new dependencies.** All animations are CSS keyframes + inline transitions.
+## What Does NOT Change
+- Component structure / file organization
+- Interaction model (gestures, scrubber, launcher-as-home)
+- Text-first / prose UI philosophy
+- Georgia serif typography family
+- ThemeProvider architecture
+- Navigation/routing logic
 
