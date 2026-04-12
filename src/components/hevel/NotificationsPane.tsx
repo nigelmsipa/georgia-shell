@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { AtmosphericBg } from "./AtmosphericBg";
 import { SAMPLE_NOTIFICATIONS, type ProseNotification, type NoteToken } from "./types";
 
 interface Props {
