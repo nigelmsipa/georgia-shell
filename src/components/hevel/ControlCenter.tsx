@@ -268,7 +268,9 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: "hsl(var(--background) / 0.3)",
+          backgroundColor: "rgba(29, 32, 33, 0.4)",
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)",
           zIndex: 39,
           transition: "opacity 0.3s ease-out",
         }}
@@ -277,16 +279,17 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
 
       {/* Panel */}
       <div
-        className="absolute left-0 right-0 top-0 z-40 flex flex-col"
+        className="absolute left-0 right-0 top-0 z-40 flex flex-col glass-surface"
         style={{
-          backgroundColor: "hsl(var(--background) / 0.96)",
-          backdropFilter: "blur(20px)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
           borderBottomLeftRadius: 16,
           borderBottomRightRadius: 16,
+          borderTop: "none",
+          borderRadius: "0 0 16px 16px",
           maxHeight: "80%",
           transition:
             "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out",
-          boxShadow: "0 8px 32px hsl(var(--background) / 0.4)",
         }}
         onPointerDown={handleDragStart}
         onPointerUp={handleDragEnd}

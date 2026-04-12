@@ -268,7 +268,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
         style={{
           backdropFilter: "blur(32px)",
           WebkitBackdropFilter: "blur(32px)",
-          backgroundColor: "hsl(var(--background) / 0.88)",
+          backgroundColor: "rgba(29, 32, 33, 0.7)",
           zIndex: 44,
           opacity: isVisible ? 1 : 0,
           transition: "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -348,7 +348,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                   style={{
                     fontSize: 64,
                     fontWeight: 700,
-                    color: "hsl(var(--primary) / 0.12)",
+                    color: "rgba(215, 153, 33, 0.08)",
                     lineHeight: 1,
                     marginBottom: 12,
                     transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",

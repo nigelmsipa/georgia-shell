@@ -16,10 +16,8 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [proseLauncher, setProseLauncher] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
 
-  // React to external navigation
   React.useEffect(() => {
     if (!navigateTo) return;
-    // Reset everything first
     setLocked(false);
     setSwitcher(false);
     setNotifications(false);
@@ -34,19 +32,17 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       case "Switcher": setSwitcher(true); break;
       case "Control Center": setControlCenter(true); break;
       case "Settings": setRunningApp("Settings"); break;
-      case "Home": break; // already reset to home
+      case "Home": break;
     }
   }, [navigateTo]);
 
-  const openApp = (name: string) => {
-    setRunningApp(name);
-  };
+  const openApp = (name: string) => setRunningApp(name);
   const closeApp = () => setRunningApp(null);
 
   const anyOverlay = controlCenter || proseLauncher;
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden atmospheric-bg">
       {/* Base layer: Home */}
       <div
         className="absolute inset-0 transition-all duration-350"
@@ -65,38 +61,14 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         />
       </div>
 
-      {/* Layers */}
-      <NotificationsPane
-        open={notifications}
-        onClose={() => setNotifications(false)}
-      />
+      <NotificationsPane open={notifications} onClose={() => setNotifications(false)} />
+      <AppSwitcher open={switcher} onClose={() => setSwitcher(false)} onOpenApp={openApp} />
+      <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
+      <ProseLauncher open={proseLauncher} onClose={() => setProseLauncher(false)} onOpenApp={openApp} />
 
-      <AppSwitcher
-        open={switcher}
-        onClose={() => setSwitcher(false)}
-        onOpenApp={openApp}
-      />
+      {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}
+      {runningApp && runningApp !== "Settings" && <AppOverlay appName={runningApp} onClose={closeApp} />}
 
-      <ControlCenter
-        open={controlCenter}
-        onClose={() => setControlCenter(false)}
-      />
-
-      <ProseLauncher
-        open={proseLauncher}
-        onClose={() => setProseLauncher(false)}
-        onOpenApp={openApp}
-      />
-
-      {/* App running overlay — Settings gets its own component */}
-      {runningApp && runningApp === "Settings" && (
-        <SettingsApp onClose={closeApp} />
-      )}
-      {runningApp && runningApp !== "Settings" && (
-        <AppOverlay appName={runningApp} onClose={closeApp} />
-      )}
-
-      {/* Lock screen — topmost layer */}
       {locked && <LockScreen onUnlock={() => setLocked(false)} />}
     </div>
   );
