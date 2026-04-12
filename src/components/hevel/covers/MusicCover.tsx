@@ -1,17 +1,17 @@
 import React from "react";
 
 export const MusicCover: React.FC = () => (
-  <div className="w-full h-full bg-gradient-to-b from-[#c8889a] to-[#a06878] flex flex-col items-center justify-center px-3 py-4 gap-2">
+  <div className="w-full h-full flex flex-col items-center justify-center px-3 py-4 gap-2" style={{ background: "linear-gradient(to bottom, #3c3836, #32302f)" }}>
     {/* Album art circle */}
-    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#d4a0b0] via-[#c890a8] to-[#907080] shadow-lg" />
+    <div className="w-12 h-12 rounded-full shadow-lg" style={{ background: "linear-gradient(135deg, #504945, #3c3836, #282828)" }} />
     {/* Track info */}
     <div className="text-center mt-1">
-      <span className="text-[8px] text-[#2a1520] font-serif block">Come Thou Fount</span>
-      <span className="text-[7px] text-[#4a2a38] block mt-0.5">2:14</span>
+      <span className="text-[8px] font-serif block" style={{ color: "#ebdbb2" }}>Come Thou Fount</span>
+      <span className="text-[7px] block mt-0.5" style={{ color: "#a89984" }}>2:14</span>
     </div>
     {/* Progress bar */}
-    <div className="w-full h-0.5 bg-[#8a5a6a] rounded-full mt-1 overflow-hidden">
-      <div className="w-[60%] h-full bg-[#4488cc] rounded-full" />
+    <div className="w-full h-0.5 rounded-full mt-1 overflow-hidden" style={{ background: "#504945" }}>
+      <div className="w-[60%] h-full rounded-full" style={{ background: "#d79921" }} />
     </div>
   </div>
 );

@@ -42,6 +42,15 @@
     --sidebar-accent-foreground: 30 12% 23%;
     --sidebar-border: 37 36% 73%;
     --sidebar-ring: 42 75% 49%;
+
+    /* Glass tokens — light mode */
+    --glass-bg: hsla(40, 20%, 75%, 0.45);
+    --glass-border: hsla(40, 30%, 30%, 0.1);
+    --glass-highlight: hsla(40, 30%, 95%, 0.3);
+    --glass-blur: 12px;
+    --glow-gold: hsla(42, 75%, 49%, 0.08);
+    --glow-blue: hsla(150, 18%, 51%, 0.06);
+    --grain-opacity: 0.02;
   }
 
   /* ===== GRUVBOX DARK ===== */
@@ -76,6 +85,15 @@
     --sidebar-accent-foreground: 43 42% 81%;
     --sidebar-border: 30 7% 29%;
     --sidebar-ring: 42 75% 49%;
+
+    /* Glass tokens — dark mode */
+    --glass-bg: rgba(40, 40, 36, 0.55);
+    --glass-border: rgba(235, 219, 178, 0.08);
+    --glass-highlight: rgba(235, 219, 178, 0.04);
+    --glass-blur: 12px;
+    --glow-gold: rgba(215, 153, 33, 0.06);
+    --glow-blue: rgba(69, 133, 136, 0.05);
+    --grain-opacity: 0.03;
   }
 
   /* ===== NORD ===== */
@@ -102,6 +120,14 @@
     --gruvbox-bg0: 220 16% 22%;
     --gruvbox-bg1: 220 17% 27%;
     --gruvbox-bg2: 220 17% 32%;
+
+    --glass-bg: rgba(46, 52, 64, 0.55);
+    --glass-border: rgba(216, 222, 233, 0.08);
+    --glass-highlight: rgba(216, 222, 233, 0.04);
+    --glass-blur: 12px;
+    --glow-gold: rgba(136, 192, 208, 0.06);
+    --glow-blue: rgba(143, 188, 187, 0.05);
+    --grain-opacity: 0.02;
   }
 
   /* ===== TOKYO NIGHT ===== */
@@ -128,6 +154,14 @@
     --gruvbox-bg0: 235 21% 15%;
     --gruvbox-bg1: 235 19% 19%;
     --gruvbox-bg2: 235 17% 24%;
+
+    --glass-bg: rgba(36, 40, 59, 0.55);
+    --glass-border: rgba(169, 177, 214, 0.08);
+    --glass-highlight: rgba(169, 177, 214, 0.04);
+    --glass-blur: 12px;
+    --glow-gold: rgba(224, 175, 104, 0.06);
+    --glow-blue: rgba(125, 207, 255, 0.05);
+    --grain-opacity: 0.02;
   }
 
   /* ===== SOLARIZED DARK ===== */
@@ -154,6 +188,14 @@
     --gruvbox-bg0: 192 100% 11%;
     --gruvbox-bg1: 192 81% 14%;
     --gruvbox-bg2: 194 60% 18%;
+
+    --glass-bg: rgba(0, 43, 54, 0.55);
+    --glass-border: rgba(253, 246, 227, 0.08);
+    --glass-highlight: rgba(253, 246, 227, 0.04);
+    --glass-blur: 12px;
+    --glow-gold: rgba(181, 137, 0, 0.06);
+    --glow-blue: rgba(38, 139, 210, 0.05);
+    --grain-opacity: 0.02;
   }
 
   /* ===== CATPPUCCIN (Mocha) ===== */
@@ -180,6 +222,14 @@
     --gruvbox-bg0: 240 21% 15%;
     --gruvbox-bg1: 240 21% 19%;
     --gruvbox-bg2: 240 18% 24%;
+
+    --glass-bg: rgba(30, 30, 46, 0.55);
+    --glass-border: rgba(205, 214, 244, 0.08);
+    --glass-highlight: rgba(205, 214, 244, 0.04);
+    --glass-blur: 12px;
+    --glow-gold: rgba(249, 226, 175, 0.06);
+    --glow-blue: rgba(137, 180, 250, 0.05);
+    --grain-opacity: 0.02;
   }
 }
 
@@ -192,6 +242,50 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ── Glass surface utility ─────────────────────────────────────────────── */
+.glass-surface {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Atmospheric background layers ─────────────────────────────────────── */
+.atmospheric-bg {
+  position: relative;
+}
+
+.atmospheric-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 20%, var(--glow-gold), transparent),
+    radial-gradient(ellipse 50% 45% at 85% 80%, var(--glow-blue), transparent),
+    linear-gradient(180deg, hsl(var(--gruvbox-bg0)) 0%, hsl(var(--gruvbox-bg1)) 50%, hsl(var(--gruvbox-bg2)) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.atmospheric-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.atmospheric-bg > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Hide scrollbar globally for swipeable areas */

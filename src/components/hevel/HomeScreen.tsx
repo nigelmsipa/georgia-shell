@@ -109,21 +109,30 @@ export const HomeScreen: React.FC<Props> = ({
 
   return (
     <div
-      className="absolute inset-0 flex flex-col bg-background select-none"
+      className="absolute inset-0 flex flex-col select-none atmospheric-bg"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       style={{ touchAction: "none" }}
     >
       {/* Status bar */}
       <div className="flex justify-between items-center px-6 pt-14 pb-2 relative z-10">
-        <span className="text-sm font-serif text-foreground tracking-tight">
+        <span
+          className="text-sm font-serif tracking-tight"
+          style={{ color: "hsl(var(--foreground) / 0.6)" }}
+        >
           {hours}:{minutes}
         </span>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-serif text-muted-foreground tracking-wider">
+          <span
+            className="text-[10px] font-serif tracking-wider"
+            style={{ color: "hsl(var(--muted-foreground) / 0.3)" }}
+          >
             ▲▲
           </span>
-          <span className="text-xs font-serif text-muted-foreground">
+          <span
+            className="text-xs font-serif"
+            style={{ color: "hsl(var(--muted-foreground) / 0.4)" }}
+          >
             78%
           </span>
         </div>
@@ -145,7 +154,7 @@ export const HomeScreen: React.FC<Props> = ({
               <button
                 key={app}
                 onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-                className="relative rounded-[24px] overflow-hidden transition-transform duration-200 active:scale-[0.97]"
+                className="relative rounded-[24px] overflow-hidden transition-transform duration-200 active:scale-[0.97] glass-surface"
                 style={{ aspectRatio: "3/4" }}
               >
                 {Cover && <Cover />}
@@ -163,7 +172,10 @@ export const HomeScreen: React.FC<Props> = ({
           transition: "opacity 0.2s ease",
         }}
       >
-        <div className="w-10 h-1 rounded-full bg-muted-foreground opacity-25" />
+        <div
+          className="w-10 h-1 rounded-full"
+          style={{ backgroundColor: "hsl(var(--muted-foreground) / 0.15)" }}
+        />
       </div>
 
       {/* Scrubber touch zone — always present, invisible */}
@@ -180,12 +192,8 @@ export const HomeScreen: React.FC<Props> = ({
       {/* Scrubber overlay list */}
       {(scrubbing) && (
         <div
-          className="absolute right-0 top-16 bottom-16 w-48 z-20 flex flex-col justify-center"
+          className="absolute right-0 top-16 bottom-16 w-48 z-20 flex flex-col justify-center glass-surface"
           style={{
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            background: "hsl(var(--background) / 0.6)",
-            borderLeft: "1px solid hsl(var(--border) / 0.3)",
             borderRadius: "16px 0 0 16px",
             opacity: fadingOut ? 0 : 1,
             transform: fadingOut ? "translateX(12px)" : "translateX(0)",
@@ -195,7 +203,6 @@ export const HomeScreen: React.FC<Props> = ({
           <div className="flex flex-col items-start py-2 px-1 overflow-hidden h-full justify-center">
             {SORTED_APPS.map((app, i) => {
               const isActive = i === scrubIndex;
-              // Show a window of items around the active index for readability
               const dist = Math.abs(i - scrubIndex);
               const opacity = dist === 0 ? 1 : dist <= 2 ? 0.6 : dist <= 4 ? 0.3 : 0.12;
 
@@ -212,10 +219,13 @@ export const HomeScreen: React.FC<Props> = ({
                   <span
                     className={`font-serif truncate ${
                       isActive
-                        ? "text-primary text-base font-semibold"
-                        : "text-foreground text-xs"
+                        ? "text-base font-semibold italic"
+                        : "text-xs"
                     }`}
                     style={{
+                      color: isActive
+                        ? "hsl(var(--primary))"
+                        : "hsl(var(--foreground) / 0.85)",
                       transition: "all 0.12s ease-out",
                     }}
                   >

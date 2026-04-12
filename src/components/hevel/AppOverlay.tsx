@@ -7,13 +7,19 @@ interface Props {
 
 export const AppOverlay: React.FC<Props> = ({ appName, onClose }) => (
   <div
-    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background"
+    className="absolute inset-0 z-50 flex flex-col items-center justify-center atmospheric-bg"
     style={{ transition: "opacity 0.3s ease-out" }}
   >
-    <span className="text-3xl text-foreground font-serif mb-8">{appName}</span>
+    <span
+      className="text-3xl font-serif mb-8"
+      style={{ color: "hsl(var(--foreground) / 0.85)", textShadow: "0 0 40px rgba(215, 153, 33, 0.08)" }}
+    >
+      {appName}
+    </span>
     <button
       onClick={onClose}
-      className="text-muted-foreground font-serif text-lg hover:text-foreground transition-colors duration-200"
+      className="font-serif text-lg transition-colors duration-200"
+      style={{ color: "hsl(var(--muted-foreground) / 0.4)" }}
     >
       ← back
     </button>
