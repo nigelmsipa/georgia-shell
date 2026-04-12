@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { COVER_APPS, ALL_APPS } from "./types";
-import { SignalCover } from "./covers/SignalCover";
+import { AtmosphericBg } from "./AtmosphericBg";
 import { TerminalCover } from "./covers/TerminalCover";
 import { FirefoxCover } from "./covers/FirefoxCover";
 import { NotesCover } from "./covers/NotesCover";
@@ -109,11 +109,12 @@ export const HomeScreen: React.FC<Props> = ({
 
   return (
     <div
-      className="absolute inset-0 flex flex-col select-none atmospheric-bg"
+      className="absolute inset-0 flex flex-col select-none"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       style={{ touchAction: "none" }}
     >
+      <AtmosphericBg />
       {/* Status bar */}
       <div className="flex justify-between items-center px-6 pt-14 pb-2 relative z-10">
         <span
