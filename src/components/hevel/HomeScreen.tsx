@@ -206,54 +206,19 @@ export const HomeScreen: React.FC<Props> = ({
 
       {/* ── Status bar ── */}
       <div
-        className="flex justify-between items-center px-5 pt-12 pb-3 relative z-10"
-        style={{
-          borderBottom: "1px solid hsl(var(--border) / 0.06)",
-        }}
+        className="flex justify-center items-center px-5 pt-12 pb-3 relative z-10"
       >
-        <div className="flex items-baseline gap-1">
-          <span
-            className="font-serif italic tracking-tight"
-            style={{
-              fontSize: 22,
-              fontWeight: 600,
-              color: "hsl(var(--foreground) / 0.85)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {hours}:{minutes}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1">
-            <div
-              className="flex gap-px"
-              style={{ opacity: 0.35 }}
-            >
-              {[4, 6, 8, 10].map((h, i) => (
-                <div
-                  key={i}
-                  className="rounded-sm"
-                  style={{
-                    width: 2.5,
-                    height: h,
-                    background: "hsl(var(--foreground))",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-          <span
-            className="font-serif"
-            style={{
-              fontSize: 11,
-              color: "hsl(var(--foreground) / 0.35)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            78%
-          </span>
-        </div>
+        <span
+          className="font-serif tracking-tight"
+          style={{
+            fontSize: 15,
+            fontWeight: 500,
+            color: "hsl(var(--foreground) / 0.5)",
+            letterSpacing: "0.02em",
+          }}
+        >
+          {hours}:{minutes}
+        </span>
       </div>
 
       {/* ── Cover cards — recede when scrubbing or in launcher focus ── */}
@@ -282,7 +247,7 @@ export const HomeScreen: React.FC<Props> = ({
                 key={app}
                 className="relative"
                 style={{
-                  aspectRatio: gridCols === 2 ? "3/4" : "2/3",
+                  aspectRatio: gridCols === 2 ? "2/3" : "3/5",
                   animation: editMode ? `wiggle 0.3s ease-in-out infinite ${idx % 2 === 0 ? '' : '0.15s'}` : "none",
                 }}
               >
