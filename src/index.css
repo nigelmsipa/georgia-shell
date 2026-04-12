@@ -283,11 +283,6 @@
   z-index: 0;
 }
 
-.atmospheric-bg > * {
-  position: relative;
-  z-index: 1;
-}
-
 /* Hide scrollbar globally for swipeable areas */
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
