@@ -4,7 +4,6 @@ import { AppSwitcher } from "./AppSwitcher";
 import { NotificationsPane } from "./NotificationsPane";
 import { AppOverlay } from "./AppOverlay";
 import { ControlCenter } from "./ControlCenter";
-import { ProseLauncher } from "./ProseLauncher";
 import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { AtmosphericBg } from "./AtmosphericBg";
@@ -14,7 +13,6 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
-  const [proseLauncher, setProseLauncher] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -23,12 +21,11 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     setSwitcher(false);
     setNotifications(false);
     setControlCenter(false);
-    setProseLauncher(false);
     setRunningApp(null);
 
     switch (navigateTo) {
       case "Lock": setLocked(true); break;
-      case "Launcher": setProseLauncher(true); break;
+      case "Launcher": break;
       case "Notifications": setNotifications(true); break;
       case "Switcher": setSwitcher(true); break;
       case "Control Center": setControlCenter(true); break;
@@ -40,7 +37,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const openApp = (name: string) => setRunningApp(name);
   const closeApp = () => setRunningApp(null);
 
-  const anyOverlay = controlCenter || proseLauncher;
+  const anyOverlay = controlCenter;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -55,7 +52,6 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         }}
       >
         <HomeScreen
-          onOpenLauncher={() => setProseLauncher(true)}
           onOpenApp={openApp}
           onSwipeToNotifications={() => setNotifications(true)}
           onOpenSwitcher={() => setSwitcher(true)}
@@ -66,7 +62,6 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       <NotificationsPane open={notifications} onClose={() => setNotifications(false)} />
       <AppSwitcher open={switcher} onClose={() => setSwitcher(false)} onOpenApp={openApp} />
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
-      <ProseLauncher open={proseLauncher} onClose={() => setProseLauncher(false)} onOpenApp={openApp} />
 
       {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}
       {runningApp && runningApp !== "Settings" && <AppOverlay appName={runningApp} onClose={closeApp} />}

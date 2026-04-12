@@ -9,7 +9,7 @@ export const PhoneFrame: React.FC<{
   return (
     <div
       className="flex items-center justify-center min-h-screen gap-6"
-      style={{ background: "#1d2021" }}
+      style={{ background: "#1a1817" }}
     >
       <div
         className="relative overflow-hidden"
@@ -19,7 +19,7 @@ export const PhoneFrame: React.FC<{
           borderRadius: 40,
           border: "3px solid #32302f",
           boxShadow: "inset 0 0 0 1px rgba(235, 219, 178, 0.04), 0 0 60px rgba(0, 0, 0, 0.5)",
-          background: "#282828",
+          background: "#1d2021",
         }}
       >
         {children}

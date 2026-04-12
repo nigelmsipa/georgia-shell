@@ -55,45 +55,45 @@
 
   /* ===== GRUVBOX DARK ===== */
   .dark, .gruvbox-dark {
-    --background: 0 0% 16%;
-    --foreground: 43 42% 81%;
-    --card: 30 5% 22%;
-    --card-foreground: 43 42% 81%;
-    --popover: 30 5% 22%;
-    --popover-foreground: 43 42% 81%;
+    --background: 20 6% 12%;
+    --foreground: 40 23% 92%;
+    --card: 20 5% 16%;
+    --card-foreground: 40 23% 92%;
+    --popover: 20 5% 16%;
+    --popover-foreground: 40 23% 92%;
     --primary: 42 75% 49%;
-    --primary-foreground: 0 0% 16%;
-    --secondary: 30 7% 29%;
-    --secondary-foreground: 43 42% 81%;
-    --muted: 30 7% 29%;
+    --primary-foreground: 20 6% 12%;
+    --secondary: 20 4% 22%;
+    --secondary-foreground: 40 23% 92%;
+    --muted: 20 4% 22%;
     --muted-foreground: 33 11% 52%;
     --accent: 150 18% 51%;
-    --accent-foreground: 0 0% 16%;
+    --accent-foreground: 20 6% 12%;
     --destructive: 0 72% 46%;
-    --destructive-foreground: 43 42% 81%;
-    --border: 30 7% 29%;
-    --input: 30 7% 29%;
+    --destructive-foreground: 40 23% 92%;
+    --border: 20 5% 20%;
+    --input: 20 5% 20%;
     --ring: 42 75% 49%;
-    --gruvbox-bg0: 0 0% 16%;
-    --gruvbox-bg1: 30 5% 22%;
-    --gruvbox-bg2: 30 7% 29%;
-    --sidebar-background: 30 5% 22%;
-    --sidebar-foreground: 43 42% 81%;
+    --gruvbox-bg0: 20 6% 12%;
+    --gruvbox-bg1: 20 5% 16%;
+    --gruvbox-bg2: 20 4% 22%;
+    --sidebar-background: 20 5% 16%;
+    --sidebar-foreground: 40 23% 92%;
     --sidebar-primary: 42 75% 49%;
-    --sidebar-primary-foreground: 0 0% 16%;
-    --sidebar-accent: 30 7% 29%;
-    --sidebar-accent-foreground: 43 42% 81%;
-    --sidebar-border: 30 7% 29%;
+    --sidebar-primary-foreground: 20 6% 12%;
+    --sidebar-accent: 20 4% 22%;
+    --sidebar-accent-foreground: 40 23% 92%;
+    --sidebar-border: 20 5% 20%;
     --sidebar-ring: 42 75% 49%;
 
     /* Glass tokens — dark mode */
-    --glass-bg: rgba(40, 40, 36, 0.55);
-    --glass-border: rgba(235, 219, 178, 0.08);
-    --glass-highlight: rgba(235, 219, 178, 0.04);
-    --glass-blur: 12px;
-    --glow-gold: rgba(215, 153, 33, 0.06);
-    --glow-blue: rgba(69, 133, 136, 0.05);
-    --grain-opacity: 0.03;
+    --glass-bg: rgba(60, 56, 54, 0.35);
+    --glass-border: rgba(235, 219, 178, 0.12);
+    --glass-highlight: rgba(235, 219, 178, 0.08);
+    --glass-blur: 20px;
+    --glow-gold: rgba(215, 153, 33, 0.1);
+    --glow-blue: rgba(69, 133, 136, 0.08);
+    --grain-opacity: 0.04;
   }
 
   /* ===== NORD ===== */
@@ -246,15 +246,44 @@
 
 /* ── Glass surface utility ─────────────────────────────────────────────── */
 .glass-surface {
+  position: relative;
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   box-shadow:
     inset 0 1px 0 0 var(--glass-highlight),
-    0 8px 32px rgba(0, 0, 0, 0.25);
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Grain texture overlay on glass surfaces */
+.glass-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  mix-blend-mode: overlay;
 }
 
 /* Hide scrollbar globally for swipeable areas */
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* Launcher app list stagger animation */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
