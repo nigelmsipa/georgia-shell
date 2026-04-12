@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { HomeScreen } from "./HomeScreen";
-import { AppSwitcher } from "./AppSwitcher";
 import { NotificationsPane } from "./NotificationsPane";
 import { AppOverlay } from "./AppOverlay";
 import { ControlCenter } from "./ControlCenter";
@@ -10,7 +9,6 @@ import { AtmosphericBg } from "./AtmosphericBg";
 
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const [locked, setLocked] = useState(true);
-  const [switcher, setSwitcher] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
@@ -18,7 +16,6 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   React.useEffect(() => {
     if (!navigateTo) return;
     setLocked(false);
-    setSwitcher(false);
     setNotifications(false);
     setControlCenter(false);
     setRunningApp(null);
@@ -27,7 +24,6 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       case "Lock": setLocked(true); break;
       case "Launcher": break;
       case "Notifications": setNotifications(true); break;
-      case "Switcher": setSwitcher(true); break;
       case "Control Center": setControlCenter(true); break;
       case "Settings": setRunningApp("Settings"); break;
       case "Home": break;
@@ -54,13 +50,11 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         <HomeScreen
           onOpenApp={openApp}
           onSwipeToNotifications={() => setNotifications(true)}
-          onOpenSwitcher={() => setSwitcher(true)}
           onOpenControlCenter={() => setControlCenter(true)}
         />
       </div>
 
       <NotificationsPane open={notifications} onClose={() => setNotifications(false)} />
-      <AppSwitcher open={switcher} onClose={() => setSwitcher(false)} onOpenApp={openApp} />
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
 
       {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}

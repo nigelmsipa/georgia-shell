@@ -4,7 +4,7 @@ export const PhoneFrame: React.FC<{
   children: React.ReactNode;
   onNavigate?: (screen: string) => void;
 }> = ({ children, onNavigate }) => {
-  const screens = ["Lock", "Home", "Launcher", "Notifications", "Switcher", "Control Center", "Settings"];
+  const screens = ["Lock", "Home", "Launcher", "Notifications", "Control Center", "Settings"];
 
   return (
     <div

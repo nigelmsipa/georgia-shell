@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { COVER_APPS, ALL_APPS } from "./types";
+import { DEFAULT_COVER_APPS, ALL_APPS } from "./types";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { SignalCover } from "./covers/SignalCover";
 import { TerminalCover } from "./covers/TerminalCover";
@@ -23,18 +23,23 @@ const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 interface Props {
   onOpenApp: (name: string) => void;
   onSwipeToNotifications: () => void;
-  onOpenSwitcher: () => void;
   onOpenControlCenter: () => void;
 }
 
 export const HomeScreen: React.FC<Props> = ({
   onOpenApp,
   onSwipeToNotifications,
-  onOpenSwitcher,
   onOpenControlCenter,
 }) => {
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });
+
+  // Dynamic cover apps
+  const [coverApps, setCoverApps] = useState<string[]>(DEFAULT_COVER_APPS);
+  const [editMode, setEditMode] = useState(false);
+  const [addedFlash, setAddedFlash] = useState<string | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const launcherLpTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Scrub / launcher-focus state
   const [scrubbing, setScrubbing] = useState(false);
@@ -44,6 +49,9 @@ export const HomeScreen: React.FC<Props> = ({
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const scrubZoneRef = useRef<HTMLDivElement>(null);
+
+  // Grid columns: 2 for ≤4, 3 for 5+
+  const gridCols = coverApps.length <= 4 ? 2 : 3;
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -165,6 +173,28 @@ export const HomeScreen: React.FC<Props> = ({
     exitLauncher();
   }, [onOpenApp, exitLauncher]);
 
+  const addAppToHome = useCallback((name: string) => {
+    setCoverApps((prev) => {
+      if (prev.includes(name)) return prev;
+      return [...prev, name];
+    });
+    setAddedFlash(name);
+    setTimeout(() => setAddedFlash(null), 800);
+  }, []);
+
+  const startLauncherLongPress = useCallback((name: string) => {
+    launcherLpTimer.current = setTimeout(() => {
+      addAppToHome(name);
+    }, 600);
+  }, [addAppToHome]);
+
+  const cancelLauncherLongPress = useCallback(() => {
+    if (launcherLpTimer.current) {
+      clearTimeout(launcherLpTimer.current);
+      launcherLpTimer.current = null;
+    }
+  }, []);
+
   return (
     <div
       className="absolute inset-0 flex flex-col select-none"
@@ -174,33 +204,61 @@ export const HomeScreen: React.FC<Props> = ({
     >
       <AtmosphericBg />
 
-      {/* Status bar */}
-      <div className="flex justify-between items-center px-6 pt-14 pb-2 relative z-10">
-        <span
-          className="text-sm font-serif tracking-tight"
-          style={{ color: "hsl(var(--foreground) / 0.6)" }}
-        >
-          {hours}:{minutes}
-        </span>
-        <div className="flex items-center gap-1.5">
+      {/* ── Status bar ── */}
+      <div
+        className="flex justify-between items-center px-5 pt-12 pb-3 relative z-10"
+        style={{
+          borderBottom: "1px solid hsl(var(--border) / 0.06)",
+        }}
+      >
+        <div className="flex items-baseline gap-1">
           <span
-            className="text-[10px] font-serif tracking-wider"
-            style={{ color: "hsl(var(--muted-foreground) / 0.3)" }}
+            className="font-serif italic tracking-tight"
+            style={{
+              fontSize: 22,
+              fontWeight: 600,
+              color: "hsl(var(--foreground) / 0.85)",
+              letterSpacing: "-0.02em",
+            }}
           >
-            ▲▲
+            {hours}:{minutes}
           </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <div
+              className="flex gap-px"
+              style={{ opacity: 0.35 }}
+            >
+              {[4, 6, 8, 10].map((h, i) => (
+                <div
+                  key={i}
+                  className="rounded-sm"
+                  style={{
+                    width: 2.5,
+                    height: h,
+                    background: "hsl(var(--foreground))",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
           <span
-            className="text-xs font-serif"
-            style={{ color: "hsl(var(--muted-foreground) / 0.4)" }}
+            className="font-serif"
+            style={{
+              fontSize: 11,
+              color: "hsl(var(--foreground) / 0.35)",
+              letterSpacing: "0.02em",
+            }}
           >
             78%
           </span>
         </div>
       </div>
 
-      {/* Cover cards — recede when scrubbing or in launcher focus */}
+      {/* ── Cover cards — recede when scrubbing or in launcher focus ── */}
       <div
-        className="flex-1 px-4 pt-6 pb-2 overflow-hidden"
+        className="flex-1 px-3 pt-4 pb-2 overflow-hidden relative"
         style={{
           filter: receded ? "blur(10px) brightness(0.6)" : "none",
           transform: receded ? "scale(0.95)" : "scale(1)",
@@ -209,18 +267,92 @@ export const HomeScreen: React.FC<Props> = ({
           pointerEvents: receded ? "none" : "auto",
         }}
       >
-        <div className={`grid gap-3 ${COVER_APPS.length <= 4 ? "grid-cols-2" : "grid-cols-3"}`}>
-          {COVER_APPS.map((app) => {
+        <div
+          className="grid"
+          style={{
+            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+            gap: gridCols === 2 ? 10 : 8,
+            transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
+          }}
+        >
+          {coverApps.map((app, idx) => {
             const Cover = COVER_COMPONENTS[app];
             return (
-              <button
+              <div
                 key={app}
-                onClick={(e) => { e.stopPropagation(); onOpenApp(app); }}
-                className="relative rounded-[24px] overflow-hidden transition-transform duration-200 active:scale-[0.97] glass-surface"
-                style={{ aspectRatio: "3/4" }}
+                className="relative"
+                style={{
+                  aspectRatio: gridCols === 2 ? "3/4" : "2/3",
+                  animation: editMode ? `wiggle 0.3s ease-in-out infinite ${idx % 2 === 0 ? '' : '0.15s'}` : "none",
+                }}
               >
-                {Cover && <Cover />}
-              </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (editMode) {
+                      setEditMode(false);
+                    } else {
+                      onOpenApp(app);
+                    }
+                  }}
+                  onPointerDown={() => {
+                    longPressTimer.current = setTimeout(() => {
+                      setEditMode(true);
+                    }, 500);
+                  }}
+                  onPointerUp={() => {
+                    if (longPressTimer.current) {
+                      clearTimeout(longPressTimer.current);
+                      longPressTimer.current = null;
+                    }
+                  }}
+                  onPointerCancel={() => {
+                    if (longPressTimer.current) {
+                      clearTimeout(longPressTimer.current);
+                      longPressTimer.current = null;
+                    }
+                  }}
+                  className="w-full h-full relative rounded-[20px] overflow-hidden transition-all duration-300 active:scale-[0.97] glass-surface"
+                >
+                  {Cover ? <Cover /> : (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ background: "hsl(var(--secondary))" }}
+                    >
+                      <span
+                        className="font-serif italic text-sm"
+                        style={{ color: "hsl(var(--foreground) / 0.4)" }}
+                      >
+                        {app}
+                      </span>
+                    </div>
+                  )}
+                </button>
+                {/* Remove badge in edit mode */}
+                {editMode && coverApps.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCoverApps((prev) => prev.filter((a) => a !== app));
+                      if (coverApps.length <= 2) setEditMode(false);
+                    }}
+                    className="absolute -top-1.5 -right-1.5 z-10 flex items-center justify-center rounded-full"
+                    style={{
+                      width: 22,
+                      height: 22,
+                      background: "hsl(var(--destructive))",
+                      border: "2px solid hsl(var(--background))",
+                    }}
+                  >
+                    <span
+                      className="font-serif"
+                      style={{ fontSize: 12, fontWeight: 700, color: "hsl(var(--destructive-foreground))", lineHeight: 1 }}
+                    >
+                      ×
+                    </span>
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
@@ -228,15 +360,15 @@ export const HomeScreen: React.FC<Props> = ({
 
       {/* Drag hint */}
       <div
-        className="flex justify-center py-6"
+        className="flex justify-center py-4"
         style={{
           opacity: receded ? 0 : 1,
           transition: "opacity 0.2s ease",
         }}
       >
         <div
-          className="w-10 h-1 rounded-full"
-          style={{ backgroundColor: "hsl(var(--muted-foreground) / 0.15)" }}
+          className="w-8 h-[3px] rounded-full"
+          style={{ backgroundColor: "hsl(var(--muted-foreground) / 0.12)" }}
         />
       </div>
 
@@ -318,31 +450,48 @@ export const HomeScreen: React.FC<Props> = ({
                   {activeLetter}
                 </div>
                 {/* App names in this letter */}
-                {(grouped[activeLetter] || []).map((app, i) => (
-                  <div
-                    key={app}
-                    onClick={() => handleAppSelect(app)}
-                    className="cursor-pointer select-none"
-                    style={{
-                      padding: "4px 0",
-                      WebkitTapHighlightColor: "transparent",
-                    }}
-                  >
-                    <span
-                      className="font-serif italic"
+                {(grouped[activeLetter] || []).map((app, i) => {
+                  const isOnHome = coverApps.includes(app);
+                  const justAdded = addedFlash === app;
+                  return (
+                    <div
+                      key={app}
+                      onClick={() => handleAppSelect(app)}
+                      onPointerDown={() => startLauncherLongPress(app)}
+                      onPointerUp={cancelLauncherLongPress}
+                      onPointerCancel={cancelLauncherLongPress}
+                      className="cursor-pointer select-none flex items-center gap-2"
                       style={{
-                        fontSize: i === 0 ? 28 : 20,
-                        fontWeight: i === 0 ? 700 : 400,
-                        color: i === 0
-                          ? "hsl(var(--primary))"
-                          : "hsl(var(--foreground) / 0.6)",
-                        transition: "all 0.12s ease-out",
+                        padding: "4px 0",
+                        WebkitTapHighlightColor: "transparent",
                       }}
                     >
-                      {app}
-                    </span>
-                  </div>
-                ))}
+                      <span
+                        className="font-serif italic"
+                        style={{
+                          fontSize: i === 0 ? 28 : 20,
+                          fontWeight: i === 0 ? 700 : 400,
+                          color: justAdded
+                            ? "hsl(var(--accent))"
+                            : i === 0
+                              ? "hsl(var(--primary))"
+                              : "hsl(var(--foreground) / 0.6)",
+                          transition: "color 0.3s ease-out",
+                        }}
+                      >
+                        {app}
+                      </span>
+                      {isOnHome && (
+                        <span
+                          className="font-serif"
+                          style={{ fontSize: 8, color: "hsl(var(--muted-foreground) / 0.3)" }}
+                        >
+                          ●
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </>
             )}
           </div>
@@ -446,11 +595,16 @@ export const HomeScreen: React.FC<Props> = ({
             <div className="flex-1 overflow-y-auto hide-scrollbar">
               {visibleApps.map((app, i) => {
                 const isFirst = i === 0 && !search.trim();
+                const isOnHome = coverApps.includes(app);
+                const justAdded = addedFlash === app;
                 return (
                   <div
                     key={app}
                     onClick={() => handleAppSelect(app)}
-                    className="cursor-pointer select-none"
+                    onPointerDown={() => startLauncherLongPress(app)}
+                    onPointerUp={cancelLauncherLongPress}
+                    onPointerCancel={cancelLauncherLongPress}
+                    className="cursor-pointer select-none flex items-center gap-2"
                     style={{
                       padding: "6px 0",
                       opacity: 0,
@@ -464,14 +618,24 @@ export const HomeScreen: React.FC<Props> = ({
                       style={{
                         fontSize: isFirst ? 28 : 20,
                         fontWeight: isFirst ? 700 : 400,
-                        color: isFirst
-                          ? "hsl(var(--primary))"
-                          : "hsl(var(--foreground) / 0.6)",
-                        transition: "all 0.12s ease-out",
+                        color: justAdded
+                          ? "hsl(var(--accent))"
+                          : isFirst
+                            ? "hsl(var(--primary))"
+                            : "hsl(var(--foreground) / 0.6)",
+                        transition: "color 0.3s ease-out",
                       }}
                     >
                       {search.trim() ? highlightMatch(app, search) : app}
                     </span>
+                    {isOnHome && (
+                      <span
+                        className="font-serif"
+                        style={{ fontSize: 8, color: "hsl(var(--muted-foreground) / 0.3)" }}
+                      >
+                        ●
+                      </span>
+                    )}
                   </div>
                 );
               })}
