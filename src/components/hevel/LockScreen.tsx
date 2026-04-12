@@ -23,7 +23,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const [error, setError] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
 
-  // Continuous vertical scroll position (0 = clock visible, 1 = PIN visible)
   const [scrollY, setScrollY] = useState(0);
   const dragRef = useRef({
     startY: 0,
@@ -46,7 +45,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const ampm = hours >= 12 ? "pm" : "am";
   const dateStr = `${DAYS[time.getDay()]}, ${MONTHS[time.getMonth()]} ${time.getDate()}`;
 
-  // --- Continuous drag handlers ---
   const handlePointerDown = (e: React.PointerEvent) => {
     if (unlocking) return;
     dragRef.current = {
@@ -73,10 +71,9 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
     dragRef.current.lastY = e.clientY;
     dragRef.current.lastTime = now;
 
-    // Map drag distance to 0..1 with rubber-banding at edges
     let next = dragRef.current.startScrollY + rawDy / containerHeight;
-    if (next < 0) next = next * 0.3; // rubber band top
-    if (next > 1) next = 1 + (next - 1) * 0.3; // rubber band bottom
+    if (next < 0) next = next * 0.3;
+    if (next > 1) next = 1 + (next - 1) * 0.3;
     setScrollY(next);
   };
 
@@ -85,19 +82,17 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
     dragRef.current.active = false;
 
     const { velocity } = dragRef.current;
-    // Snap to nearest phase, biased by velocity
     let target: number;
     if (velocity > 0.4) {
-      target = 1; // flicked up → PIN
+      target = 1;
     } else if (velocity < -0.4) {
-      target = 0; // flicked down → clock
+      target = 0;
     } else {
       target = scrollY > 0.4 ? 1 : 0;
     }
     setScrollY(target);
   };
 
-  // --- PIN handlers ---
   const handleKey = (key: string) => {
     if (unlocking) return;
     if (key === "delete") {
@@ -142,7 +137,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-[60] overflow-hidden select-none bg-background"
+      className="absolute inset-0 z-[60] overflow-hidden select-none atmospheric-bg"
       style={{
         touchAction: "none",
         opacity: unlocking ? 0 : 1,
@@ -156,7 +151,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
-      {/* Continuous vertical surface: two viewport-height sections stacked */}
       <div
         style={{
           transform: `translateY(${translatePx}px)`,
@@ -171,7 +165,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           style={{ height: containerH, position: "relative" }}
         >
           <div className="flex flex-col items-center">
-            {/* Time */}
             <span
               className="font-serif"
               style={{
@@ -180,6 +173,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                 lineHeight: 1,
                 letterSpacing: "-0.04em",
                 color: "hsl(var(--foreground))",
+                textShadow: "0 0 60px rgba(215, 153, 33, 0.08)",
                 opacity: 1 - scrollY * 0.6,
                 transform: `scale(${1 - scrollY * 0.08})`,
                 transition: isAnimating ? "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)" : "none",
@@ -188,12 +182,11 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               {displayHour}:{minutes}
             </span>
 
-            {/* Date & AM/PM as a prose line */}
             <span
               className="font-serif italic mt-4"
               style={{
                 fontSize: 14,
-                color: "hsl(var(--muted-foreground) / 0.35)",
+                color: "hsl(var(--muted-foreground) / 0.3)",
                 letterSpacing: "0.02em",
                 opacity: 1 - scrollY * 1.5,
                 transition: isAnimating ? "opacity 0.6s ease" : "none",
@@ -203,7 +196,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             </span>
           </div>
 
-          {/* Swipe hint — prose, not icons */}
           <div
             className="absolute bottom-12 animate-breathe"
             style={{
@@ -215,7 +207,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               className="font-serif italic"
               style={{
                 fontSize: 12,
-                color: "hsl(var(--muted-foreground) / 0.5)",
+                color: "hsl(var(--muted-foreground) / 0.4)",
                 letterSpacing: "0.06em",
               }}
             >
@@ -229,19 +221,17 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           className="flex flex-col items-center justify-center"
           style={{ height: containerH }}
         >
-          {/* Prose prompt */}
           <span
             className="font-serif italic"
             style={{
               fontSize: 14,
-              color: "hsl(var(--muted-foreground) / 0.4)",
+              color: "hsl(var(--muted-foreground) / 0.35)",
               letterSpacing: "0.04em",
             }}
           >
             enter passcode
           </span>
 
-          {/* PIN dots */}
           <div
             className={`flex items-center justify-center gap-5 mt-8 ${error ? "animate-shake" : ""}`}
           >
@@ -256,8 +246,8 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     i < entered.length
                       ? error
                         ? "hsl(var(--destructive))"
-                        : "hsl(var(--foreground))"
-                      : "hsl(var(--muted-foreground) / 0.12)",
+                        : "hsl(var(--primary))"
+                      : "hsl(var(--muted-foreground) / 0.1)",
                   transform:
                     unlocking && i < entered.length ? "scale(1.4)" : "scale(1)",
                   opacity: unlocking ? 0 : 1,
@@ -269,7 +259,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             ))}
           </div>
 
-          {/* Keypad */}
           <div className="flex flex-col items-center gap-3 mt-10">
             {KEYS.map((row, ri) => (
               <div key={ri} className="flex items-center gap-5">
@@ -286,9 +275,11 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                       style={{
                         width: 68,
                         height: 68,
-                        backgroundColor: isDelete
+                        background: isDelete
                           ? "transparent"
-                          : "hsl(var(--foreground) / 0.06)",
+                          : "var(--glass-bg)",
+                        border: isDelete ? "none" : "1px solid var(--glass-border)",
+                        boxShadow: isDelete ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
                       }}
                     >
                       {isDelete ? (
@@ -296,7 +287,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                           className="font-serif italic"
                           style={{
                             fontSize: 12,
-                            color: "hsl(var(--muted-foreground) / 0.4)",
+                            color: "hsl(var(--muted-foreground) / 0.35)",
                             letterSpacing: "0.03em",
                           }}
                         >

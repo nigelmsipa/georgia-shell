@@ -169,7 +169,7 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <div
-      className="absolute inset-0 z-20 flex flex-col bg-background"
+      className="absolute inset-0 z-20 flex flex-col atmospheric-bg"
       style={{ touchAction: "none" }}
       onPointerDown={handlePaneSwipe}
       onPointerUp={handlePaneSwipeEnd}
