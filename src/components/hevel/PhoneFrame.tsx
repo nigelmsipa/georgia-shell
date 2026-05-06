@@ -1,11 +1,23 @@
 import React from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const PhoneFrame: React.FC<{
   children: React.ReactNode;
   onNavigate?: (screen: string) => void;
 }> = ({ children, onNavigate }) => {
+  const isMobile = useIsMobile();
   const screens = ["Lock", "Home", "Launcher", "Notifications", "Control Center", "Settings"];
 
+  // On mobile: fullscreen, no frame chrome
+  if (isMobile) {
+    return (
+      <div className="relative w-screen h-screen overflow-hidden" style={{ background: "#1d2021" }}>
+        {children}
+      </div>
+    );
+  }
+
+  // On desktop: phone frame + debug toolbar
   return (
     <div
       className="flex items-center justify-center min-h-screen gap-6"
@@ -25,7 +37,6 @@ export const PhoneFrame: React.FC<{
         {children}
       </div>
 
-      {/* Debug toolbar */}
       {onNavigate && (
         <div className="flex flex-col gap-2 py-4">
           <span
