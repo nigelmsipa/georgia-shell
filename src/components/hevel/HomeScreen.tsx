@@ -209,6 +209,7 @@ export const HomeScreen: React.FC<Props> = ({
 
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 flex flex-col select-none"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
