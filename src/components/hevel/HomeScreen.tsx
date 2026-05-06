@@ -24,12 +24,14 @@ interface Props {
   onOpenApp: (name: string) => void;
   onSwipeToNotifications: () => void;
   onOpenControlCenter: () => void;
+  onOpenUtilityDrawer?: () => void;
 }
 
 export const HomeScreen: React.FC<Props> = ({
   onOpenApp,
   onSwipeToNotifications,
   onOpenControlCenter,
+  onOpenUtilityDrawer,
 }) => {
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });
@@ -102,6 +104,8 @@ export const HomeScreen: React.FC<Props> = ({
   }, []);
 
   // Gesture handling
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const handlePointerDown = (e: React.PointerEvent) => {
     dragRef.current = { startY: e.clientY, startX: e.clientX, dragging: true };
   };
@@ -117,8 +121,16 @@ export const HomeScreen: React.FC<Props> = ({
       return;
     }
 
-    // Flick up enters launcher focus (with search)
-    if (dy > 80) {
+    // Swipe up from bottom 60px → utility drawer
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    const startedFromBottom = containerRect
+      ? dragRef.current.startY > containerRect.bottom - 60
+      : false;
+
+    if (dy > 80 && startedFromBottom && onOpenUtilityDrawer) {
+      onOpenUtilityDrawer();
+    } else if (dy > 80) {
+      // Flick up enters launcher focus (with search)
       setLauncherFocus(true);
       setSearch("");
       setActiveLetter(null);
@@ -197,6 +209,7 @@ export const HomeScreen: React.FC<Props> = ({
 
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 flex flex-col select-none"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}

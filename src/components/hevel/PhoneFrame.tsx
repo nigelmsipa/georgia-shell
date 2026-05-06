@@ -6,7 +6,7 @@ export const PhoneFrame: React.FC<{
   onNavigate?: (screen: string) => void;
 }> = ({ children, onNavigate }) => {
   const isMobile = useIsMobile();
-  const screens = ["Lock", "Home", "Launcher", "Notifications", "Control Center", "Settings"];
+  const screens = ["Lock", "Home", "Launcher", "Notifications", "Control Center", "Utility", "Settings"];
 
   // On mobile: fullscreen, no frame chrome
   if (isMobile) {

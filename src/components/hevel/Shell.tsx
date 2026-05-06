@@ -5,12 +5,14 @@ import { AppOverlay } from "./AppOverlay";
 import { ControlCenter } from "./ControlCenter";
 import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
+import { UtilityDrawer } from "./UtilityDrawer";
 import { AtmosphericBg } from "./AtmosphericBg";
 
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const [locked, setLocked] = useState(true);
   const [notifications, setNotifications] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
+  const [utilityDrawer, setUtilityDrawer] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -18,6 +20,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     setLocked(false);
     setNotifications(false);
     setControlCenter(false);
+    setUtilityDrawer(false);
     setRunningApp(null);
 
     switch (navigateTo) {
@@ -25,6 +28,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       case "Launcher": break;
       case "Notifications": setNotifications(true); break;
       case "Control Center": setControlCenter(true); break;
+      case "Utility": setUtilityDrawer(true); break;
       case "Settings": setRunningApp("Settings"); break;
       case "Home": break;
     }
@@ -33,7 +37,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const openApp = (name: string) => setRunningApp(name);
   const closeApp = () => setRunningApp(null);
 
-  const anyOverlay = controlCenter;
+  const anyOverlay = controlCenter || utilityDrawer;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -51,14 +55,22 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
           onOpenApp={openApp}
           onSwipeToNotifications={() => setNotifications(true)}
           onOpenControlCenter={() => setControlCenter(true)}
+          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
         />
       </div>
 
       <NotificationsPane open={notifications} onClose={() => setNotifications(false)} />
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
+      <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
 
       {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}
-      {runningApp && runningApp !== "Settings" && <AppOverlay appName={runningApp} onClose={closeApp} />}
+      {runningApp && runningApp !== "Settings" && (
+        <AppOverlay
+          appName={runningApp}
+          onClose={closeApp}
+          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+        />
+      )}
 
       {locked && <LockScreen onUnlock={() => setLocked(false)} />}
     </div>
