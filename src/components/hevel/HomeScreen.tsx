@@ -24,12 +24,14 @@ interface Props {
   onOpenApp: (name: string) => void;
   onSwipeToNotifications: () => void;
   onOpenControlCenter: () => void;
+  onOpenUtilityDrawer?: () => void;
 }
 
 export const HomeScreen: React.FC<Props> = ({
   onOpenApp,
   onSwipeToNotifications,
   onOpenControlCenter,
+  onOpenUtilityDrawer,
 }) => {
   const [time, setTime] = useState(new Date());
   const dragRef = useRef({ startY: 0, startX: 0, dragging: false });

@@ -4,6 +4,7 @@ import { AtmosphericBg } from "./AtmosphericBg";
 interface Props {
   appName: string;
   onClose: () => void;
+  onOpenUtilityDrawer?: () => void;
 }
 
 export const AppOverlay: React.FC<Props> = ({ appName, onClose }) => (
