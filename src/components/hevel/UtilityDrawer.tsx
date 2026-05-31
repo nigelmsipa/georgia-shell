@@ -116,7 +116,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           pointerEvents: open ? "auto" : "none",
           background: "rgba(0, 0, 0, 0.25)",
         }}
-        onPointerDown={(e) => { e.stopPropagation(); onClose(); }}
+        onPointerDown={(e) => { e.stopPropagation(); dismiss(); }}
       />
 
       {/* Drawer */}
@@ -132,6 +132,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           transition: dragRef.current.dragging
             ? "none"
             : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          pointerEvents: open ? "auto" : "none",
           borderBottom: "none",
         }}
       >
@@ -139,7 +140,6 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
         <div
           className="flex justify-center pt-3 pb-4 cursor-pointer"
           style={{ touchAction: "none" }}
-          onClick={onClose}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -164,8 +164,9 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
             >
               utilities
             </p>
-            <UtilityToken label="close" onTap={onClose} />
+            <UtilityToken label="close" onTap={dismiss} />
           </div>
+
 
           {/* Clipboard section */}
           <p
