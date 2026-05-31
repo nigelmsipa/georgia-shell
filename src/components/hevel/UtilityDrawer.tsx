@@ -17,7 +17,12 @@ const UtilityToken: React.FC<{
   return (
     <span
       role="button"
-      onPointerDown={fire}
+      tabIndex={0}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={fire}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") fire(e);
+      }}
       className="cursor-pointer font-serif italic select-none transition-all duration-200"
       style={{
         fontWeight: 600,
@@ -104,6 +109,8 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const handleShare = () => console.log("[Utility] Share triggered");
   const handleKill = () => console.log("[Utility] Kill foreground app");
 
+  if (!open) return null;
+
   const translateY = open ? dragOffset : 0;
 
   return (
@@ -112,8 +119,8 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
       <div
         className="absolute inset-0 z-[60] transition-opacity duration-300"
         style={{
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? "auto" : "none",
+          opacity: 1,
+          pointerEvents: "auto",
           background: "rgba(0, 0, 0, 0.25)",
         }}
         onPointerDown={(e) => { e.stopPropagation(); dismiss(); }}
@@ -132,7 +139,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           transition: dragRef.current.dragging
             ? "none"
             : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-          pointerEvents: open ? "auto" : "none",
+          pointerEvents: "auto",
           borderBottom: "none",
         }}
       >
