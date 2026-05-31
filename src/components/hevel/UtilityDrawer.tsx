@@ -126,7 +126,11 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
         {/* Drag handle (tap or swipe down to close) */}
         <div
           className="flex justify-center pt-3 pb-4 cursor-pointer"
+          style={{ touchAction: "none" }}
           onClick={onClose}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
         >
           <div
             style={{
@@ -140,16 +144,16 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
 
         {/* Content */}
         <div className="px-6 overflow-y-auto" style={{ maxHeight: "calc(100% - 48px)" }}>
-          {/* Title */}
-          <p
-            className="font-serif text-lg mb-5"
-            style={{
-              color: "hsl(var(--foreground) / 0.5)",
-              fontStyle: "italic",
-            }}
-          >
-            utilities
-          </p>
+          {/* Title row with close */}
+          <div className="flex items-baseline justify-between mb-5">
+            <p
+              className="font-serif text-lg"
+              style={{ color: "hsl(var(--foreground) / 0.5)", fontStyle: "italic" }}
+            >
+              utilities
+            </p>
+            <UtilityToken label="close" onTap={onClose} />
+          </div>
 
           {/* Clipboard section */}
           <p
