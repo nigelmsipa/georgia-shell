@@ -6,16 +6,18 @@ const UtilityToken: React.FC<{
 }> = ({ label, onTap }) => {
   const [flash, setFlash] = useState(false);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const fire = (e: React.SyntheticEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     setFlash(true);
-    setTimeout(() => setFlash(false), 300);
+    setTimeout(() => setFlash(false), 220);
     onTap();
   };
 
   return (
     <span
-      onClick={handleClick}
+      role="button"
+      onPointerDown={fire}
       className="cursor-pointer font-serif italic select-none transition-all duration-200"
       style={{
         fontWeight: 600,
@@ -30,6 +32,7 @@ const UtilityToken: React.FC<{
         textDecoration: "underline",
         textDecorationColor: "hsl(var(--primary) / 0.3)",
         textUnderlineOffset: "3px",
+        touchAction: "manipulation",
       }}
     >
       {label}
@@ -45,14 +48,23 @@ interface Props {
 export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const dragRef = useRef({ startY: 0, dragging: false });
   const [dragOffset, setDragOffset] = useState(0);
+  const closingRef = useRef(false);
+
+  const dismiss = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    onClose();
+    // allow re-open after animation settles
+    setTimeout(() => { closingRef.current = false; }, 350);
+  }, [onClose]);
 
   // Escape key closes
   React.useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") dismiss(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, dismiss]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     dragRef.current = { startY: e.clientY, dragging: true };
@@ -70,10 +82,10 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
     if (!dragRef.current.dragging) return;
     dragRef.current.dragging = false;
     if (dragOffset > 60) {
-      onClose();
+      dismiss();
     }
     setDragOffset(0);
-  }, [dragOffset, onClose]);
+  }, [dragOffset, dismiss]);
 
   // Clipboard actions (prototype stubs)
   const handleCopy = () => {
@@ -104,7 +116,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           pointerEvents: open ? "auto" : "none",
           background: "rgba(0, 0, 0, 0.25)",
         }}
-        onPointerDown={(e) => { e.stopPropagation(); onClose(); }}
+        onPointerDown={(e) => { e.stopPropagation(); dismiss(); }}
       />
 
       {/* Drawer */}
@@ -120,6 +132,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           transition: dragRef.current.dragging
             ? "none"
             : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          pointerEvents: open ? "auto" : "none",
           borderBottom: "none",
         }}
       >
@@ -127,7 +140,6 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
         <div
           className="flex justify-center pt-3 pb-4 cursor-pointer"
           style={{ touchAction: "none" }}
-          onClick={onClose}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -152,8 +164,9 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
             >
               utilities
             </p>
-            <UtilityToken label="close" onTap={onClose} />
+            <UtilityToken label="close" onTap={dismiss} />
           </div>
+
 
           {/* Clipboard section */}
           <p
