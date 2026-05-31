@@ -46,10 +46,18 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const dragRef = useRef({ startY: 0, dragging: false });
   const [dragOffset, setDragOffset] = useState(0);
 
+  // Escape key closes
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     dragRef.current = { startY: e.clientY, dragging: true };
     setDragOffset(0);
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
   }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
@@ -61,7 +69,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const handlePointerUp = useCallback(() => {
     if (!dragRef.current.dragging) return;
     dragRef.current.dragging = false;
-    if (dragOffset > 80) {
+    if (dragOffset > 60) {
       onClose();
     }
     setDragOffset(0);
@@ -84,7 +92,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const handleShare = () => console.log("[Utility] Share triggered");
   const handleKill = () => console.log("[Utility] Kill foreground app");
 
-  const translateY = open ? dragOffset : 100;
+  const translateY = open ? dragOffset : 0;
 
   return (
     <>
@@ -114,9 +122,6 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
             : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
           borderBottom: "none",
         }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
       >
         {/* Drag handle (tap or swipe down to close) */}
         <div
