@@ -96,7 +96,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           pointerEvents: open ? "auto" : "none",
           background: "rgba(0, 0, 0, 0.25)",
         }}
-        onClick={onClose}
+        onPointerDown={(e) => { e.stopPropagation(); onClose(); }}
       />
 
       {/* Drawer */}
