@@ -46,10 +46,18 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const dragRef = useRef({ startY: 0, dragging: false });
   const [dragOffset, setDragOffset] = useState(0);
 
+  // Escape key closes
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     dragRef.current = { startY: e.clientY, dragging: true };
     setDragOffset(0);
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
   }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
@@ -61,7 +69,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const handlePointerUp = useCallback(() => {
     if (!dragRef.current.dragging) return;
     dragRef.current.dragging = false;
-    if (dragOffset > 80) {
+    if (dragOffset > 60) {
       onClose();
     }
     setDragOffset(0);
@@ -84,7 +92,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
   const handleShare = () => console.log("[Utility] Share triggered");
   const handleKill = () => console.log("[Utility] Kill foreground app");
 
-  const translateY = open ? dragOffset : 100;
+  const translateY = open ? dragOffset : 0;
 
   return (
     <>
@@ -114,14 +122,15 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
             : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
           borderBottom: "none",
         }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
       >
         {/* Drag handle (tap or swipe down to close) */}
         <div
           className="flex justify-center pt-3 pb-4 cursor-pointer"
+          style={{ touchAction: "none" }}
           onClick={onClose}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
         >
           <div
             style={{
@@ -135,16 +144,16 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
 
         {/* Content */}
         <div className="px-6 overflow-y-auto" style={{ maxHeight: "calc(100% - 48px)" }}>
-          {/* Title */}
-          <p
-            className="font-serif text-lg mb-5"
-            style={{
-              color: "hsl(var(--foreground) / 0.5)",
-              fontStyle: "italic",
-            }}
-          >
-            utilities
-          </p>
+          {/* Title row with close */}
+          <div className="flex items-baseline justify-between mb-5">
+            <p
+              className="font-serif text-lg"
+              style={{ color: "hsl(var(--foreground) / 0.5)", fontStyle: "italic" }}
+            >
+              utilities
+            </p>
+            <UtilityToken label="close" onTap={onClose} />
+          </div>
 
           {/* Clipboard section */}
           <p
