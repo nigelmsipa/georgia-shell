@@ -96,7 +96,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           pointerEvents: open ? "auto" : "none",
           background: "rgba(0, 0, 0, 0.25)",
         }}
-        onClick={onClose}
+        onPointerDown={(e) => { e.stopPropagation(); onClose(); }}
       />
 
       {/* Drawer */}
@@ -118,8 +118,11 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-4">
+        {/* Drag handle (tap or swipe down to close) */}
+        <div
+          className="flex justify-center pt-3 pb-4 cursor-pointer"
+          onClick={onClose}
+        >
           <div
             style={{
               width: 36,
