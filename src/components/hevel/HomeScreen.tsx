@@ -238,12 +238,12 @@ export const HomeScreen: React.FC<Props> = ({
       <div
         className="flex-1 px-3 pt-4 pb-2 overflow-hidden relative"
         style={{
-          filter: receded ? "blur(10px) brightness(0.6)" : "none",
           transform: receded ? "scale(0.95)" : "scale(1)",
-          opacity: receded ? 0.5 : 1,
-          transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
+          opacity: receded ? 0.35 : 1,
+          transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s cubic-bezier(0.16,1,0.3,1)",
           pointerEvents: receded ? "none" : "auto",
         }}
+
       >
         <div
           className="grid"
