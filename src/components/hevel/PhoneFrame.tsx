@@ -39,8 +39,7 @@ export const PhoneFrame: React.FC<{
       {onNavigate && (
         <div className="flex flex-col gap-2 py-4">
           <span
-            className="text-[10px] uppercase tracking-widest mb-1 font-mono"
-            style={{ color: "#a89984" }}
+            className="text-[10px] uppercase tracking-widest mb-1 font-mono text-muted-foreground"
           >
             screens
           </span>
@@ -48,10 +47,7 @@ export const PhoneFrame: React.FC<{
             <button
               key={s}
               onClick={() => onNavigate(s)}
-              className="text-left text-xs font-mono px-3 py-1.5 rounded transition-colors"
-              style={{ color: "#ebdbb2" }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#3c3836")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              className="text-left text-xs font-mono px-3 py-1.5 rounded transition-colors text-foreground hover:bg-secondary"
             >
               {s}
             </button>
