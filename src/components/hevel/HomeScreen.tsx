@@ -290,7 +290,7 @@ export const HomeScreen: React.FC<Props> = ({
                       longPressTimer.current = null;
                     }
                   }}
-                  className="w-full h-full relative rounded-[20px] overflow-hidden transition-all duration-300 active:scale-[0.97] glass-surface"
+                  className="w-full h-full relative rounded-[20px] overflow-hidden transition-transform duration-200 active:scale-[0.97] bg-card border border-border/40"
                 >
                   {Cover ? <Cover /> : (
                     <div
