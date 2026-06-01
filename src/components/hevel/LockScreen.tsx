@@ -317,6 +317,208 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </div>
             ))}
           </div>
+
+          <button
+            onClick={() => setEmergency(true)}
+            className="mt-8 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 active:scale-95 hover:opacity-100"
+            style={{
+              background: "transparent",
+              border: "1px solid hsl(var(--destructive) / 0.35)",
+              opacity: 0.75,
+            }}
+          >
+            <span
+              className="rounded-full"
+              style={{
+                width: 6,
+                height: 6,
+                background: "hsl(var(--destructive))",
+                boxShadow: "0 0 8px hsl(var(--destructive) / 0.6)",
+              }}
+            />
+            <span
+              className="font-serif italic"
+              style={{
+                fontSize: 13,
+                color: "hsl(var(--destructive))",
+                letterSpacing: "0.04em",
+              }}
+            >
+              emergency
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── Emergency overlay ── */}
+      <div
+        className="absolute inset-0 flex flex-col"
+        style={{
+          background: "hsl(var(--background))",
+          opacity: emergency ? 1 : 0,
+          pointerEvents: emergency ? "auto" : "none",
+          transform: emergency ? "translateY(0)" : "translateY(20px)",
+          transition: "opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
+        <div className="flex items-center justify-between px-6 pt-6">
+          <button
+            onClick={() => {
+              setEmergency(false);
+              setEmergencyDigits("");
+              setCalling(false);
+            }}
+            className="font-serif italic"
+            style={{
+              fontSize: 13,
+              color: "hsl(var(--muted-foreground) / 0.6)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            cancel
+          </button>
+          <span
+            className="font-serif italic"
+            style={{
+              fontSize: 13,
+              color: "hsl(var(--destructive) / 0.8)",
+              letterSpacing: "0.06em",
+            }}
+          >
+            emergency only
+          </span>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+          <span
+            className="font-serif italic"
+            style={{
+              fontSize: 14,
+              color: "hsl(var(--muted-foreground) / 0.5)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            {calling ? "calling…" : "dial a number, or call"}
+          </span>
+
+          <span
+            className="font-serif mt-6"
+            style={{
+              fontSize: emergencyDigits ? 52 : 64,
+              fontWeight: 300,
+              color: "hsl(var(--foreground))",
+              letterSpacing: "0.05em",
+              minHeight: 72,
+              transition: "all 0.2s ease",
+            }}
+          >
+            {emergencyDigits || "—"}
+          </span>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-6 max-w-[260px]">
+            {["911", "112", "999", "police", "ambulance", "fire"].map((label) => (
+              <button
+                key={label}
+                onClick={() => {
+                  setEmergencyDigits(label);
+                  setCalling(true);
+                  setTimeout(() => {
+                    setCalling(false);
+                    setEmergency(false);
+                    setEmergencyDigits("");
+                  }, 2200);
+                }}
+                className="font-serif italic px-3 py-1 rounded-full transition-all active:scale-95"
+                style={{
+                  fontSize: 12,
+                  color: "hsl(var(--destructive) / 0.9)",
+                  background: "hsl(var(--destructive) / 0.08)",
+                  border: "1px solid hsl(var(--destructive) / 0.25)",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-3 pb-10">
+          {KEYS.map((row, ri) => (
+            <div key={ri} className="flex items-center gap-5">
+              {row.map((key, ci) => {
+                if (key === "") return <div key={ci} style={{ width: 64, height: 64 }} />;
+                const isDelete = key === "delete";
+                return (
+                  <button
+                    key={ci}
+                    onClick={() => {
+                      if (isDelete) setEmergencyDigits((p) => p.slice(0, -1));
+                      else setEmergencyDigits((p) => (p.length < 12 ? p + key : p));
+                    }}
+                    className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                    style={{
+                      width: 64,
+                      height: 64,
+                      background: isDelete ? "transparent" : "var(--glass-bg)",
+                      border: isDelete ? "none" : "1px solid var(--glass-border)",
+                    }}
+                  >
+                    <span
+                      className={isDelete ? "font-serif italic" : "font-serif"}
+                      style={{
+                        fontSize: isDelete ? 12 : 24,
+                        fontWeight: 300,
+                        color: isDelete
+                          ? "hsl(var(--muted-foreground) / 0.5)"
+                          : "hsl(var(--foreground))",
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      {isDelete ? "del" : key}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+
+          <button
+            disabled={!emergencyDigits || calling}
+            onClick={() => {
+              setCalling(true);
+              setTimeout(() => {
+                setCalling(false);
+                setEmergency(false);
+                setEmergencyDigits("");
+              }, 2500);
+            }}
+            className="mt-4 flex items-center justify-center rounded-full transition-all active:scale-95"
+            style={{
+              width: 64,
+              height: 64,
+              background: emergencyDigits
+                ? "hsl(var(--destructive))"
+                : "hsl(var(--destructive) / 0.25)",
+              boxShadow: emergencyDigits
+                ? "0 0 24px hsl(var(--destructive) / 0.4)"
+                : "none",
+              opacity: emergencyDigits ? 1 : 0.5,
+            }}
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="hsl(var(--destructive-foreground))"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
