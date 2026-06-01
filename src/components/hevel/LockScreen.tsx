@@ -23,6 +23,9 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const [entered, setEntered] = useState("");
   const [error, setError] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
+  const [emergency, setEmergency] = useState(false);
+  const [emergencyDigits, setEmergencyDigits] = useState("");
+  const [calling, setCalling] = useState(false);
 
   const [scrollY, setScrollY] = useState(0);
   const dragRef = useRef({
