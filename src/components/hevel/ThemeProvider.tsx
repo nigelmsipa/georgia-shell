@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-export type ThemeScheme = "gruvbox-dark" | "gruvbox-light" | "nord" | "tokyo-night" | "solarized-dark" | "catppuccin";
+export type ThemeScheme = "gruvbox-dark" | "gruvbox-light" | "nord" | "tokyo-night" | "solarized-dark" | "catppuccin" | "rhubarb" | "red-cabbage";
 
 const SCHEME_META: Record<ThemeScheme, { label: string; colors: string[] }> = {
   "gruvbox-dark":    { label: "gruvbox dark",    colors: ["#282828", "#3c3836", "#ebdbb2", "#d79921", "#689d6a"] },
@@ -9,6 +9,8 @@ const SCHEME_META: Record<ThemeScheme, { label: string; colors: string[] }> = {
   "tokyo-night":     { label: "tokyo night",      colors: ["#1a1b26", "#414868", "#a9b1d6", "#7aa2f7", "#bb9af7"] },
   "solarized-dark":  { label: "solarized dark",   colors: ["#002b36", "#073642", "#839496", "#b58900", "#2aa198"] },
   "catppuccin":      { label: "catppuccin",        colors: ["#1e1e2e", "#45475a", "#cdd6f4", "#cba6f7", "#94e2d5"] },
+  "rhubarb":         { label: "rhubarb",           colors: ["#1a0e0c", "#2e1a17", "#f2e3d0", "#d8395a", "#9fb89a"] },
+  "red-cabbage":     { label: "red cabbage",       colors: ["#15101a", "#2a1f36", "#e6dcf0", "#b13bb8", "#6fa067"] },
 };
 
 export const ALL_SCHEMES = Object.entries(SCHEME_META) as [ThemeScheme, { label: string; colors: string[] }][];
