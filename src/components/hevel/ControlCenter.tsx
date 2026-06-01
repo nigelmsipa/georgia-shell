@@ -268,9 +268,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: "rgba(29, 32, 33, 0.4)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+          backgroundColor: "hsl(var(--background) / 0.55)",
           zIndex: 39,
           transition: "opacity 0.3s ease-out",
         }}
@@ -281,9 +279,9 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
       <div
         className="absolute left-0 right-0 top-0 z-40 flex flex-col"
         style={{
-          background: "rgba(40, 40, 36, 0.92)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
+          background: "hsl(var(--card) / 0.96)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           border: "1px solid var(--glass-border)",
           borderTop: "none",
           borderRadius: "0 0 16px 16px",

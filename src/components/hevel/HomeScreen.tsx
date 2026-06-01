@@ -238,12 +238,12 @@ export const HomeScreen: React.FC<Props> = ({
       <div
         className="flex-1 px-3 pt-4 pb-2 overflow-hidden relative"
         style={{
-          filter: receded ? "blur(10px) brightness(0.6)" : "none",
           transform: receded ? "scale(0.95)" : "scale(1)",
-          opacity: receded ? 0.5 : 1,
-          transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
+          opacity: receded ? 0.35 : 1,
+          transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s cubic-bezier(0.16,1,0.3,1)",
           pointerEvents: receded ? "none" : "auto",
         }}
+
       >
         <div
           className="grid"
@@ -290,7 +290,7 @@ export const HomeScreen: React.FC<Props> = ({
                       longPressTimer.current = null;
                     }
                   }}
-                  className="w-full h-full relative rounded-[20px] overflow-hidden transition-all duration-300 active:scale-[0.97] glass-surface"
+                  className="w-full h-full relative rounded-[20px] overflow-hidden transition-transform duration-200 active:scale-[0.97] bg-card border border-border/40"
                 >
                   {Cover ? <Cover /> : (
                     <div
