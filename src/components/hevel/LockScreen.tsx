@@ -272,31 +272,42 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     return <div key={ci} style={{ width: 68, height: 68 }} />;
                   }
                   const isDelete = key === "delete";
+                  const isSos = key === "sos";
+                  const isWord = isDelete || isSos;
                   return (
                     <button
                       key={ci}
-                      onClick={() => handleKey(key)}
-                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      onClick={() => {
+                        if (isSos) setEmergency(true);
+                        else handleKey(key);
+                      }}
+                      className="group flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
                       style={{
                         width: 68,
                         height: 68,
-                        background: isDelete
-                          ? "transparent"
-                          : "var(--glass-bg)",
-                        border: isDelete ? "none" : "1px solid var(--glass-border)",
-                        boxShadow: isDelete ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
+                        background: isWord ? "transparent" : "var(--glass-bg)",
+                        border: isWord ? "none" : "1px solid var(--glass-border)",
+                        boxShadow: isWord ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
                       }}
                     >
-                      {isDelete ? (
+                      {isWord ? (
                         <span
-                          className="font-serif italic"
+                          className="font-serif italic transition-colors duration-300"
                           style={{
                             fontSize: 12,
-                            color: "hsl(var(--muted-foreground) / 0.35)",
+                            color: isSos
+                              ? "hsl(var(--muted-foreground) / 0.3)"
+                              : "hsl(var(--muted-foreground) / 0.35)",
                             letterSpacing: "0.03em",
                           }}
+                          onMouseEnter={isSos ? (e) => {
+                            (e.currentTarget as HTMLSpanElement).style.color = "hsl(var(--destructive))";
+                          } : undefined}
+                          onMouseLeave={isSos ? (e) => {
+                            (e.currentTarget as HTMLSpanElement).style.color = "hsl(var(--muted-foreground) / 0.3)";
+                          } : undefined}
                         >
-                          delete
+                          {key}
                         </span>
                       ) : (
                         <span
@@ -317,37 +328,8 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </div>
             ))}
           </div>
-
-          <button
-            onClick={() => setEmergency(true)}
-            className="mt-8 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 active:scale-95 hover:opacity-100"
-            style={{
-              background: "transparent",
-              border: "1px solid hsl(var(--destructive) / 0.35)",
-              opacity: 0.75,
-            }}
-          >
-            <span
-              className="rounded-full"
-              style={{
-                width: 6,
-                height: 6,
-                background: "hsl(var(--destructive))",
-                boxShadow: "0 0 8px hsl(var(--destructive) / 0.6)",
-              }}
-            />
-            <span
-              className="font-serif italic"
-              style={{
-                fontSize: 13,
-                color: "hsl(var(--destructive))",
-                letterSpacing: "0.04em",
-              }}
-            >
-              emergency
-            </span>
-          </button>
         </div>
+
       </div>
 
       {/* ── Emergency overlay ── */}
