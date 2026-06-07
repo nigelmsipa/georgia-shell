@@ -1,23 +1,39 @@
-Add two new ambient themes alongside the existing six, selectable from the Settings ribbon.
+# Refine the emergency action
 
-## Rhubarb
-Inspired by fresh rhubarb stalks on a dark grocery shelf — deep near-black background with warm crimson-to-pink primary and a pale celadon-green accent (the leafy tops).
-- bg0 #1a0e0c, bg1 #241412, bg2 #2e1a17 (deep near-black with red undertone)
-- foreground: warm cream #f2e3d0
-- primary: rhubarb crimson #d8395a
-- accent: pale celadon green #9fb89a
-- destructive: deeper red #a8232f
-- Glass glow: warm pink tint
+Three coordinated changes in `src/components/hevel/LockScreen.tsx`.
 
-## Red Cabbage
-Inspired by the wet purple leaf — saturated magenta-violet primary on deep aubergine ground with cool green-leaf accent.
-- bg0 #15101a, bg1 #1f1827, bg2 #2a1f36
-- foreground: cool lavender-white #e6dcf0
-- primary: vivid magenta #b13bb8
-- accent: cabbage green #6fa067
-- Glass glow: violet + green
+## 1. Placement — opposite `delete`, inside the keypad
 
-## Technical changes
-1. `src/index.css` — append two `:root.rhubarb { ... }` and `:root.red-cabbage { ... }` blocks following the same token shape as existing themes (background/card/popover/primary/secondary/muted/accent/destructive/border/input/ring + gruvbox-bg0/1/2 + glass tokens + grain).
-2. `src/components/hevel/ThemeProvider.tsx` — extend `ThemeScheme` union with `"rhubarb" | "red-cabbage"`, add entries to `SCHEME_META` with labels "rhubarb" and "red cabbage" and 5-color swatches matching the palette.
-3. No other code changes needed — `SettingsApp` and `ControlCenter` iterate `ALL_SCHEMES` and pick up new themes automatically.
+The bottom row of the keypad is currently `["", "0", "delete"]` — the empty cell at the left is just a spacer. Turn that cell into the emergency trigger so it sits symmetrically opposite `delete`, anchoring the row visually and removing the separate pill button below the keypad.
+
+- Replace the spacer with a 68×68 button that opens the emergency overlay.
+- Remove the standalone `emergency` pill below the keypad entirely.
+- Keep tap target identical to other keys so the row reads as a unified trio.
+
+## 2. Visual weight — whisper
+
+No red at rest. The cell shows only the italic word `sos` (or `emergency` — see note) in muted-foreground at very low opacity, no border, no background. On press/hover it warms to `hsl(var(--destructive))` and a single 4px red ember dot fades in beside it. This keeps the lock screen calm and on-brand with Prose UI's "intentional roughness," while still being unmistakable in a real emergency.
+
+- Resting: `color: hsl(var(--muted-foreground) / 0.3)`, no chrome.
+- Hover/active: color shifts to destructive, tiny glowing dot fades in.
+- Use `sos` (3 letters, balances `del` opposite it) — short enough to feel like a sibling of `del`.
+
+## 3. Dialer overlay — prose sentence
+
+Replace the chip cluster + label with a single flowing sentence in the Prose UI style. The keypad and call button below stay, but the chips become inline tappable tokens within natural language.
+
+Sentence (centered, Georgia italic, ~16px, generous line-height):
+
+> in an emergency, call **911**, **112**, or **999** — or reach **police**, **ambulance**, or **fire** directly.
+
+- Each bold token is an inline button: tapping sets digits + initiates call (same handler as today).
+- Above it, the large digit display stays for manual dialing.
+- Drop the separate "dial a number, or call" label — the sentence carries that meaning.
+- "calling…" state replaces the sentence with a single italic line: `calling {label}…`.
+
+## Technical notes
+
+- All colors via existing HSL tokens (`--destructive`, `--muted-foreground`, `--foreground`).
+- Animations stay organic: opacity/color transitions 0.3–0.4s ease, no scale jumps.
+- Cancel button and "emergency only" header unchanged.
+- No new state, no new dependencies.

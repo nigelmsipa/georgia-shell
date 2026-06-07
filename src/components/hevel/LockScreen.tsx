@@ -15,7 +15,7 @@ const KEYS = [
   ["1", "2", "3"],
   ["4", "5", "6"],
   ["7", "8", "9"],
-  ["", "0", "delete"],
+  ["sos", "0", "delete"],
 ];
 
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
@@ -272,31 +272,42 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     return <div key={ci} style={{ width: 68, height: 68 }} />;
                   }
                   const isDelete = key === "delete";
+                  const isSos = key === "sos";
+                  const isWord = isDelete || isSos;
                   return (
                     <button
                       key={ci}
-                      onClick={() => handleKey(key)}
-                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      onClick={() => {
+                        if (isSos) setEmergency(true);
+                        else handleKey(key);
+                      }}
+                      className="group flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
                       style={{
                         width: 68,
                         height: 68,
-                        background: isDelete
-                          ? "transparent"
-                          : "var(--glass-bg)",
-                        border: isDelete ? "none" : "1px solid var(--glass-border)",
-                        boxShadow: isDelete ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
+                        background: isWord ? "transparent" : "var(--glass-bg)",
+                        border: isWord ? "none" : "1px solid var(--glass-border)",
+                        boxShadow: isWord ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
                       }}
                     >
-                      {isDelete ? (
+                      {isWord ? (
                         <span
-                          className="font-serif italic"
+                          className="font-serif italic transition-colors duration-300"
                           style={{
                             fontSize: 12,
-                            color: "hsl(var(--muted-foreground) / 0.35)",
+                            color: isSos
+                              ? "hsl(var(--muted-foreground) / 0.3)"
+                              : "hsl(var(--muted-foreground) / 0.35)",
                             letterSpacing: "0.03em",
                           }}
+                          onMouseEnter={isSos ? (e) => {
+                            (e.currentTarget as HTMLSpanElement).style.color = "hsl(var(--destructive))";
+                          } : undefined}
+                          onMouseLeave={isSos ? (e) => {
+                            (e.currentTarget as HTMLSpanElement).style.color = "hsl(var(--muted-foreground) / 0.3)";
+                          } : undefined}
                         >
-                          delete
+                          {key}
                         </span>
                       ) : (
                         <span
@@ -317,37 +328,8 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </div>
             ))}
           </div>
-
-          <button
-            onClick={() => setEmergency(true)}
-            className="mt-8 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 active:scale-95 hover:opacity-100"
-            style={{
-              background: "transparent",
-              border: "1px solid hsl(var(--destructive) / 0.35)",
-              opacity: 0.75,
-            }}
-          >
-            <span
-              className="rounded-full"
-              style={{
-                width: 6,
-                height: 6,
-                background: "hsl(var(--destructive))",
-                boxShadow: "0 0 8px hsl(var(--destructive) / 0.6)",
-              }}
-            />
-            <span
-              className="font-serif italic"
-              style={{
-                fontSize: 13,
-                color: "hsl(var(--destructive))",
-                letterSpacing: "0.04em",
-              }}
-            >
-              emergency
-            </span>
-          </button>
         </div>
+
       </div>
 
       {/* ── Emergency overlay ── */}
@@ -391,18 +373,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
         <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
           <span
-            className="font-serif italic"
-            style={{
-              fontSize: 14,
-              color: "hsl(var(--muted-foreground) / 0.5)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            {calling ? "calling…" : "dial a number, or call"}
-          </span>
-
-          <span
-            className="font-serif mt-6"
+            className="font-serif mt-2"
             style={{
               fontSize: emergencyDigits ? 52 : 64,
               fontWeight: 300,
@@ -415,33 +386,84 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             {emergencyDigits || "—"}
           </span>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-6 max-w-[260px]">
-            {["911", "112", "999", "police", "ambulance", "fire"].map((label) => (
-              <button
-                key={label}
-                onClick={() => {
-                  setEmergencyDigits(label);
-                  setCalling(true);
-                  setTimeout(() => {
-                    setCalling(false);
-                    setEmergency(false);
-                    setEmergencyDigits("");
-                  }, 2200);
-                }}
-                className="font-serif italic px-3 py-1 rounded-full transition-all active:scale-95"
-                style={{
-                  fontSize: 12,
-                  color: "hsl(var(--destructive) / 0.9)",
-                  background: "hsl(var(--destructive) / 0.08)",
-                  border: "1px solid hsl(var(--destructive) / 0.25)",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          {calling ? (
+            <span
+              className="font-serif italic mt-8 animate-breathe"
+              style={{
+                fontSize: 15,
+                color: "hsl(var(--destructive) / 0.85)",
+                letterSpacing: "0.05em",
+              }}
+            >
+              calling {emergencyDigits}…
+            </span>
+          ) : (
+            <p
+              className="font-serif italic mt-8 max-w-[280px]"
+              style={{
+                fontSize: 15,
+                lineHeight: 1.7,
+                color: "hsl(var(--muted-foreground) / 0.55)",
+                letterSpacing: "0.01em",
+              }}
+            >
+              in an emergency, call{" "}
+              {(["911", "112", "999"] as const).map((n, i, arr) => (
+                <React.Fragment key={n}>
+                  <button
+                    onClick={() => {
+                      setEmergencyDigits(n);
+                      setCalling(true);
+                      setTimeout(() => {
+                        setCalling(false);
+                        setEmergency(false);
+                        setEmergencyDigits("");
+                      }, 2200);
+                    }}
+                    className="font-serif italic transition-colors active:opacity-70"
+                    style={{
+                      color: "hsl(var(--destructive))",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "3px",
+                      textDecorationColor: "hsl(var(--destructive) / 0.35)",
+                    }}
+                  >
+                    {n}
+                  </button>
+                  {i < arr.length - 2 ? ", " : i === arr.length - 2 ? ", or " : ""}
+                </React.Fragment>
+              ))}
+              {" — or reach "}
+              {(["police", "ambulance", "fire"] as const).map((n, i, arr) => (
+                <React.Fragment key={n}>
+                  <button
+                    onClick={() => {
+                      setEmergencyDigits(n);
+                      setCalling(true);
+                      setTimeout(() => {
+                        setCalling(false);
+                        setEmergency(false);
+                        setEmergencyDigits("");
+                      }, 2200);
+                    }}
+                    className="font-serif italic transition-colors active:opacity-70"
+                    style={{
+                      color: "hsl(var(--destructive))",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "3px",
+                      textDecorationColor: "hsl(var(--destructive) / 0.35)",
+                    }}
+                  >
+                    {n}
+                  </button>
+                  {i < arr.length - 2 ? ", " : i === arr.length - 2 ? ", or " : ""}
+                </React.Fragment>
+              ))}
+              {" directly."}
+            </p>
+          )}
         </div>
+
 
         <div className="flex flex-col items-center gap-3 pb-10">
           {KEYS.map((row, ri) => (
