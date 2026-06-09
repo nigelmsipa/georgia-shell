@@ -10,7 +10,6 @@ import { MusicCover } from "./covers/MusicCover";
 import { AIChatCover } from "./covers/AIChatCover";
 import { HavelTubeCover } from "./covers/HavelTubeCover";
 import { ContactsCover } from "./covers/ContactsCover";
-import { CalendarCover } from "./covers/CalendarCover";
 
 const COVER_COMPONENTS: Record<string, React.FC> = {
   "AI Chat": AIChatCover,
@@ -22,7 +21,6 @@ const COVER_COMPONENTS: Record<string, React.FC> = {
   Messages: MessagesCover,
   Music: MusicCover,
   Contacts: ContactsCover,
-  Calendar: CalendarCover,
 };
 
 

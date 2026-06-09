@@ -1,5 +1,5 @@
 export const ALL_APPS = [
-  "AI Chat", "Calendar", "Calculator", "Camera", "Clock", "Contacts",
+  "AI Chat", "Calculator", "Camera", "Clock", "Contacts",
   "Files", "Firefox", "Gallery", "HavelTube", "KOReader", "Maps",
   "Messages", "Music", "Notes", "Settings", "Signal",
   "Spotify", "Telegram", "Terminal", "Weather",

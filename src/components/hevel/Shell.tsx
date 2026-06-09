@@ -11,8 +11,6 @@ import { AIChat } from "./apps/AIChat";
 import { HavelTube } from "./apps/HavelTube";
 import { Music } from "./apps/Music";
 import { Signal } from "./apps/Signal";
-import { Contacts } from "./apps/Contacts";
-import { Calendar } from "./apps/Calendar";
 
 type MockAppProps = { onClose: () => void; onOpenUtilityDrawer?: () => void };
 const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
@@ -21,7 +19,6 @@ const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
   "Music": Music,
   "Signal": Signal,
   "Contacts": Contacts,
-  "Calendar": Calendar,
 };
 
 
