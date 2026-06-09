@@ -172,13 +172,31 @@ export const HomeScreen: React.FC<Props> = ({
 
   const handleScrubEnd = () => {
     if (!scrubbing) return;
-    // Select the first app in the active letter group
-    if (activeLetter) {
-      const apps = grouped[activeLetter];
-      if (apps && apps.length === 1) {
-        onOpenApp(apps[0]);
-      }
+    const letter = activeLetter;
+    const apps = letter ? grouped[letter] : null;
+
+    // Single-app letter → open directly
+    if (letter && apps && apps.length === 1) {
+      onOpenApp(apps[0]);
+      setFadingOut(true);
+      setTimeout(() => {
+        setScrubbing(false);
+        setFadingOut(false);
+        setActiveLetter(null);
+      }, 250);
+      return;
     }
+
+    // Multi-app letter → keep visible so user can tap a specific app
+    if (letter && apps && apps.length > 1) {
+      setScrubbing(false);
+      setLauncherFocus(true);
+      setSearch("");
+      // keep activeLetter as-is
+      return;
+    }
+
+    // No letter selected → just fade out
     setFadingOut(true);
     setTimeout(() => {
       setScrubbing(false);
@@ -246,8 +264,9 @@ export const HomeScreen: React.FC<Props> = ({
         className="flex-1 px-3 pt-4 pb-2 overflow-hidden relative"
         style={{
           transform: receded ? "scale(0.95)" : "scale(1)",
-          opacity: receded ? 0.35 : 1,
-          transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s cubic-bezier(0.16,1,0.3,1)",
+          opacity: receded ? 0.28 : 1,
+          filter: receded ? "blur(14px)" : "blur(0px)",
+          transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s cubic-bezier(0.16,1,0.3,1), filter 0.35s cubic-bezier(0.16,1,0.3,1)",
           pointerEvents: receded ? "none" : "auto",
         }}
 
