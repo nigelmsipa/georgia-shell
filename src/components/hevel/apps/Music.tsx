@@ -74,6 +74,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fullPlayer, setFullPlayer] = useState(false);
+  const [speed, setSpeed] = useState<1 | 2>(1);
 
   const visible = useMemo(() => {
     if (tab === "Search") {
@@ -107,9 +108,10 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
 
   useEffect(() => {
     if (!playing || paused) return;
-    const id = setInterval(() => setProgress((p) => (p >= 1 ? 0 : p + 0.004)), 200);
+    const step = 0.004 * speed;
+    const id = setInterval(() => setProgress((p) => (p >= 1 ? 0 : p + step)), 200);
     return () => clearInterval(id);
-  }, [playing, paused]);
+  }, [playing, paused, speed]);
 
   const startTrack = (t: Track) => {
     setPlaying(t);
@@ -418,6 +420,25 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)" }}
               >
                 ⏭
+              </button>
+            </div>
+
+            <div className="flex justify-center mt-5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSpeed((s) => (s === 1 ? 2 : 1));
+                }}
+                className="font-serif italic"
+                style={{
+                  fontSize: 12,
+                  color: speed === 2 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)",
+                  border: `1px solid ${speed === 2 ? "hsl(var(--primary) / 0.4)" : "hsl(var(--border) / 0.4)"}`,
+                  borderRadius: 999,
+                  padding: "4px 12px",
+                }}
+              >
+                {speed}x
               </button>
             </div>
           </div>
