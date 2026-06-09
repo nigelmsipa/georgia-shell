@@ -171,7 +171,10 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         {filtered.map((v) => (
           <button
             key={v.id}
-            onClick={() => {
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
               setPlaying(v);
               setProgress(0);
               setPaused(false);
