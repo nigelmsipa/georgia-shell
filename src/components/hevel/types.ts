@@ -1,9 +1,10 @@
 export const ALL_APPS = [
-  "Calendar", "Calculator", "Camera", "Clock", "Contacts",
+  "AI Chat", "Calendar", "Calculator", "Camera", "Clock", "Contacts",
   "Files", "Firefox", "Gallery", "KOReader", "Maps",
   "Messages", "Music", "Notes", "Settings", "Signal",
   "Spotify", "Telegram", "Terminal", "Weather",
 ];
+
 
 export interface AppEntry {
   name: string;
