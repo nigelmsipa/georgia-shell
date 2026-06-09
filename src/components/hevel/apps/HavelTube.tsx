@@ -220,9 +220,13 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
       {/* Player */}
       {playing && (
         <div
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          onPointerMove={(e) => e.stopPropagation()}
           className="absolute inset-0 z-40 flex flex-col"
           style={{
             background: "hsl(var(--background) / 0.97)",
+            touchAction: "auto",
             backdropFilter: "blur(20px)",
           }}
         >
