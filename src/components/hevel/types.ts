@@ -113,7 +113,7 @@ export const SAMPLE_NOTIFICATIONS: ProseNotification[] = [
 ];
 
 export const RECENT_APPS: AppEntry[] = [
-  { name: "Firefox", lastUsed: 2 },
+  { name: "Angelfish", lastUsed: 2 },
   { name: "Terminal", lastUsed: 8 },
   { name: "Signal", lastUsed: 15 },
   { name: "Notes", lastUsed: 34 },
