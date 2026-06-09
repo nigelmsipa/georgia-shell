@@ -74,6 +74,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fullPlayer, setFullPlayer] = useState(false);
+  const [speed, setSpeed] = useState<1 | 2>(1);
 
   const visible = useMemo(() => {
     if (tab === "Search") {
