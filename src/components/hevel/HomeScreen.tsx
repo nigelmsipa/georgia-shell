@@ -401,42 +401,6 @@ export const HomeScreen: React.FC<Props> = ({
             pointerEvents: fadingOut ? "none" : "auto",
           }}
         >
-          {/* Left: alphabet rail */}
-          <div
-            className="flex flex-col items-center justify-between select-none"
-            style={{ width: 32, padding: "8px 0" }}
-          >
-            {LETTERS.map((l, i) => {
-              const has = activeLetterSet.has(l);
-              const isCur = l === activeLetter;
-              const dist = activeIdx >= 0 ? Math.abs(i - activeIdx) : 999;
-              const isNear = dist > 0 && dist <= 2;
-              const offset = isCur ? 8 : isNear ? 4 * (1 - dist / 3) : 0;
-
-              return (
-                <span
-                  key={l}
-                  className="font-serif block text-center"
-                  style={{
-                    fontSize: isCur ? 18 : isNear ? 11 : 9,
-                    fontWeight: isCur ? 700 : 400,
-                    fontStyle: isCur ? "italic" : "normal",
-                    lineHeight: isCur ? "20px" : "13px",
-                    color: isCur
-                      ? "hsl(var(--primary))"
-                      : has
-                        ? `hsl(var(--foreground) / ${isNear ? 0.5 : 0.25})`
-                        : "hsl(var(--foreground) / 0.06)",
-                    transform: `translateX(${offset}px) scale(${isCur ? 1.15 : 1})`,
-                    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                >
-                  {l}
-                </span>
-              );
-            })}
-          </div>
-
           {/* Center: focused app name + neighbors */}
           <div className="flex-1 flex flex-col justify-center items-start px-6">
             {activeLetter && (
@@ -500,6 +464,42 @@ export const HomeScreen: React.FC<Props> = ({
                 })}
               </>
             )}
+          </div>
+
+          {/* Right: alphabet rail */}
+          <div
+            className="flex flex-col items-center justify-between select-none"
+            style={{ width: 32, padding: "8px 0" }}
+          >
+            {LETTERS.map((l, i) => {
+              const has = activeLetterSet.has(l);
+              const isCur = l === activeLetter;
+              const dist = activeIdx >= 0 ? Math.abs(i - activeIdx) : 999;
+              const isNear = dist > 0 && dist <= 2;
+              const offset = isCur ? -8 : isNear ? -4 * (1 - dist / 3) : 0;
+
+              return (
+                <span
+                  key={l}
+                  className="font-serif block text-center"
+                  style={{
+                    fontSize: isCur ? 18 : isNear ? 11 : 9,
+                    fontWeight: isCur ? 700 : 400,
+                    fontStyle: isCur ? "italic" : "normal",
+                    lineHeight: isCur ? "20px" : "13px",
+                    color: isCur
+                      ? "hsl(var(--primary))"
+                      : has
+                        ? `hsl(var(--foreground) / ${isNear ? 0.5 : 0.25})`
+                        : "hsl(var(--foreground) / 0.06)",
+                    transform: `translateX(${offset}px) scale(${isCur ? 1.15 : 1})`,
+                    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  {l}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}
