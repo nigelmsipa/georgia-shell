@@ -71,7 +71,13 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
 
       {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}
-      {runningApp && runningApp !== "Settings" && (
+      {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
+        (() => {
+          const App = MOCK_APPS[runningApp];
+          return <App onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} />;
+        })()
+      )}
+      {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
         <AppOverlay
           appName={runningApp}
           onClose={closeApp}
@@ -83,3 +89,4 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     </div>
   );
 };
+
