@@ -3,7 +3,7 @@ import { DEFAULT_COVER_APPS, ALL_APPS } from "./types";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { SignalCover } from "./covers/SignalCover";
 import { TerminalCover } from "./covers/TerminalCover";
-import { FirefoxCover } from "./covers/FirefoxCover";
+import { AngelfishCover } from "./covers/AngelfishCover";
 import { NotesCover } from "./covers/NotesCover";
 import { MessagesCover } from "./covers/MessagesCover";
 import { MusicCover } from "./covers/MusicCover";
@@ -16,7 +16,7 @@ const COVER_COMPONENTS: Record<string, React.FC> = {
   "HavelTube": HavelTubeCover,
   Signal: SignalCover,
   Terminal: TerminalCover,
-  Firefox: FirefoxCover,
+  Angelfish: AngelfishCover,
   Notes: NotesCover,
   Messages: MessagesCover,
   Music: MusicCover,
