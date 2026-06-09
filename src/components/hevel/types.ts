@@ -1,6 +1,6 @@
 export const ALL_APPS = [
   "AI Chat", "Calendar", "Calculator", "Camera", "Clock", "Contacts",
-  "Files", "Firefox", "Gallery", "KOReader", "Maps",
+  "Files", "Firefox", "Gallery", "HavelTube", "KOReader", "Maps",
   "Messages", "Music", "Notes", "Settings", "Signal",
   "Spotify", "Telegram", "Terminal", "Weather",
 ];
@@ -121,7 +121,7 @@ export const RECENT_APPS: AppEntry[] = [
   { name: "Maps", lastUsed: 120 },
 ];
 
-export const DEFAULT_COVER_APPS = ["AI Chat", "Signal", "Terminal", "Firefox"];
+export const DEFAULT_COVER_APPS = ["AI Chat", "HavelTube", "Signal", "Terminal", "Firefox"];
 
 export const COVER_APPS = DEFAULT_COVER_APPS;
 

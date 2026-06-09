@@ -8,9 +8,11 @@ import { NotesCover } from "./covers/NotesCover";
 import { MessagesCover } from "./covers/MessagesCover";
 import { MusicCover } from "./covers/MusicCover";
 import { AIChatCover } from "./covers/AIChatCover";
+import { HavelTubeCover } from "./covers/HavelTubeCover";
 
 const COVER_COMPONENTS: Record<string, React.FC> = {
   "AI Chat": AIChatCover,
+  "HavelTube": HavelTubeCover,
   Signal: SignalCover,
   Terminal: TerminalCover,
   Firefox: FirefoxCover,
