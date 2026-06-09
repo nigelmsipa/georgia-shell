@@ -8,10 +8,12 @@ import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { AIChat } from "./apps/AIChat";
+import { HavelTube } from "./apps/HavelTube";
 
 type MockAppProps = { onClose: () => void; onOpenUtilityDrawer?: () => void };
 const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
   "AI Chat": AIChat,
+  "HavelTube": HavelTube,
 };
 
 
