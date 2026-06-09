@@ -378,10 +378,10 @@ export const HomeScreen: React.FC<Props> = ({
         />
       </div>
 
-      {/* ── Invisible scrub zone — left edge ── */}
+      {/* ── Invisible scrub zone — right edge ── */}
       <div
         ref={scrubZoneRef}
-        className="absolute left-0 top-16 bottom-16 w-10 z-30"
+        className="absolute right-0 top-16 bottom-16 w-10 z-30"
         style={{ touchAction: "none" }}
         onPointerDown={handleScrubStart}
         onPointerMove={handleScrubMove}
