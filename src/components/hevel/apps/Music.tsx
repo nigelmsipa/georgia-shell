@@ -422,6 +422,25 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 ⏭
               </button>
             </div>
+
+            <div className="flex justify-center mt-5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSpeed((s) => (s === 1 ? 2 : 1));
+                }}
+                className="font-serif italic"
+                style={{
+                  fontSize: 12,
+                  color: speed === 2 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)",
+                  border: `1px solid ${speed === 2 ? "hsl(var(--primary) / 0.4)" : "hsl(var(--border) / 0.4)"}`,
+                  borderRadius: 999,
+                  padding: "4px 12px",
+                }}
+              >
+                {speed}x
+              </button>
+            </div>
           </div>
         </div>
       )}
