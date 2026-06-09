@@ -13,6 +13,7 @@ import { Music } from "./apps/Music";
 import { Signal } from "./apps/Signal";
 import { Contacts } from "./apps/Contacts";
 import { Angelfish } from "./apps/Angelfish";
+import { Voice } from "./apps/Voice";
 
 type MockAppProps = { onClose: () => void; onOpenUtilityDrawer?: () => void };
 const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
@@ -22,6 +23,7 @@ const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
   "Signal": Signal,
   "Contacts": Contacts,
   "Angelfish": Angelfish,
+  "Voice": Voice,
 };
 
 
