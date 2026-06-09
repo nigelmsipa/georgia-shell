@@ -378,10 +378,10 @@ export const HomeScreen: React.FC<Props> = ({
         />
       </div>
 
-      {/* ── Invisible scrub zone — left edge ── */}
+      {/* ── Invisible scrub zone — right edge ── */}
       <div
         ref={scrubZoneRef}
-        className="absolute left-0 top-16 bottom-16 w-10 z-30"
+        className="absolute right-0 top-16 bottom-16 w-10 z-30"
         style={{ touchAction: "none" }}
         onPointerDown={handleScrubStart}
         onPointerMove={handleScrubMove}
@@ -401,42 +401,6 @@ export const HomeScreen: React.FC<Props> = ({
             pointerEvents: fadingOut ? "none" : "auto",
           }}
         >
-          {/* Left: alphabet rail */}
-          <div
-            className="flex flex-col items-center justify-between select-none"
-            style={{ width: 32, padding: "8px 0" }}
-          >
-            {LETTERS.map((l, i) => {
-              const has = activeLetterSet.has(l);
-              const isCur = l === activeLetter;
-              const dist = activeIdx >= 0 ? Math.abs(i - activeIdx) : 999;
-              const isNear = dist > 0 && dist <= 2;
-              const offset = isCur ? 8 : isNear ? 4 * (1 - dist / 3) : 0;
-
-              return (
-                <span
-                  key={l}
-                  className="font-serif block text-center"
-                  style={{
-                    fontSize: isCur ? 18 : isNear ? 11 : 9,
-                    fontWeight: isCur ? 700 : 400,
-                    fontStyle: isCur ? "italic" : "normal",
-                    lineHeight: isCur ? "20px" : "13px",
-                    color: isCur
-                      ? "hsl(var(--primary))"
-                      : has
-                        ? `hsl(var(--foreground) / ${isNear ? 0.5 : 0.25})`
-                        : "hsl(var(--foreground) / 0.06)",
-                    transform: `translateX(${offset}px) scale(${isCur ? 1.15 : 1})`,
-                    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                >
-                  {l}
-                </span>
-              );
-            })}
-          </div>
-
           {/* Center: focused app name + neighbors */}
           <div className="flex-1 flex flex-col justify-center items-start px-6">
             {activeLetter && (
@@ -501,45 +465,18 @@ export const HomeScreen: React.FC<Props> = ({
               </>
             )}
           </div>
-        </div>
-      )}
 
-      {/* ── Launcher focus (flick-up) — same integrated look + search ── */}
-      {launcherFocus && !scrubbing && (
-        <div
-          className="absolute inset-0 z-20 flex"
-          style={{
-            paddingTop: 72,
-            paddingBottom: 16,
-          }}
-        >
-          {/* Left: alphabet rail (tappable) */}
+          {/* Right: alphabet rail */}
           <div
             className="flex flex-col items-center justify-between select-none"
-            style={{
-              width: 32,
-              padding: "8px 0",
-              touchAction: "none",
-              cursor: "pointer",
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              const l = calcLetter(e.clientY);
-              if (l) { setActiveLetter(l); setSearch(""); }
-            }}
-            onPointerMove={(e) => {
-              if (e.buttons > 0) {
-                const l = calcLetter(e.clientY);
-                if (l && l !== activeLetter) { setActiveLetter(l); setSearch(""); }
-              }
-            }}
+            style={{ width: 32, padding: "8px 0" }}
           >
             {LETTERS.map((l, i) => {
               const has = activeLetterSet.has(l);
               const isCur = l === activeLetter;
               const dist = activeIdx >= 0 ? Math.abs(i - activeIdx) : 999;
               const isNear = dist > 0 && dist <= 2;
-              const offset = isCur ? 8 : isNear ? 4 * (1 - dist / 3) : 0;
+              const offset = isCur ? -8 : isNear ? -4 * (1 - dist / 3) : 0;
 
               return (
                 <span
@@ -564,7 +501,18 @@ export const HomeScreen: React.FC<Props> = ({
               );
             })}
           </div>
+        </div>
+      )}
 
+      {/* ── Launcher focus (flick-up) — same integrated look + search ── */}
+      {launcherFocus && !scrubbing && (
+        <div
+          className="absolute inset-0 z-20 flex"
+          style={{
+            paddingTop: 72,
+            paddingBottom: 16,
+          }}
+        >
           {/* Center: app content */}
           <div className="flex-1 flex flex-col min-h-0 px-4">
             {/* Letter heading watermark */}
@@ -731,6 +679,58 @@ export const HomeScreen: React.FC<Props> = ({
                 />
               )}
             </div>
+          </div>
+
+          {/* Right: alphabet rail (tappable) */}
+          <div
+            className="flex flex-col items-center justify-between select-none"
+            style={{
+              width: 32,
+              padding: "8px 0",
+              touchAction: "none",
+              cursor: "pointer",
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              const l = calcLetter(e.clientY);
+              if (l) { setActiveLetter(l); setSearch(""); }
+            }}
+            onPointerMove={(e) => {
+              if (e.buttons > 0) {
+                const l = calcLetter(e.clientY);
+                if (l && l !== activeLetter) { setActiveLetter(l); setSearch(""); }
+              }
+            }}
+          >
+            {LETTERS.map((l, i) => {
+              const has = activeLetterSet.has(l);
+              const isCur = l === activeLetter;
+              const dist = activeIdx >= 0 ? Math.abs(i - activeIdx) : 999;
+              const isNear = dist > 0 && dist <= 2;
+              const offset = isCur ? -8 : isNear ? -4 * (1 - dist / 3) : 0;
+
+              return (
+                <span
+                  key={l}
+                  className="font-serif block text-center"
+                  style={{
+                    fontSize: isCur ? 18 : isNear ? 11 : 9,
+                    fontWeight: isCur ? 700 : 400,
+                    fontStyle: isCur ? "italic" : "normal",
+                    lineHeight: isCur ? "20px" : "13px",
+                    color: isCur
+                      ? "hsl(var(--primary))"
+                      : has
+                        ? `hsl(var(--foreground) / ${isNear ? 0.5 : 0.25})`
+                        : "hsl(var(--foreground) / 0.06)",
+                    transform: `translateX(${offset}px) scale(${isCur ? 1.15 : 1})`,
+                    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  {l}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}
