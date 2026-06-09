@@ -1,6 +1,6 @@
 export const ALL_APPS = [
-  "AI Chat", "Calculator", "Camera", "Clock", "Contacts",
-  "Files", "Firefox", "Gallery", "HavelTube", "KOReader", "Maps",
+  "AI Chat", "Angelfish", "Calculator", "Camera", "Clock", "Contacts",
+  "Files", "Gallery", "HavelTube", "KOReader", "Maps",
   "Messages", "Music", "Notes", "Settings", "Signal",
   "Spotify", "Telegram", "Terminal", "Weather",
 ];
@@ -113,7 +113,7 @@ export const SAMPLE_NOTIFICATIONS: ProseNotification[] = [
 ];
 
 export const RECENT_APPS: AppEntry[] = [
-  { name: "Firefox", lastUsed: 2 },
+  { name: "Angelfish", lastUsed: 2 },
   { name: "Terminal", lastUsed: 8 },
   { name: "Signal", lastUsed: 15 },
   { name: "Notes", lastUsed: 34 },
