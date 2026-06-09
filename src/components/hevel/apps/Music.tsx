@@ -108,9 +108,10 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
 
   useEffect(() => {
     if (!playing || paused) return;
-    const id = setInterval(() => setProgress((p) => (p >= 1 ? 0 : p + 0.004)), 200);
+    const step = 0.004 * speed;
+    const id = setInterval(() => setProgress((p) => (p >= 1 ? 0 : p + step)), 200);
     return () => clearInterval(id);
-  }, [playing, paused]);
+  }, [playing, paused, speed]);
 
   const startTrack = (t: Track) => {
     setPlaying(t);
