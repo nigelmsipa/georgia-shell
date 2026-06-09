@@ -121,7 +121,7 @@ export const RECENT_APPS: AppEntry[] = [
   { name: "Maps", lastUsed: 120 },
 ];
 
-export const DEFAULT_COVER_APPS = ["AI Chat", "HavelTube", "Signal", "Terminal"];
+export const DEFAULT_COVER_APPS = ["AI Chat", "HavelTube", "Music", "Signal"];
 
 export const COVER_APPS = DEFAULT_COVER_APPS;
 
