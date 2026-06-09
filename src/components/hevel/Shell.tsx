@@ -7,6 +7,13 @@ import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AtmosphericBg } from "./AtmosphericBg";
+import { AIChat } from "./apps/AIChat";
+
+type MockAppProps = { onClose: () => void; onOpenUtilityDrawer?: () => void };
+const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
+  "AI Chat": AIChat,
+};
+
 
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const [locked, setLocked] = useState(true);
