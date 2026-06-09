@@ -7,6 +7,13 @@ import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AtmosphericBg } from "./AtmosphericBg";
+import { AIChat } from "./apps/AIChat";
+
+type MockAppProps = { onClose: () => void; onOpenUtilityDrawer?: () => void };
+const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
+  "AI Chat": AIChat,
+};
+
 
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const [locked, setLocked] = useState(true);
@@ -64,7 +71,13 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
 
       {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}
-      {runningApp && runningApp !== "Settings" && (
+      {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
+        (() => {
+          const App = MOCK_APPS[runningApp];
+          return <App onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} />;
+        })()
+      )}
+      {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
         <AppOverlay
           appName={runningApp}
           onClose={closeApp}
@@ -76,3 +89,4 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     </div>
   );
 };
+

@@ -7,8 +7,10 @@ import { FirefoxCover } from "./covers/FirefoxCover";
 import { NotesCover } from "./covers/NotesCover";
 import { MessagesCover } from "./covers/MessagesCover";
 import { MusicCover } from "./covers/MusicCover";
+import { AIChatCover } from "./covers/AIChatCover";
 
 const COVER_COMPONENTS: Record<string, React.FC> = {
+  "AI Chat": AIChatCover,
   Signal: SignalCover,
   Terminal: TerminalCover,
   Firefox: FirefoxCover,
@@ -16,6 +18,7 @@ const COVER_COMPONENTS: Record<string, React.FC> = {
   Messages: MessagesCover,
   Music: MusicCover,
 };
+
 
 const SORTED_APPS = [...ALL_APPS].sort();
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
