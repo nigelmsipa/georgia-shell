@@ -60,7 +60,6 @@ export const HevelBar: React.FC<Props> = ({ onCloseApp, appDragY, onScrubLeft, o
             }, 2000);
           }
         }}
-        style={{ y: appDragY }} // The bar itself moves up slightly with the drag
       />
     </div>
   );

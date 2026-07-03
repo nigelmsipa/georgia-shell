@@ -9,17 +9,17 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 ## State now
 
 - Repo: `/home/nigel/georgia-shell` (Vite + React + TS + Tailwind + shadcn, bun).
-- **Tasks 1 and 2 completed and committed**: `AppScreen` surface drag was replaced with the global `HevelBar` (bottom edge hit box for close/scrub/voice) and a global top edge hit box for `ControlCenter`.
+- **Tasks 1, 2, and 3 completed and committed**: Side Pill was added to the left edge to trigger Utility Drawer (swipe right) and App Switcher (diagonal down-right).
 - Lock screen is **active** (`locked = useState(true)` in `Shell.tsx`).
 - Existing mock apps in `src/components/hevel/apps/`: AIChat, Angelfish
   (browser UI already started), Contacts, HavelTube, Music, Signal, Voice.
 - Shell chrome components in `src/components/hevel/`: Shell, HomeScreen,
   ProseLauncher, ControlCenter, NotificationsPane, UtilityDrawer, AppSwitcher,
-  AppOverlay, LockScreen, AtmosphericBg, PhoneFrame, SettingsApp, HevelBar.
+  AppOverlay, LockScreen, AtmosphericBg, PhoneFrame, SettingsApp, HevelBar, SidePill.
 
 ## Next action
 
-Start Task 3 (Side Pill).
+Start Task 4 (Home canvas paging + Niagara edge scrub).
 
 ## Goal
 

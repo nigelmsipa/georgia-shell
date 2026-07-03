@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { SAMPLE_NOTIFICATIONS, type ProseNotification, type NoteToken } from "./types";
 
@@ -169,9 +170,13 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
   if (!open) return null;
 
   return (
-    <div
-      className="absolute inset-0 z-20 flex flex-col"
+    <motion.div
+      className="absolute inset-0 z-20 flex flex-col bg-background"
       style={{ touchAction: "none" }}
+      initial={{ x: "100%", opacity: 0.5 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "100%", opacity: 0.5 }}
+      transition={{ type: "spring", stiffness: 350, damping: 30 }}
       onPointerDown={handlePaneSwipe}
       onPointerUp={handlePaneSwipeEnd}
     >
@@ -247,6 +252,6 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
           swipe right to go back
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };

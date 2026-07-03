@@ -113,7 +113,9 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         />
       </div>
 
-      <NotificationsPane open={notifications} onClose={() => setNotifications(false)} />
+      <AnimatePresence>
+        {notifications && <NotificationsPane key="notifications" open={true} onClose={() => setNotifications(false)} />}
+      </AnimatePresence>
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
       <AppSwitcher open={appSwitcher} onClose={() => setAppSwitcher(false)} onOpenApp={openApp} />
