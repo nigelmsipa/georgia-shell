@@ -9,7 +9,7 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 ## State now
 
 - Repo: `/home/nigel/georgia-shell` (Vite + React + TS + Tailwind + shadcn, bun).
-- **Tasks 1, 2, and 3 completed and committed**: Side Pill was added to the left edge to trigger Utility Drawer (swipe right) and App Switcher (diagonal down-right).
+- **Tasks 1, 2, 3, and 4 completed and committed**: Home canvas paging is active (swiping left opens `NotificationsPane` which now uses `framer-motion` sliding animations), and the Niagara-style alphabetized edge scrubber works on both extreme left and right edges.
 - Lock screen is **active** (`locked = useState(true)` in `Shell.tsx`).
 - Existing mock apps in `src/components/hevel/apps/`: AIChat, Angelfish
   (browser UI already started), Contacts, HavelTube, Music, Signal, Voice.
@@ -19,7 +19,7 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 
 ## Next action
 
-Start Task 4 (Home canvas paging + Niagara edge scrub).
+Start Task 5 (Mock app flows).
 
 ## Goal
 
