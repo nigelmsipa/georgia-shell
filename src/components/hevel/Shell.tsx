@@ -155,7 +155,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       />
 
       {/* Hevel Bar - Global bottom hit box */}
-      {runningApp && !anyOverlay && (
+      {!anyOverlay && (
         <HevelBar 
           onCloseApp={closeApp} 
           appDragY={appDragY} 
@@ -176,4 +176,3 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     </div>
   );
 };
-

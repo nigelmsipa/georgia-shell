@@ -143,7 +143,6 @@ const NotificationRow: React.FC<{
 export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
   const [notifications, setNotifications] = useState<ProseNotification[]>(SAMPLE_NOTIFICATIONS);
   const [closing, setClosing] = useState(false);
-  const dragRef = useRef({ startX: 0 });
 
   const dismiss = (id: string) => {
     setNotifications((n) => n.filter((x) => x.id !== id));
@@ -157,16 +156,6 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
     }, 250);
   };
 
-  const handlePaneSwipe = (e: React.PointerEvent) => {
-    dragRef.current.startX = e.clientX;
-  };
-
-  const handlePaneSwipeEnd = (e: React.PointerEvent) => {
-    if (e.clientX - dragRef.current.startX > 60) {
-      onClose();
-    }
-  };
-
   if (!open) return null;
 
   return (
@@ -177,8 +166,14 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: "100%", opacity: 0.5 }}
       transition={{ type: "spring", stiffness: 350, damping: 30 }}
-      onPointerDown={handlePaneSwipe}
-      onPointerUp={handlePaneSwipeEnd}
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={{ left: 0, right: 1 }}
+      onDragEnd={(e, info) => {
+        if (info.offset.x > 80 || info.velocity.x > 500) {
+          onClose();
+        }
+      }}
     >
       <AtmosphericBg />
       {/* Header */}
