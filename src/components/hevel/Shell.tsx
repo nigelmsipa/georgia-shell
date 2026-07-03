@@ -7,6 +7,7 @@ import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AtmosphericBg } from "./AtmosphericBg";
+import { AnimatePresence } from "framer-motion";
 import { AIChat } from "./apps/AIChat";
 import { HavelTube } from "./apps/HavelTube";
 import { Music } from "./apps/Music";
@@ -82,20 +83,23 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
 
-      {runningApp && runningApp === "Settings" && <SettingsApp onClose={closeApp} />}
-      {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
-        (() => {
-          const App = MOCK_APPS[runningApp];
-          return <App onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} />;
-        })()
-      )}
-      {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
-        <AppOverlay
-          appName={runningApp}
-          onClose={closeApp}
-          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
-        />
-      )}
+      <AnimatePresence>
+        {runningApp && runningApp === "Settings" && <SettingsApp key="settings" onClose={closeApp} />}
+        {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
+          (() => {
+            const App = MOCK_APPS[runningApp];
+            return <App key={runningApp} onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} />;
+          })()
+        )}
+        {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
+          <AppOverlay
+            key={runningApp}
+            appName={runningApp}
+            onClose={closeApp}
+            onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+          />
+        )}
+      </AnimatePresence>
 
       {locked && <LockScreen onUnlock={() => setLocked(false)} />}
     </div>

@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
+import { motion, useAnimation, PanInfo } from "framer-motion";
 import { AtmosphericBg } from "../AtmosphericBg";
 
 interface Props {
@@ -21,9 +22,6 @@ export const AppScreen: React.FC<Props> = ({
   onOpenUtilityDrawer,
   children,
 }) => {
-  const dragRef = useRef({ startY: 0, startX: 0, fromTop: false, fromBottom: false, dragging: false });
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [pull, setPull] = useState(0);
   const [time, setTime] = useState(new Date());
 
   React.useEffect(() => {
@@ -34,53 +32,25 @@ export const AppScreen: React.FC<Props> = ({
   const hours = time.getHours().toString().padStart(2, "0");
   const minutes = time.getMinutes().toString().padStart(2, "0");
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    dragRef.current = {
-      startY: e.clientY,
-      startX: e.clientX,
-      fromTop: e.clientY < rect.top + 80,
-      fromBottom: e.clientY > rect.bottom - 60,
-      dragging: true,
-    };
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current.dragging) return;
-    if (!dragRef.current.fromTop) return;
-    const dy = e.clientY - dragRef.current.startY;
-    if (dy > 0) setPull(Math.min(dy, 200));
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (!dragRef.current.dragging) return;
-    const dy = dragRef.current.startY - e.clientY;
-    const { fromTop, fromBottom } = dragRef.current;
-    dragRef.current.dragging = false;
-
-    if (fromTop && -dy > 80) {
-      onClose();
-    } else if (fromBottom && dy > 80 && onOpenUtilityDrawer) {
-      onOpenUtilityDrawer();
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    if (info.offset.y > 120 || info.velocity.y > 600) {
+      onClose(); // Dragged down -> close
+    } else if (info.offset.y < -80 || info.velocity.y < -600) {
+      if (onOpenUtilityDrawer) onOpenUtilityDrawer(); // Dragged up -> drawer
     }
-    setPull(0);
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 z-50 flex flex-col select-none"
-      style={{
-        touchAction: "none",
-        transform: `translateY(${pull * 0.4}px)`,
-        opacity: 1 - pull / 600,
-        transition: pull === 0 ? "transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease" : "none",
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+    <motion.div
+      className="absolute inset-0 z-50 flex flex-col bg-background select-none"
+      drag="y"
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={0.3}
+      onDragEnd={handleDragEnd}
+      initial={{ opacity: 0, scale: 0.96, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96, y: 50 }}
+      transition={{ type: "spring", stiffness: 450, damping: 45 }}
     >
       <AtmosphericBg />
 
@@ -117,8 +87,6 @@ export const AppScreen: React.FC<Props> = ({
             width: 32,
             height: 3,
             background: "hsl(var(--muted-foreground) / 0.15)",
-            opacity: pull > 0 ? Math.min(1, 0.3 + pull / 100) : 0.4,
-            transition: "opacity 0.2s ease",
           }}
         />
       </div>
@@ -127,6 +95,6 @@ export const AppScreen: React.FC<Props> = ({
       <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 };
