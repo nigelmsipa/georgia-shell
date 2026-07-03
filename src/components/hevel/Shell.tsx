@@ -6,9 +6,11 @@ import { ControlCenter } from "./ControlCenter";
 import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
+import { AppSwitcher } from "./AppSwitcher";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { AnimatePresence, useMotionValue, motion } from "framer-motion";
 import { HevelBar } from "./HevelBar";
+import { SidePill } from "./SidePill";
 import { AIChat } from "./apps/AIChat";
 import { HavelTube } from "./apps/HavelTube";
 import { Music } from "./apps/Music";
@@ -38,6 +40,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [notifications, setNotifications] = useState(false);
   const [controlCenter, setControlCenter] = useState(false);
   const [utilityDrawer, setUtilityDrawer] = useState(false);
+  const [appSwitcher, setAppSwitcher] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
   const [recents, setRecents] = useState<string[]>([]);
   
@@ -88,7 +91,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     }
   };
 
-  const anyOverlay = controlCenter || utilityDrawer;
+  const anyOverlay = controlCenter || utilityDrawer || appSwitcher;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -113,6 +116,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       <NotificationsPane open={notifications} onClose={() => setNotifications(false)} />
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
+      <AppSwitcher open={appSwitcher} onClose={() => setAppSwitcher(false)} onOpenApp={openApp} />
 
       <AnimatePresence>
         {runningApp && runningApp === "Settings" && <SettingsApp key="settings" onClose={closeApp} />}
@@ -153,6 +157,14 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
           appDragY={appDragY} 
           onScrubLeft={handleScrubLeft}
           onScrubRight={handleScrubRight}
+        />
+      )}
+
+      {/* Side Pill - Global edge panel */}
+      {!anyOverlay && (
+        <SidePill 
+          onOpenUtilityDrawer={() => setUtilityDrawer(true)} 
+          onOpenAppSwitcher={() => setAppSwitcher(true)} 
         />
       )}
 
