@@ -9,24 +9,17 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 ## State now
 
 - Repo: `/home/nigel/georgia-shell` (Vite + React + TS + Tailwind + shadcn, bun).
-- **Uncommitted working-tree changes** left by the previous agent (framer-motion
-  install + `AnimatePresence` in `Shell.tsx` + rewritten `AppScreen.tsx`).
-  `bun run build` passes with them. They are NOT committed yet.
-- **Bug introduced by those changes:** `AppScreen.tsx` now puts `drag="y"` on the
-  entire app container. Any vertical drag anywhere in an app moves/closes the
-  whole app — this will fight scrollable app content and violates the gesture
-  spec (see Gotchas). Must be fixed in Task 1.
-- Lock screen is **active** (`locked = useState(true)` in `Shell.tsx:32`). The
-  old handoff claimed it was bypassed — that is false in the current tree.
+- **Tasks 1 and 2 completed and committed**: `AppScreen` surface drag was replaced with the global `HevelBar` (bottom edge hit box for close/scrub/voice) and a global top edge hit box for `ControlCenter`.
+- Lock screen is **active** (`locked = useState(true)` in `Shell.tsx`).
 - Existing mock apps in `src/components/hevel/apps/`: AIChat, Angelfish
   (browser UI already started), Contacts, HavelTube, Music, Signal, Voice.
 - Shell chrome components in `src/components/hevel/`: Shell, HomeScreen,
   ProseLauncher, ControlCenter, NotificationsPane, UtilityDrawer, AppSwitcher,
-  AppOverlay, LockScreen, AtmosphericBg, PhoneFrame, SettingsApp.
+  AppOverlay, LockScreen, AtmosphericBg, PhoneFrame, SettingsApp, HevelBar.
 
 ## Next action
 
-Task 0 below: checkpoint-commit the pending diff, then start Task 1.
+Start Task 3 (Side Pill).
 
 ## Goal
 
