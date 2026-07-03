@@ -9,17 +9,16 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 ## State now
 
 - Repo: `/home/nigel/georgia-shell` (Vite + React + TS + Tailwind + shadcn, bun).
-- **Tasks 1, 2, 3, and 4 completed and committed**: Home canvas paging is active (swiping left opens `NotificationsPane` which now uses `framer-motion` sliding animations), and the Niagara-style alphabetized edge scrubber works on both extreme left and right edges.
+- **All Phase 1 Tasks (1-5) completed and committed**: The Reliable PDF gesture spec is fully implemented (Hevel Bar, Side Pill, edge scrubbers). The Phone mock app is added. 
 - Lock screen is **active** (`locked = useState(true)` in `Shell.tsx`).
-- Existing mock apps in `src/components/hevel/apps/`: AIChat, Angelfish
-  (browser UI already started), Contacts, HavelTube, Music, Signal, Voice.
+- Existing mock apps in `src/components/hevel/apps/`: AIChat, Angelfish, Contacts, HavelTube, Music, Signal, Voice, Phone.
 - Shell chrome components in `src/components/hevel/`: Shell, HomeScreen,
   ProseLauncher, ControlCenter, NotificationsPane, UtilityDrawer, AppSwitcher,
   AppOverlay, LockScreen, AtmosphericBg, PhoneFrame, SettingsApp, HevelBar, SidePill.
 
 ## Next action
 
-Start Task 5 (Mock app flows).
+Phase 1 is complete! The React prototype demonstrates the precise interaction model. Phase 2 (AOSP translation) can begin.
 
 ## Goal
 
