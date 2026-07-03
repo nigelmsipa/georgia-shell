@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, useAnimation, PanInfo } from "framer-motion";
+import { motion, MotionValue } from "framer-motion";
 import { AtmosphericBg } from "../AtmosphericBg";
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
   onClose: () => void;
   onOpenUtilityDrawer?: () => void;
   children: React.ReactNode;
+  appDragY?: MotionValue<number>;
 }
 
 /**
@@ -20,6 +21,7 @@ export const AppScreen: React.FC<Props> = ({
   appName,
   onClose,
   onOpenUtilityDrawer,
+  appDragY,
   children,
 }) => {
   const [time, setTime] = useState(new Date());
@@ -32,25 +34,14 @@ export const AppScreen: React.FC<Props> = ({
   const hours = time.getHours().toString().padStart(2, "0");
   const minutes = time.getMinutes().toString().padStart(2, "0");
 
-  const handleDragEnd = (event: any, info: PanInfo) => {
-    if (info.offset.y > 120 || info.velocity.y > 600) {
-      onClose(); // Dragged down -> close
-    } else if (info.offset.y < -80 || info.velocity.y < -600) {
-      if (onOpenUtilityDrawer) onOpenUtilityDrawer(); // Dragged up -> drawer
-    }
-  };
-
   return (
     <motion.div
       className="absolute inset-0 z-50 flex flex-col bg-background select-none"
-      drag="y"
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={0.3}
-      onDragEnd={handleDragEnd}
       initial={{ opacity: 0, scale: 0.96, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96, y: 50 }}
       transition={{ type: "spring", stiffness: 450, damping: 45 }}
+      style={{ y: appDragY }}
     >
       <AtmosphericBg />
 
@@ -79,17 +70,7 @@ export const AppScreen: React.FC<Props> = ({
         <span style={{ width: 32 }} />
       </div>
 
-      {/* Drag hint at top */}
-      <div className="relative z-10 flex justify-center" style={{ marginTop: -4, marginBottom: 4 }}>
-        <div
-          className="rounded-full"
-          style={{
-            width: 32,
-            height: 3,
-            background: "hsl(var(--muted-foreground) / 0.15)",
-          }}
-        />
-      </div>
+
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col overflow-hidden">

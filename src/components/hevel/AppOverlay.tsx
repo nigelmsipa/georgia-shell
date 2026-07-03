@@ -1,13 +1,15 @@
 import React, { useRef } from "react";
+import { motion, MotionValue } from "framer-motion";
 import { AtmosphericBg } from "./AtmosphericBg";
 
 interface Props {
   appName: string;
   onClose: () => void;
   onOpenUtilityDrawer?: () => void;
+  appDragY?: MotionValue<number>;
 }
 
-export const AppOverlay: React.FC<Props> = ({ appName, onClose, onOpenUtilityDrawer }) => {
+export const AppOverlay: React.FC<Props> = ({ appName, onClose, onOpenUtilityDrawer, appDragY }) => {
   const dragRef = useRef({ startY: 0, dragging: false });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -29,10 +31,13 @@ export const AppOverlay: React.FC<Props> = ({ appName, onClose, onOpenUtilityDra
   };
 
   return (
-    <div
+    <motion.div
       ref={containerRef}
       className="absolute inset-0 z-50 flex flex-col items-center justify-center"
-      style={{ transition: "opacity 0.3s ease-out", touchAction: "none" }}
+      style={{ y: appDragY, transition: "opacity 0.3s ease-out", touchAction: "none" }}
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     >
@@ -50,6 +55,6 @@ export const AppOverlay: React.FC<Props> = ({ appName, onClose, onOpenUtilityDra
       >
         ← back
       </button>
-    </div>
+    </motion.div>
   );
 };

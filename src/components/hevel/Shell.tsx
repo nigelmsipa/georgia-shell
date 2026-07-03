@@ -7,7 +7,8 @@ import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AtmosphericBg } from "./AtmosphericBg";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, useMotionValue, motion } from "framer-motion";
+import { HevelBar } from "./HevelBar";
 import { AIChat } from "./apps/AIChat";
 import { HavelTube } from "./apps/HavelTube";
 import { Music } from "./apps/Music";
@@ -16,7 +17,11 @@ import { Contacts } from "./apps/Contacts";
 import { Angelfish } from "./apps/Angelfish";
 import { Voice } from "./apps/Voice";
 
-type MockAppProps = { onClose: () => void; onOpenUtilityDrawer?: () => void };
+type MockAppProps = { 
+  onClose: () => void; 
+  onOpenUtilityDrawer?: () => void;
+  appDragY?: any;
+};
 const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
   "AI Chat": AIChat,
   "HavelTube": HavelTube,
@@ -34,6 +39,9 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [controlCenter, setControlCenter] = useState(false);
   const [utilityDrawer, setUtilityDrawer] = useState(false);
   const [runningApp, setRunningApp] = useState<string | null>(null);
+  const [recents, setRecents] = useState<string[]>([]);
+  
+  const appDragY = useMotionValue(0);
 
   React.useEffect(() => {
     if (!navigateTo) return;
@@ -54,8 +62,31 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     }
   }, [navigateTo]);
 
-  const openApp = (name: string) => setRunningApp(name);
+  const openApp = (name: string) => {
+    setRunningApp(name);
+    setRecents(prev => [name, ...prev.filter(app => app !== name)]);
+  };
   const closeApp = () => setRunningApp(null);
+
+  const handleScrubLeft = () => {
+    // Next recent app
+    if (recents.length > 1) {
+      const idx = runningApp ? recents.indexOf(runningApp) : -1;
+      if (idx !== -1 && idx + 1 < recents.length) {
+        setRunningApp(recents[idx + 1]);
+      }
+    }
+  };
+
+  const handleScrubRight = () => {
+    // Prev recent app
+    if (recents.length > 1) {
+      const idx = runningApp ? recents.indexOf(runningApp) : -1;
+      if (idx > 0) {
+        setRunningApp(recents[idx - 1]);
+      }
+    }
+  };
 
   const anyOverlay = controlCenter || utilityDrawer;
 
@@ -88,7 +119,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
           (() => {
             const App = MOCK_APPS[runningApp];
-            return <App key={runningApp} onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} />;
+            return <App key={runningApp} onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} appDragY={appDragY} />;
           })()
         )}
         {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
@@ -97,9 +128,33 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
             appName={runningApp}
             onClose={closeApp}
             onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+            appDragY={appDragY}
           />
         )}
       </AnimatePresence>
+
+      {/* Top Edge Hitbox - Global pull-down for Control Center */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+        dragElastic={0.1}
+        onDragEnd={(e, info) => {
+          if (info.offset.y > 30 || info.velocity.y > 300) {
+            setControlCenter(true);
+          }
+        }}
+      />
+
+      {/* Hevel Bar - Global bottom hit box */}
+      {runningApp && !anyOverlay && (
+        <HevelBar 
+          onCloseApp={closeApp} 
+          appDragY={appDragY} 
+          onScrubLeft={handleScrubLeft}
+          onScrubRight={handleScrubRight}
+        />
+      )}
 
       {locked && <LockScreen onUnlock={() => setLocked(false)} />}
     </div>
