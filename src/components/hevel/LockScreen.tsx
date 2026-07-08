@@ -295,29 +295,8 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </div>
             ))}
 
-            {/* 4th row: backspace, 0, enter */}
-            <div className="flex items-center gap-5">
-              <button
-                onClick={() => handleKey("delete")}
-                className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
-                style={{
-                  width: 68,
-                  height: 68,
-                  background: "var(--glass-bg)",
-                  border: "1px solid var(--glass-border)",
-                  boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
-                  opacity: entered.length > 0 ? 1 : 0,
-                  pointerEvents: entered.length > 0 ? "auto" : "none",
-                }}
-                aria-label="Backspace"
-              >
-                <X
-                  size={22}
-                  strokeWidth={1.5}
-                  style={{ color: "hsl(var(--foreground) / 0.7)" }}
-                />
-              </button>
-
+            {/* 4th row: 0 centered */}
+            <div className="flex items-center justify-center">
               <button
                 onClick={() => handleKey("0")}
                 className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
@@ -341,6 +320,28 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                   0
                 </span>
               </button>
+            </div>
+
+            {/* Prose action row: Back, Enter */}
+            <div className="flex items-center justify-center gap-8 mt-1">
+              <button
+                onClick={() => handleKey("delete")}
+                className="font-serif italic transition-all duration-150 active:opacity-50"
+                style={{
+                  fontSize: 14,
+                  color: "hsl(var(--foreground) / 0.7)",
+                  letterSpacing: "0.04em",
+                  opacity: entered.length > 0 ? 1 : 0,
+                  pointerEvents: entered.length > 0 ? "auto" : "none",
+                  width: 68,
+                  height: 68,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                Back
+              </button>
 
               <button
                 onClick={() => {
@@ -357,28 +358,28 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     }
                   }
                 }}
-                className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                className="font-serif italic transition-all duration-150 active:opacity-50"
                 style={{
-                  width: 68,
-                  height: 68,
-                  background: "var(--glass-bg)",
-                  border: "1px solid var(--glass-border)",
-                  boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
+                  fontSize: 14,
+                  color: entered.length === PIN_LENGTH
+                    ? "hsl(var(--primary))"
+                    : "hsl(var(--foreground) / 0.7)",
+                  letterSpacing: "0.04em",
                   opacity: entered.length > 0 ? 1 : 0,
                   pointerEvents: entered.length > 0 ? "auto" : "none",
+                  width: 68,
+                  height: 68,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                aria-label="Enter"
               >
-                <ArrowLeft
-                  size={22}
-                  strokeWidth={1.5}
-                  style={{ color: "hsl(var(--foreground) / 0.7)" }}
-                />
+                Enter
               </button>
             </div>
 
             {/* Emergency pill */}
-            <div className="flex items-center justify-center mt-5">
+            <div className="flex items-center justify-center mt-2">
               <button
                 onClick={() => setEmergency(true)}
                 className="font-serif italic transition-all duration-150 active:opacity-60"
