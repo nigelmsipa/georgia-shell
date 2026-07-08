@@ -265,68 +265,114 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-10">
-            {KEYS.map((row, ri) => (
-              <div key={ri} className="flex items-center gap-5">
-                {row.map((key, ci) => {
-                  if (key === "") {
-                    return <div key={ci} style={{ width: 68, height: 68 }} />;
-                  }
-                  const isDelete = key === "delete";
-                  const isSos = key === "sos";
-                  const isWord = isDelete || isSos;
-                  return (
+            {KEYS.map((row, ri) => {
+              if (ri === 3) {
+                return (
+                  <div key={ri} className="flex items-center gap-5">
                     <button
-                      key={ci}
-                      onClick={() => {
-                        if (isSos) setEmergency(true);
-                        else handleKey(key);
-                      }}
-                      className="group flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      onClick={() => setEmergency(true)}
+                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      style={{ width: 68, height: 68 }}
+                      aria-label="Emergency"
+                    >
+                      <span
+                        className="font-serif italic transition-colors duration-300"
+                        style={{
+                          fontSize: 12,
+                          color: "hsl(var(--destructive) / 0.65)",
+                          letterSpacing: "0.03em",
+                        }}
+                      >
+                        Emergency
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleKey("0")}
+                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
                       style={{
                         width: 68,
                         height: 68,
-                        background: isWord ? "transparent" : "var(--glass-bg)",
-                        border: isWord ? "none" : "1px solid var(--glass-border)",
-                        boxShadow: isWord ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
+                        background: "var(--glass-bg)",
+                        border: "1px solid var(--glass-border)",
+                        boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
                       }}
                     >
-                      {isWord ? (
-                        <span
-                          className="font-serif italic transition-colors duration-300"
-                          style={{
-                            fontSize: 12,
-                            color: isSos
-                              ? "hsl(var(--muted-foreground) / 0.3)"
-                              : "hsl(var(--muted-foreground) / 0.35)",
-                            letterSpacing: "0.03em",
-                          }}
-                          onMouseEnter={isSos ? (e) => {
-                            (e.currentTarget as HTMLSpanElement).style.color = "hsl(var(--destructive))";
-                          } : undefined}
-                          onMouseLeave={isSos ? (e) => {
-                            (e.currentTarget as HTMLSpanElement).style.color = "hsl(var(--muted-foreground) / 0.3)";
-                          } : undefined}
-                        >
-                          {key}
-                        </span>
-                      ) : (
-                        <span
-                          className="font-serif"
-                          style={{
-                            fontSize: 26,
-                            fontWeight: 300,
-                            letterSpacing: "0.02em",
-                            color: "hsl(var(--foreground))",
-                          }}
-                        >
-                          {key}
-                        </span>
-                      )}
+                      <span
+                        className="font-serif"
+                        style={{
+                          fontSize: 26,
+                          fontWeight: 300,
+                          letterSpacing: "0.02em",
+                          color: "hsl(var(--foreground))",
+                        }}
+                      >
+                        0
+                      </span>
                     </button>
-                  );
-                })}
-              </div>
-            ))}
+
+                    <button
+                      onClick={() => handleKey("delete")}
+                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      style={{
+                        width: 68,
+                        height: 68,
+                        opacity: entered.length > 0 ? 1 : 0,
+                        pointerEvents: entered.length > 0 ? "auto" : "none",
+                        transition: "opacity 0.25s ease, transform 0.15s ease",
+                      }}
+                      aria-label="Delete"
+                    >
+                      <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="hsl(var(--foreground) / 0.7)"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+                        <line x1="18" y1="9" x2="12" y2="15" />
+                        <line x1="12" y1="9" x2="18" y2="15" />
+                      </svg>
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={ri} className="flex items-center gap-5">
+                  {row.map((key, ci) => (
+                    <button
+                      key={ci}
+                      onClick={() => handleKey(key)}
+                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                      style={{
+                        width: 68,
+                        height: 68,
+                        background: "var(--glass-bg)",
+                        border: "1px solid var(--glass-border)",
+                        boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
+                      }}
+                    >
+                      <span
+                        className="font-serif"
+                        style={{
+                          fontSize: 26,
+                          fontWeight: 300,
+                          letterSpacing: "0.02em",
+                          color: "hsl(var(--foreground))",
+                        }}
+                      >
+                        {key}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         </div>
 
