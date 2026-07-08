@@ -209,14 +209,15 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             }}
           >
             <span
-              className="font-serif italic"
+              className="font-serif italic flex flex-col items-center gap-1.5"
               style={{
                 fontSize: 12,
                 color: "hsl(var(--muted-foreground) / 0.4)",
                 letterSpacing: "0.06em",
               }}
             >
-              swipe up
+              <span>unlock with pin or fingerprint</span>
+              <span style={{ opacity: 0.7 }}>swipe up</span>
             </span>
           </div>
         </div>
