@@ -142,20 +142,22 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       </AnimatePresence>
 
       {/* Top Edge Hitbox - Global pull-down for Control Center */}
-      <motion.div
-        className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-        dragElastic={0.1}
-        onDragEnd={(e, info) => {
-          if (info.offset.y > 30 || info.velocity.y > 300) {
-            setControlCenter(true);
-          }
-        }}
-      />
+      {!locked && (
+        <motion.div
+          className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+          dragElastic={0.1}
+          onDragEnd={(e, info) => {
+            if (info.offset.y > 30 || info.velocity.y > 300) {
+              setControlCenter(true);
+            }
+          }}
+        />
+      )}
 
       {/* Hevel Bar - Global bottom hit box */}
-      {!anyOverlay && (
+      {!locked && !anyOverlay && (
         <HevelBar 
           onCloseApp={closeApp} 
           appDragY={appDragY} 
@@ -165,7 +167,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       )}
 
       {/* Side Pill - Global edge panel */}
-      {!anyOverlay && (
+      {!locked && !anyOverlay && (
         <SidePill 
           onOpenUtilityDrawer={() => setUtilityDrawer(true)} 
           onOpenAppSwitcher={() => setAppSwitcher(true)} 

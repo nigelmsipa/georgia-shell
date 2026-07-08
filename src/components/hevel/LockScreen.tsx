@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { PhoneCall } from "lucide-react";
 import { AtmosphericBg } from "./AtmosphericBg";
 
 interface Props {
@@ -15,6 +16,11 @@ const KEYS = [
   ["1", "2", "3"],
   ["4", "5", "6"],
   ["7", "8", "9"],
+];
+
+const EMERGENCY_KEYS = [
+  ...KEYS,
+  ["", "0", "delete"],
 ];
 
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
@@ -136,6 +142,23 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
   const translatePx = -scrollY * containerH;
   const isAnimating = !dragRef.current.active;
+
+  const closeEmergency = () => {
+    setEmergency(false);
+    setEmergencyDigits("");
+    setCalling(false);
+  };
+
+  const startEmergencyCall = (target = emergencyDigits) => {
+    if (!target || calling) return;
+    setEmergencyDigits(target);
+    setCalling(true);
+    setTimeout(() => {
+      setCalling(false);
+      setEmergency(false);
+      setEmergencyDigits("");
+    }, 2500);
+  };
 
   return (
     <div
@@ -302,7 +325,9 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                 className="font-serif italic transition-all duration-150 active:opacity-50"
                 style={{
                   fontSize: 14,
-                  color: "hsl(var(--foreground) / 0.7)",
+                  color: entered.length
+                    ? "hsl(var(--foreground) / 0.7)"
+                    : "hsl(var(--muted-foreground) / 0.28)",
                   letterSpacing: "0.04em",
                   width: 68,
                   height: 68,
@@ -371,24 +396,23 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </button>
             </div>
 
-            {/* Emergency pill */}
-            <div className="flex items-center justify-center mt-2">
-              <button
-                onClick={() => setEmergency(true)}
-                className="font-serif italic transition-all duration-150 active:opacity-60"
-                style={{
-                  fontSize: 13,
-                  color: "hsl(var(--destructive) / 0.85)",
-                  letterSpacing: "0.04em",
-                  background: "hsl(var(--muted) / 0.12)",
-                  border: "1px solid hsl(var(--destructive) / 0.15)",
-                  borderRadius: 9999,
-                  padding: "10px 32px",
-                }}
-              >
-                Emergency
-              </button>
-            </div>
+            <button
+              onClick={() => setEmergency(true)}
+              aria-label="Emergency call"
+              className="font-serif italic transition-all duration-150 active:opacity-55"
+              style={{
+                minWidth: 144,
+                minHeight: 44,
+                background: "transparent",
+                border: "none",
+                color: "hsl(var(--destructive) / 0.56)",
+                fontSize: 12,
+                letterSpacing: "0.045em",
+              }}
+            >
+              emergency
+            </button>
+
           </div>
         </div>
 
@@ -396,7 +420,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
       {/* ── Emergency overlay ── */}
       <div
-        className="absolute inset-0 flex flex-col"
+        className="absolute inset-0 flex flex-col overflow-hidden"
         style={{
           background: "hsl(var(--background))",
           opacity: emergency ? 1 : 0,
@@ -405,13 +429,10 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           transition: "opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        <div className="flex items-center justify-between px-6 pt-6">
+        <AtmosphericBg />
+        <div className="relative z-10 flex items-center justify-between px-6 pt-6">
           <button
-            onClick={() => {
-              setEmergency(false);
-              setEmergencyDigits("");
-              setCalling(false);
-            }}
+            onClick={closeEmergency}
             className="font-serif italic"
             style={{
               fontSize: 13,
@@ -433,19 +454,21 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
           <span
             className="font-serif mt-2"
             style={{
-              fontSize: emergencyDigits ? 52 : 64,
+              fontSize: emergencyDigits ? 52 : 22,
               fontWeight: 300,
-              color: "hsl(var(--foreground))",
-              letterSpacing: "0.05em",
+              color: emergencyDigits
+                ? "hsl(var(--foreground))"
+                : "hsl(var(--muted-foreground) / 0.24)",
+              letterSpacing: emergencyDigits ? "0.05em" : "0.04em",
               minHeight: 72,
               transition: "all 0.2s ease",
             }}
           >
-            {emergencyDigits || "—"}
+            {emergencyDigits || "emergency"}
           </span>
 
           {calling ? (
@@ -460,75 +483,44 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               calling {emergencyDigits}…
             </span>
           ) : (
-            <p
-              className="font-serif italic mt-8 max-w-[280px]"
-              style={{
-                fontSize: 15,
-                lineHeight: 1.7,
-                color: "hsl(var(--muted-foreground) / 0.55)",
-                letterSpacing: "0.01em",
-              }}
-            >
-              in an emergency, call{" "}
-              {(["911", "112", "999"] as const).map((n, i, arr) => (
-                <React.Fragment key={n}>
+            <>
+              <div className="mt-4 flex items-center gap-6">
+                {(["911", "112", "999"] as const).map((n) => (
                   <button
-                    onClick={() => {
-                      setEmergencyDigits(n);
-                      setCalling(true);
-                      setTimeout(() => {
-                        setCalling(false);
-                        setEmergency(false);
-                        setEmergencyDigits("");
-                      }, 2200);
-                    }}
-                    className="font-serif italic transition-colors active:opacity-70"
+                    key={n}
+                    onClick={() => startEmergencyCall(n)}
+                    className="font-serif transition-all duration-150 active:opacity-60"
                     style={{
-                      color: "hsl(var(--destructive))",
-                      textDecoration: "underline",
-                      textUnderlineOffset: "3px",
-                      textDecorationColor: "hsl(var(--destructive) / 0.35)",
+                      background: "transparent",
+                      border: "none",
+                      color: "hsl(var(--destructive) / 0.68)",
+                      fontSize: 18,
+                      fontWeight: 300,
+                      letterSpacing: "0.04em",
+                      padding: 0,
                     }}
                   >
                     {n}
                   </button>
-                  {i < arr.length - 2 ? ", " : i === arr.length - 2 ? ", or " : ""}
-                </React.Fragment>
-              ))}
-              {" — or reach "}
-              {(["police", "ambulance", "fire"] as const).map((n, i, arr) => (
-                <React.Fragment key={n}>
-                  <button
-                    onClick={() => {
-                      setEmergencyDigits(n);
-                      setCalling(true);
-                      setTimeout(() => {
-                        setCalling(false);
-                        setEmergency(false);
-                        setEmergencyDigits("");
-                      }, 2200);
-                    }}
-                    className="font-serif italic transition-colors active:opacity-70"
-                    style={{
-                      color: "hsl(var(--destructive))",
-                      textDecoration: "underline",
-                      textUnderlineOffset: "3px",
-                      textDecorationColor: "hsl(var(--destructive) / 0.35)",
-                    }}
-                  >
-                    {n}
-                  </button>
-                  {i < arr.length - 2 ? ", " : i === arr.length - 2 ? ", or " : ""}
-                </React.Fragment>
-              ))}
-              {" directly."}
-            </p>
+                ))}
+              </div>
+              <span
+                className="font-serif italic mt-6"
+                style={{
+                  fontSize: 14,
+                  color: "hsl(var(--muted-foreground) / 0.38)",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                or dial below
+              </span>
+            </>
           )}
         </div>
 
 
-        <div className="flex flex-col items-center gap-3 pb-10">
-          {KEYS.map((row, ri) => (
+        <div className="relative z-10 flex flex-col items-center gap-3 pb-10">
+          {EMERGENCY_KEYS.map((row, ri) => (
             <div key={ri} className="flex items-center gap-5">
               {row.map((key, ci) => {
                 if (key === "") return <div key={ci} style={{ width: 64, height: 64 }} />;
@@ -546,6 +538,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                       height: 64,
                       background: isDelete ? "transparent" : "var(--glass-bg)",
                       border: isDelete ? "none" : "1px solid var(--glass-border)",
+                      boxShadow: isDelete ? "none" : "inset 0 1px 0 0 var(--glass-highlight)",
                     }}
                   >
                     <span
@@ -569,39 +562,24 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
           <button
             disabled={!emergencyDigits || calling}
-            onClick={() => {
-              setCalling(true);
-              setTimeout(() => {
-                setCalling(false);
-                setEmergency(false);
-                setEmergencyDigits("");
-              }, 2500);
-            }}
+            onClick={() => startEmergencyCall()}
             className="mt-4 flex items-center justify-center rounded-full transition-all active:scale-95"
             style={{
               width: 64,
               height: 64,
               background: emergencyDigits
-                ? "hsl(var(--destructive))"
-                : "hsl(var(--destructive) / 0.25)",
+                ? "hsl(var(--destructive) / 0.82)"
+                : "hsl(var(--muted-foreground) / 0.08)",
               boxShadow: emergencyDigits
-                ? "0 0 24px hsl(var(--destructive) / 0.4)"
+                ? "0 0 22px hsl(var(--destructive) / 0.28)"
                 : "none",
-              opacity: emergencyDigits ? 1 : 0.5,
+              opacity: emergencyDigits ? 1 : 0.65,
+              color: emergencyDigits
+                ? "hsl(var(--destructive-foreground))"
+                : "hsl(var(--muted-foreground) / 0.45)",
             }}
           >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="hsl(var(--destructive-foreground))"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z" />
-            </svg>
+            <PhoneCall size={22} strokeWidth={1.5} />
           </button>
         </div>
       </div>

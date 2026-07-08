@@ -11,6 +11,8 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 - Repo: `/home/nigel/georgia-shell` (Vite + React + TS + Tailwind + shadcn, bun).
 - **All Phase 1 Tasks (1-5) completed and committed**: The Reliable PDF gesture spec is fully implemented (Hevel Bar, Side Pill, edge scrubbers). The Phone mock app is added. 
 - Lock screen is **active** (`locked = useState(true)` in `Shell.tsx`).
+- Lock screen emergency access has been refined: `Back / 0 / Enter` remains stable, and `emergency` is a persistent quiet text affordance below the keypad with a proper touch target. The emergency overlay uses the same atmospheric treatment, quiet quick-call text for `911 / 112 / 999`, and a complete dial pad with `0` plus delete.
+- Global shell hit-boxes/chrome are hidden while locked, so the Side Pill / Hevel Bar / top edge do not leak over the lock screen.
 - Existing mock apps in `src/components/hevel/apps/`: AIChat, Angelfish, Contacts, HavelTube, Music, Signal, Voice, Phone.
 - Shell chrome components in `src/components/hevel/`: Shell, HomeScreen,
   ProseLauncher, ControlCenter, NotificationsPane, UtilityDrawer, AppSwitcher,
@@ -18,7 +20,7 @@ session), rewrite **State now** and **Next action** only — the rest is stable.
 
 ## Next action
 
-Phase 1 is complete! The React prototype demonstrates the precise interaction model. Phase 2 (AOSP translation) can begin.
+Review the lock-screen emergency treatment on a real phone-sized viewport, then continue Phase 2 (AOSP translation) once the lock-screen look is accepted.
 
 ## Goal
 
