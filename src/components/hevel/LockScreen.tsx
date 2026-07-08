@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { X, ArrowLeft } from "lucide-react";
 import { AtmosphericBg } from "./AtmosphericBg";
 
 interface Props {
