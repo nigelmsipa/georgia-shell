@@ -304,8 +304,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                   fontSize: 14,
                   color: "hsl(var(--foreground) / 0.7)",
                   letterSpacing: "0.04em",
-                  opacity: entered.length > 0 ? 1 : 0,
-                  pointerEvents: entered.length > 0 ? "auto" : "none",
                   width: 68,
                   height: 68,
                   display: "flex",
