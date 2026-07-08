@@ -15,7 +15,6 @@ const KEYS = [
   ["1", "2", "3"],
   ["4", "5", "6"],
   ["7", "8", "9"],
-  ["sos", "0", "delete"],
 ];
 
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
@@ -265,114 +264,145 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-10">
-            {KEYS.map((row, ri) => {
-              if (ri === 3) {
-                return (
-                  <div key={ri} className="flex items-center gap-5">
-                    <button
-                      onClick={() => setEmergency(true)}
-                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
-                      style={{ width: 68, height: 68 }}
-                      aria-label="Emergency"
-                    >
-                      <span
-                        className="font-serif italic transition-colors duration-300"
-                        style={{
-                          fontSize: 12,
-                          color: "hsl(var(--destructive) / 0.65)",
-                          letterSpacing: "0.03em",
-                        }}
-                      >
-                        Emergency
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => handleKey("0")}
-                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+            {KEYS.map((row, ri) => (
+              <div key={ri} className="flex items-center gap-5">
+                {row.map((key, ci) => (
+                  <button
+                    key={ci}
+                    onClick={() => handleKey(key)}
+                    className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                    style={{
+                      width: 68,
+                      height: 68,
+                      background: "var(--glass-bg)",
+                      border: "1px solid var(--glass-border)",
+                      boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
+                    }}
+                  >
+                    <span
+                      className="font-serif"
                       style={{
-                        width: 68,
-                        height: 68,
-                        background: "var(--glass-bg)",
-                        border: "1px solid var(--glass-border)",
-                        boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
+                        fontSize: 26,
+                        fontWeight: 300,
+                        letterSpacing: "0.02em",
+                        color: "hsl(var(--foreground))",
                       }}
                     >
-                      <span
-                        className="font-serif"
-                        style={{
-                          fontSize: 26,
-                          fontWeight: 300,
-                          letterSpacing: "0.02em",
-                          color: "hsl(var(--foreground))",
-                        }}
-                      >
-                        0
-                      </span>
-                    </button>
+                      {key}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ))}
 
-                    <button
-                      onClick={() => handleKey("delete")}
-                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
-                      style={{
-                        width: 68,
-                        height: 68,
-                        opacity: entered.length > 0 ? 1 : 0,
-                        pointerEvents: entered.length > 0 ? "auto" : "none",
-                        transition: "opacity 0.25s ease, transform 0.15s ease",
-                      }}
-                      aria-label="Delete"
-                    >
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="hsl(var(--foreground) / 0.7)"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-                        <line x1="18" y1="9" x2="12" y2="15" />
-                        <line x1="12" y1="9" x2="18" y2="15" />
-                      </svg>
-                    </button>
-                  </div>
-                );
-              }
+            {/* Centered 0 key */}
+            <div className="flex items-center justify-center">
+              <button
+                onClick={() => handleKey("0")}
+                className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                style={{
+                  width: 68,
+                  height: 68,
+                  background: "var(--glass-bg)",
+                  border: "1px solid var(--glass-border)",
+                  boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
+                }}
+              >
+                <span
+                  className="font-serif"
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 300,
+                    letterSpacing: "0.02em",
+                    color: "hsl(var(--foreground))",
+                  }}
+                >
+                  0
+                </span>
+              </button>
+            </div>
 
-              return (
-                <div key={ri} className="flex items-center gap-5">
-                  {row.map((key, ci) => (
-                    <button
-                      key={ci}
-                      onClick={() => handleKey(key)}
-                      className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
-                      style={{
-                        width: 68,
-                        height: 68,
-                        background: "var(--glass-bg)",
-                        border: "1px solid var(--glass-border)",
-                        boxShadow: "inset 0 1px 0 0 var(--glass-highlight)",
-                      }}
-                    >
-                      <span
-                        className="font-serif"
-                        style={{
-                          fontSize: 26,
-                          fontWeight: 300,
-                          letterSpacing: "0.02em",
-                          color: "hsl(var(--foreground))",
-                        }}
-                      >
-                        {key}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              );
-            })}
+            {/* Prose action row */}
+            <div className="flex items-center gap-5 mt-1">
+              <button
+                onClick={() => setEmergency(true)}
+                className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                style={{ width: 68, height: 68 }}
+                aria-label="Emergency"
+              >
+                <span
+                  className="font-serif italic"
+                  style={{
+                    fontSize: 12,
+                    color: "hsl(var(--destructive) / 0.65)",
+                    letterSpacing: "0.03em",
+                  }}
+                >
+                  Emergency
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (entered.length === PIN_LENGTH) {
+                    if (entered === PIN) {
+                      setUnlocking(true);
+                      setTimeout(onUnlock, 600);
+                    } else {
+                      setError(true);
+                      setTimeout(() => {
+                        setEntered("");
+                        setError(false);
+                      }, 600);
+                    }
+                  }
+                }}
+                className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                style={{
+                  width: 68,
+                  height: 68,
+                  opacity: entered.length > 0 ? 1 : 0.25,
+                }}
+                aria-label="Enter"
+              >
+                <span
+                  className="font-serif italic"
+                  style={{
+                    fontSize: 12,
+                    color:
+                      entered.length === PIN_LENGTH
+                        ? "hsl(var(--primary))"
+                        : "hsl(var(--muted-foreground) / 0.35)",
+                    letterSpacing: "0.03em",
+                    transition: "color 0.25s ease",
+                  }}
+                >
+                  Enter
+                </span>
+              </button>
+
+              <button
+                onClick={() => handleKey("delete")}
+                className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
+                style={{
+                  width: 68,
+                  height: 68,
+                  opacity: entered.length > 0 ? 1 : 0.25,
+                }}
+                aria-label="Back"
+              >
+                <span
+                  className="font-serif italic"
+                  style={{
+                    fontSize: 12,
+                    color: "hsl(var(--muted-foreground) / 0.55)",
+                    letterSpacing: "0.03em",
+                  }}
+                >
+                  Back
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
