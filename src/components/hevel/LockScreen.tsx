@@ -295,8 +295,27 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </div>
             ))}
 
-            {/* 4th row: 0 centered */}
-            <div className="flex items-center justify-center">
+            {/* 4th row: Back — 0 — Enter */}
+            <div className="flex items-center gap-5">
+              <button
+                onClick={() => handleKey("delete")}
+                className="font-serif italic transition-all duration-150 active:opacity-50"
+                style={{
+                  fontSize: 14,
+                  color: "hsl(var(--foreground) / 0.7)",
+                  letterSpacing: "0.04em",
+                  opacity: entered.length > 0 ? 1 : 0,
+                  pointerEvents: entered.length > 0 ? "auto" : "none",
+                  width: 68,
+                  height: 68,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                Back
+              </button>
+
               <button
                 onClick={() => handleKey("0")}
                 className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-90"
@@ -319,28 +338,6 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                 >
                   0
                 </span>
-              </button>
-            </div>
-
-            {/* Prose action row: Back, Enter */}
-            <div className="flex items-center justify-center gap-8 mt-1">
-              <button
-                onClick={() => handleKey("delete")}
-                className="font-serif italic transition-all duration-150 active:opacity-50"
-                style={{
-                  fontSize: 14,
-                  color: "hsl(var(--foreground) / 0.7)",
-                  letterSpacing: "0.04em",
-                  opacity: entered.length > 0 ? 1 : 0,
-                  pointerEvents: entered.length > 0 ? "auto" : "none",
-                  width: 68,
-                  height: 68,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                Back
               </button>
 
               <button
