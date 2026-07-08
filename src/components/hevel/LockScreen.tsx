@@ -235,7 +235,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               letterSpacing: "0.04em",
             }}
           >
-            enter passcode
+            enter passcode or use fingerprint
           </span>
 
           <div
