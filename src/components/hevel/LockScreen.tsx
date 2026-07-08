@@ -329,6 +329,22 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
               </div>
             ))}
           </div>
+
+          <button
+            onClick={() => {
+              if (unlocking) return;
+              setUnlocking(true);
+              setTimeout(onUnlock, 600);
+            }}
+            className="font-serif italic mt-8 animate-breathe active:opacity-60 transition-opacity"
+            style={{
+              fontSize: 11,
+              color: "hsl(var(--muted-foreground) / 0.35)",
+              letterSpacing: "0.08em",
+            }}
+          >
+            fingerprint
+          </button>
         </div>
 
       </div>
