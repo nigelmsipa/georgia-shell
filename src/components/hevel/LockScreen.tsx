@@ -227,7 +227,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           style={{ height: containerH }}
         >
           <span
-            className="font-serif italic"
+            className="font-serif italic animate-breathe"
             style={{
               fontSize: 14,
               color: "hsl(var(--muted-foreground) / 0.35)",
