@@ -145,7 +145,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     if (idx > 0) dispatch({ t: "pickApp", name: recents[idx - 1] });
   };
 
-  const anyOverlay = controlCenter || utilityDrawer || nav.kind === "switcher";
+  const anyOverlay = controlCenter || utilityDrawer || nav.kind === "switcher" || launcher;
   const locked = nav.kind === "lock";
 
   // Top-edge gesture zone ref registration
