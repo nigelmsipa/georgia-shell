@@ -178,10 +178,9 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         className="absolute inset-0"
         style={{
           x: screenX,
-          rotateY: screenRotate,
-          transformOrigin: "left center",
-          boxShadow: screenShadow,
-          // Keep rounded corners of PhoneFrame visible during slide.
+          clipPath: screenClip,
+          WebkitClipPath: screenClip,
+          filter: screenDropShadow,
           borderRadius: "inherit",
         }}
       >
