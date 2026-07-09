@@ -178,8 +178,18 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
           onSwipeToNotifications={() => setNotifications(true)}
           onOpenControlCenter={() => setControlCenter(true)}
           onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+          onOpenLauncher={() => setLauncher(true)}
         />
       </div>
+
+      <ProseLauncher
+        open={launcher}
+        onClose={() => setLauncher(false)}
+        onOpenApp={(name) => {
+          setLauncher(false);
+          openApp(name);
+        }}
+      />
 
       <AnimatePresence>
         {notifications && <NotificationsPane key="notifications" open onClose={() => setNotifications(false)} />}
