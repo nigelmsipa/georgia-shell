@@ -48,6 +48,9 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [utilityDrawer, setUtilityDrawer] = useState(false);
   const [appSwitcher, setAppSwitcher] = useState(false);
   const [recents, setRecents] = useState<string[]>([]);
+  const [dictating, setDictating] = useState(false);
+  // Pill sits at vertical center of the screen; overlay blooms from there.
+  const dictationAnchorY = typeof window !== "undefined" ? window.innerHeight / 2 : 400;
 
   const appDragY = useMotionValue(0);
 
