@@ -227,22 +227,23 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </div>
 
           <div
-            className="absolute bottom-12 animate-breathe"
+            className="absolute bottom-12"
             style={{
               opacity: Math.max(0, 0.3 - scrollY * 2),
               transition: isAnimating ? "opacity 0.6s ease" : "none",
             }}
           >
-            <span
+            <motion.span
               className="font-serif italic"
               style={{
                 fontSize: 12,
                 color: "hsl(var(--muted-foreground) / 0.4)",
                 letterSpacing: "0.06em",
+                opacity: breathOpacity,
               }}
             >
               swipe up
-            </span>
+            </motion.span>
           </div>
         </div>
 
