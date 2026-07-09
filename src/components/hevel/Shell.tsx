@@ -12,6 +12,7 @@ import { HoldingStation } from "./HoldingStation";
 import { AnimatePresence, useMotionValue, useSpring, useTransform, motion, animate } from "framer-motion";
 import { HevelBar } from "./HevelBar";
 import { SidePill } from "./SidePill";
+import { DictationOverlay } from "./DictationOverlay";
 import { AIChat } from "./apps/AIChat";
 import { HavelTube } from "./apps/HavelTube";
 import { Music } from "./apps/Music";
@@ -47,6 +48,9 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [utilityDrawer, setUtilityDrawer] = useState(false);
   const [appSwitcher, setAppSwitcher] = useState(false);
   const [recents, setRecents] = useState<string[]>([]);
+  const [dictating, setDictating] = useState(false);
+  // Pill sits at vertical center of the screen; overlay blooms from there.
+  const dictationAnchorY = "50%";
 
   const appDragY = useMotionValue(0);
 
@@ -238,8 +242,20 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
               isOpen={isSidePillOpen}
               onOpen={() => dispatch({ type: "OPEN_SIDE_PILL" })}
               onClose={closeSidePill}
+              onTap={() => setDictating(true)}
             />
           )}
+
+          <AnimatePresence>
+            {dictating && (
+              <DictationOverlay
+                key="dictation"
+                anchorY={dictationAnchorY}
+                onDismiss={() => setDictating(false)}
+              />
+            )}
+          </AnimatePresence>
+
 
           {locked && <LockScreen onUnlock={() => dispatch({ type: "UNLOCK" })} />}
 
