@@ -8,29 +8,34 @@ interface Props {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
+  /** Tap (no meaningful drag) — starts dictation. */
+  onTap: () => void;
 }
 
-/**
- * A slim handle on the left edge of the screen. Dragging it inward pushes
- * the entire screen aside, revealing the void behind. The pill lives INSIDE
- * the sliding screen layer, so it travels with the surface it belongs to —
- * you're literally grabbing the edge of the screen.
- */
+const TAP_SLOP = 6; // px — below this, treat gesture as tap
+
 export const SidePill: React.FC<Props> = ({
   dragTarget,
   openDistance,
   isOpen,
   onOpen,
   onClose,
+  onTap,
 }) => {
   const startRef = useRef(0);
+  const movedRef = useRef(0);
 
   const handlePanStart = () => {
     startRef.current = dragTarget.get();
+    movedRef.current = 0;
   };
 
   const handlePan = (_: unknown, info: PanInfo) => {
-    // 1:1 tracking, clamped with a bit of overtravel for elastic feel.
+    movedRef.current = Math.max(
+      movedRef.current,
+      Math.abs(info.offset.x) + Math.abs(info.offset.y),
+    );
+    if (movedRef.current < TAP_SLOP) return; // don't slide on tiny jitter
     const next = Math.max(
       0,
       Math.min(openDistance * 1.15, startRef.current + info.offset.x),
@@ -39,15 +44,14 @@ export const SidePill: React.FC<Props> = ({
   };
 
   const handlePanEnd = (_: unknown, info: PanInfo) => {
+    if (movedRef.current < TAP_SLOP) {
+      onTap();
+      return;
+    }
     const current = dragTarget.get();
-    const shouldOpen =
-      current > openDistance / 2 || info.velocity.x > 450;
+    const shouldOpen = current > openDistance / 2 || info.velocity.x > 450;
     const target = shouldOpen ? openDistance : 0;
-    animate(dragTarget, target, {
-      type: "spring",
-      stiffness: 280,
-      damping: 26,
-    });
+    animate(dragTarget, target, { type: "spring", stiffness: 280, damping: 26 });
     if (shouldOpen && !isOpen) onOpen();
     else if (!shouldOpen && isOpen) onClose();
   };
@@ -73,3 +77,4 @@ export const SidePill: React.FC<Props> = ({
     </motion.div>
   );
 };
+
