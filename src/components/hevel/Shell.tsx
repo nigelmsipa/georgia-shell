@@ -12,6 +12,7 @@ import { HoldingStation } from "./HoldingStation";
 import { AnimatePresence, useMotionValue, useSpring, useTransform, motion, animate } from "framer-motion";
 import { HevelBar } from "./HevelBar";
 import { SidePill } from "./SidePill";
+import { DictationOverlay } from "./DictationOverlay";
 import { AIChat } from "./apps/AIChat";
 import { HavelTube } from "./apps/HavelTube";
 import { Music } from "./apps/Music";
