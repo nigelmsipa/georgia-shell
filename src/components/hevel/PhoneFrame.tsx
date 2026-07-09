@@ -47,7 +47,7 @@ export const PhoneFrame: React.FC<{
             <button
               key={s}
               onClick={() => onNavigate(s)}
-              className="text-left text-xs font-mono px-3 py-1.5 rounded transition-colors text-foreground hover:bg-secondary"
+              className="text-left text-caption font-mono px-3 py-1.5 rounded transition-colors text-foreground hover:bg-secondary"
             >
               {s}
             </button>

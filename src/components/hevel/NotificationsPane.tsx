@@ -21,7 +21,7 @@ const Token: React.FC<{
           e.stopPropagation();
           onAction?.(token.action!);
         }}
-        className="font-serif italic cursor-pointer select-none"
+        className="italic cursor-pointer select-none"
         style={{
           color: token.highlight
             ? "hsl(var(--primary))"
@@ -43,7 +43,7 @@ const Token: React.FC<{
 
   return (
     <span
-      className="font-serif"
+      className=""
       style={{
         color: token.highlight
           ? "hsl(var(--primary))"
@@ -96,7 +96,7 @@ const NotificationRow: React.FC<{
     >
       {/* App label */}
       <div
-        className="font-serif"
+        className=""
         style={{
           fontSize: 10,
           letterSpacing: "0.12em",
@@ -123,7 +123,7 @@ const NotificationRow: React.FC<{
 
       {/* Prose body */}
       <div
-        className="font-serif"
+        className=""
         style={{
           fontSize: 15,
           lineHeight: 1.6,
@@ -179,7 +179,7 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
         <span
-          className="font-serif text-foreground block"
+          className="text-foreground block"
           style={{ fontSize: 38, fontWeight: 300, lineHeight: 1, letterSpacing: "-0.02em" }}
         >
           {notifications.length > 0
@@ -213,7 +213,7 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
         {notifications.length === 0 && (
           <div className="flex items-center justify-center h-40">
             <span
-              className="font-serif italic"
+              className="italic"
               style={{ fontSize: 14, color: "hsl(var(--muted-foreground) / 0.25)" }}
             >
               all clear
@@ -227,7 +227,7 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
         {notifications.length > 0 && (
           <button
             onClick={clearAll}
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 13,
               color: "hsl(var(--muted-foreground) / 0.3)",
@@ -241,7 +241,7 @@ export const NotificationsPane: React.FC<Props> = ({ open, onClose }) => {
           </button>
         )}
         <span
-          className="font-serif italic ml-auto"
+          className="italic ml-auto"
           style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.2)" }}
         >
           swipe right to go back

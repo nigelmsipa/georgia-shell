@@ -299,7 +299,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
       <div className="px-6 pb-3 flex items-center justify-between">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="font-serif italic transition-colors active:opacity-60"
+          className="italic transition-colors active:opacity-60"
           style={{
             fontSize: 13,
             color: "hsl(var(--muted-foreground) / 0.45)",
@@ -309,7 +309,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           past chats
         </button>
         <span
-          className="font-serif italic"
+          className="italic"
           style={{
             fontSize: 13,
             color: "hsl(var(--muted-foreground) / 0.4)",
@@ -320,7 +320,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         </span>
         <button
           onClick={newChat}
-          className="font-serif italic transition-colors active:opacity-60"
+          className="italic transition-colors active:opacity-60"
           style={{
             fontSize: 13,
             color: "hsl(var(--primary) / 0.7)",
@@ -337,7 +337,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           {active.messages.length === 0 && (
             <div className="flex justify-center pt-12">
               <p
-                className="font-serif italic text-center max-w-[240px]"
+                className="italic text-center max-w-[240px]"
                 style={{
                   fontSize: 14,
                   lineHeight: 1.6,
@@ -354,7 +354,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               return (
                 <div key={m.id} className="flex justify-end">
                   <p
-                    className="font-serif italic max-w-[80%] text-right"
+                    className="italic max-w-[80%] text-right"
                     style={{
                       fontSize: 16,
                       lineHeight: 1.55,
@@ -371,7 +371,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               return (
                 <div key={m.id} className="flex">
                   <span
-                    className="font-serif italic animate-breathe"
+                    className="italic animate-breathe"
                     style={{
                       fontSize: 15,
                       color: "hsl(var(--muted-foreground) / 0.5)",
@@ -386,7 +386,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             return (
               <div key={m.id} className="flex">
                 <p
-                  className="font-serif max-w-full"
+                  className="max-w-full"
                   style={{
                     fontSize: 16,
                     lineHeight: 1.7,
@@ -400,7 +400,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                         <button
                           key={i}
                           onClick={() => t.action && handleAction(t.action)}
-                          className="font-serif transition-colors active:opacity-70"
+                          className="transition-colors active:opacity-70"
                           style={{
                             color: "hsl(var(--accent))",
                             textDecoration: t.action ? "underline" : "none",
@@ -429,7 +429,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
       {savedFlash && (
         <div className="absolute left-0 right-0 flex justify-center pointer-events-none" style={{ bottom: 96 }}>
           <span
-            className="font-serif italic animate-breathe"
+            className="italic animate-breathe"
             style={{ fontSize: 12, color: "hsl(var(--accent))", letterSpacing: "0.06em" }}
           >
             saved to notes
@@ -451,7 +451,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             }}
           />
           <span
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)", letterSpacing: "0.08em" }}
           >
             listening…
@@ -475,7 +475,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           onChange={(e) => setInput(e.target.value)}
           placeholder="what's on your mind?"
           disabled={listening}
-          className="flex-1 bg-transparent outline-none font-serif italic"
+          className="flex-1 bg-transparent outline-none italic"
           style={{
             fontSize: 15,
             color: "hsl(var(--foreground))",
@@ -490,7 +490,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             e.preventDefault();
             if (!listening) startListening();
           }}
-          className="font-serif italic transition-colors active:opacity-60"
+          className="italic transition-colors active:opacity-60"
           style={{
             fontSize: 12,
             color: listening ? "hsl(var(--destructive))" : "hsl(var(--muted-foreground) / 0.55)",
@@ -534,14 +534,14 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         {/* Sidebar header */}
         <div className="flex items-center justify-between px-5 pt-14 pb-3">
           <span
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 14, color: "hsl(var(--muted-foreground) / 0.5)", letterSpacing: "0.06em" }}
           >
             past chats
           </span>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="font-serif italic transition-colors active:opacity-60"
+            className="italic transition-colors active:opacity-60"
             style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.45)", letterSpacing: "0.06em" }}
           >
             close
@@ -554,7 +554,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="search"
-            className="w-full bg-transparent outline-none font-serif italic"
+            className="w-full bg-transparent outline-none italic"
             style={{
               fontSize: 14,
               color: "hsl(var(--foreground))",
@@ -572,7 +572,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           style={{ borderBottom: "1px solid hsl(var(--border) / 0.25)" }}
         >
           <span
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 15, color: "hsl(var(--primary))", letterSpacing: "0.02em" }}
           >
             + new chat
@@ -583,7 +583,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
           {filteredThreads.length === 0 && (
             <p
-              className="font-serif italic px-5 py-6 text-center"
+              className="italic px-5 py-6 text-center"
               style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.4)" }}
             >
               nothing matches "{search}".
@@ -610,7 +610,7 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               >
                 <div className="flex items-baseline justify-between gap-3 mb-1">
                   <span
-                    className="font-serif italic truncate"
+                    className="italic truncate"
                     style={{
                       fontSize: 14,
                       color: isActive ? "hsl(var(--foreground))" : "hsl(var(--foreground) / 0.78)",
@@ -620,14 +620,14 @@ export const AIChat: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                     {t.title}
                   </span>
                   <span
-                    className="font-serif italic shrink-0"
+                    className="italic shrink-0"
                     style={{ fontSize: 10, color: "hsl(var(--muted-foreground) / 0.4)" }}
                   >
                     {t.agoLabel}
                   </span>
                 </div>
                 <p
-                  className="font-serif truncate"
+                  className="truncate"
                   style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.55)", letterSpacing: "0.005em" }}
                 >
                   {preview}

@@ -3,7 +3,7 @@ import React from "react";
 export const MessagesCover: React.FC = () => (
   <div className="w-full h-full flex flex-col px-3 py-3 gap-2 bg-card">
     <div className="flex items-center gap-1 pl-2 border-l-2 border-accent">
-      <span className="text-[9px] font-bold font-serif text-foreground"># hevel:general</span>
+      <span className="text-[9px] font-bold text-foreground"># hevel:general</span>
     </div>
     <div className="flex-1 flex flex-col gap-1.5">
       <div>

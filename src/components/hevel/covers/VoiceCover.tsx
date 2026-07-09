@@ -35,7 +35,7 @@ export const VoiceCover: React.FC = () => {
 
       <div>
         <p
-          className="font-serif italic"
+          className="italic"
           style={{
             fontSize: 10,
             color: "hsl(var(--muted-foreground) / 0.55)",

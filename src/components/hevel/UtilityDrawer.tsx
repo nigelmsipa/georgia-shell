@@ -23,7 +23,7 @@ const UtilityToken: React.FC<{
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") fire(e);
       }}
-      className="cursor-pointer font-serif italic select-none transition-all duration-200"
+      className="cursor-pointer italic select-none transition-all duration-200"
       style={{
         fontWeight: 600,
         color: flash
@@ -166,7 +166,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           {/* Title row with close */}
           <div className="flex items-baseline justify-between mb-5">
             <p
-              className="font-serif text-lg"
+              className="text-body"
               style={{ color: "hsl(var(--foreground) / 0.5)", fontStyle: "italic" }}
             >
               utilities
@@ -177,7 +177,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
 
           {/* Clipboard section */}
           <p
-            className="font-serif text-base leading-relaxed mb-4"
+            className="text-body leading-relaxed mb-4"
             style={{ color: "hsl(var(--foreground) / 0.85)" }}
           >
             You can{" "}
@@ -191,7 +191,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
 
           {/* Screen tools */}
           <p
-            className="font-serif text-base leading-relaxed mb-4"
+            className="text-body leading-relaxed mb-4"
             style={{ color: "hsl(var(--foreground) / 0.85)" }}
           >
             Take a{" "}
@@ -203,7 +203,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
 
           {/* System */}
           <p
-            className="font-serif text-base leading-relaxed mb-4"
+            className="text-body leading-relaxed mb-4"
             style={{ color: "hsl(var(--foreground) / 0.85)" }}
           >
             If something's stuck, you can{" "}
@@ -213,7 +213,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           {/* Brightness slider */}
           <div className="mt-6 mb-3">
             <p
-              className="font-serif text-sm italic mb-2"
+              className="text-caption italic mb-2"
               style={{ color: "hsl(var(--foreground) / 0.4)" }}
             >
               brightness
@@ -234,7 +234,7 @@ export const UtilityDrawer: React.FC<Props> = ({ open, onClose }) => {
           {/* Volume slider */}
           <div className="mb-6">
             <p
-              className="font-serif text-sm italic mb-2"
+              className="text-caption italic mb-2"
               style={{ color: "hsl(var(--foreground) / 0.4)" }}
             >
               volume

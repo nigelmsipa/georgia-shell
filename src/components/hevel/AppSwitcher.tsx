@@ -69,8 +69,8 @@ export const AppSwitcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
     >
       {/* Header */}
       <div className="px-6 pt-14 pb-4 flex justify-between items-center">
-        <span className="text-xl text-foreground font-serif">recent</span>
-        <button onClick={onClose} className="text-sm text-muted-foreground font-serif">
+        <span className="text-title text-foreground">recent</span>
+        <button onClick={onClose} className="text-caption text-muted-foreground">
           done
         </button>
       </div>
@@ -85,7 +85,7 @@ export const AppSwitcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
         <div className="flex-1 overflow-y-auto px-6">
           {apps.length === 0 && (
             <div className="flex items-center justify-center h-full">
-              <span className="text-muted-foreground font-serif">nothing running</span>
+              <span className="text-muted-foreground">nothing running</span>
             </div>
           )}
           {apps.map((app, i) => {
@@ -103,7 +103,7 @@ export const AppSwitcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
               >
                 {/* Red background layer */}
                 <div className="absolute inset-0 bg-destructive flex items-center justify-end pr-6">
-                  <span className="text-destructive-foreground font-serif text-sm">close</span>
+                  <span className="text-destructive-foreground text-caption">close</span>
                 </div>
                 {/* Foreground row */}
                 <div
@@ -115,8 +115,8 @@ export const AppSwitcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
                   onClick={() => setFocusedIdx(i)}
                   onDoubleClick={() => { onOpenApp(app.name); onClose(); }}
                 >
-                  <div className="text-xl text-foreground font-serif">{app.name}</div>
-                  <div className="text-xs text-muted-foreground font-serif mt-1">
+                  <div className="text-title text-foreground">{app.name}</div>
+                  <div className="text-caption text-muted-foreground mt-1">
                     {formatAgo(app.lastUsed)}
                   </div>
                 </div>
@@ -151,7 +151,7 @@ export const AppSwitcher: React.FC<Props> = ({ open, onClose, onOpenApp }) => {
       {/* Clear all */}
       {apps.length > 0 && (
         <div className="flex justify-center pb-8 pt-4">
-          <button onClick={clearAll} className="text-sm text-muted-foreground font-serif">
+          <button onClick={clearAll} className="text-caption text-muted-foreground">
             clear all
           </button>
         </div>

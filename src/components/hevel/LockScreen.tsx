@@ -193,7 +193,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         >
           <div className="flex flex-col items-center">
             <span
-              className="font-serif"
+              className=""
               style={{
                 fontSize: 84,
                 fontWeight: 300,
@@ -210,7 +210,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             </span>
 
             <span
-              className="font-serif italic mt-4"
+              className="italic mt-4"
               style={{
                 fontSize: 14,
                 color: "hsl(var(--muted-foreground) / 0.3)",
@@ -231,7 +231,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             }}
           >
             <span
-              className="font-serif italic"
+              className="italic"
               style={{
                 fontSize: 12,
                 color: "hsl(var(--muted-foreground) / 0.4)",
@@ -249,7 +249,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           style={{ height: containerH }}
         >
           <span
-            className="font-serif italic animate-breathe"
+            className="italic animate-breathe"
             style={{
               fontSize: 14,
               color: "hsl(var(--muted-foreground) / 0.35)",
@@ -303,7 +303,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     }}
                   >
                     <span
-                      className="font-serif"
+                      className=""
                       style={{
                         fontSize: 26,
                         fontWeight: 300,
@@ -322,7 +322,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             <div className="flex items-center gap-5">
               <button
                 onClick={() => handleKey("delete")}
-                className="font-serif italic transition-all duration-150 active:opacity-50"
+                className="italic transition-all duration-150 active:opacity-50"
                 style={{
                   fontSize: 14,
                   color: entered.length
@@ -351,7 +351,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                 }}
               >
                 <span
-                  className="font-serif"
+                  className=""
                   style={{
                     fontSize: 26,
                     fontWeight: 300,
@@ -378,7 +378,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     }
                   }
                 }}
-                className="font-serif italic transition-all duration-150 active:opacity-50"
+                className="italic transition-all duration-150 active:opacity-50"
                 style={{
                   fontSize: 14,
                   color: entered.length === PIN_LENGTH
@@ -399,7 +399,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             <button
               onClick={() => setEmergency(true)}
               aria-label="Emergency call"
-              className="font-serif italic transition-all duration-150 active:opacity-55"
+              className="italic transition-all duration-150 active:opacity-55"
               style={{
                 minWidth: 144,
                 minHeight: 44,
@@ -433,7 +433,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
         <div className="relative z-10 flex items-center justify-between px-6 pt-6">
           <button
             onClick={closeEmergency}
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 13,
               color: "hsl(var(--muted-foreground) / 0.6)",
@@ -443,7 +443,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
             cancel
           </button>
           <span
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 13,
               color: "hsl(var(--destructive) / 0.8)",
@@ -456,7 +456,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
           <span
-            className="font-serif mt-2"
+            className="mt-2"
             style={{
               fontSize: emergencyDigits ? 52 : 22,
               fontWeight: 300,
@@ -473,7 +473,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
 
           {calling ? (
             <span
-              className="font-serif italic mt-8 animate-breathe"
+              className="italic mt-8 animate-breathe"
               style={{
                 fontSize: 15,
                 color: "hsl(var(--destructive) / 0.85)",
@@ -489,7 +489,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                   <button
                     key={n}
                     onClick={() => startEmergencyCall(n)}
-                    className="font-serif transition-all duration-150 active:opacity-60"
+                    className="transition-all duration-150 active:opacity-60"
                     style={{
                       background: "transparent",
                       border: "none",
@@ -505,7 +505,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                 ))}
               </div>
               <span
-                className="font-serif italic mt-6"
+                className="italic mt-6"
                 style={{
                   fontSize: 14,
                   color: "hsl(var(--muted-foreground) / 0.38)",
@@ -542,7 +542,7 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
                     }}
                   >
                     <span
-                      className={isDelete ? "font-serif italic" : "font-serif"}
+                      className={isDelete ? "italic" : ""}
                       style={{
                         fontSize: isDelete ? 12 : 24,
                         fontWeight: 300,
