@@ -113,7 +113,7 @@ export const AppSwitcher: React.FC<Props> = ({ open, focusApp, onPickApp, onBack
                   <span className="text-destructive-foreground text-caption">close</span>
                 </div>
                 <div
-                  className={`relative bg-background py-4 cursor-pointer transition-colors duration-150 ${
+                  className={`relative bg-background py-3 cursor-pointer transition-colors duration-150 flex items-stretch gap-3 ${
                     i === focusedIdx ? "bg-secondary/50" : ""
                   }`}
                   style={{ transform: `translateX(${offset}px)` }}
@@ -121,20 +121,40 @@ export const AppSwitcher: React.FC<Props> = ({ open, focusApp, onPickApp, onBack
                   onClick={() => setFocusedIdx(i)}
                   onDoubleClick={() => onPickApp(app.name)}
                 >
-                  <div className="text-title text-foreground">{app.name}</div>
-                  <div className="text-caption text-muted-foreground mt-1">
-                    {formatAgo(app.lastUsed)}
-                    {i === focusedIdx && (
-                      <>
-                        {" · "}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onPickApp(app.name); }}
-                          className="italic text-foreground/80"
+                  {/* Live cover preview */}
+                  <div
+                    className="rounded-[10px] overflow-hidden border border-border/40 flex-shrink-0 bg-card"
+                    style={{ width: 56, height: 84 }}
+                    onClick={(e) => { e.stopPropagation(); onPickApp(app.name); }}
+                  >
+                    {COVER_COMPONENTS[app.name]
+                      ? React.createElement(COVER_COMPONENTS[app.name])
+                      : (
+                        <div
+                          className="w-full h-full flex items-center justify-center italic text-caption"
+                          style={{ color: "hsl(var(--foreground) / 0.4)" }}
                         >
-                          open
-                        </button>
-                      </>
-                    )}
+                          {app.name[0]}
+                        </div>
+                      )}
+                  </div>
+
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="text-title text-foreground italic">{app.name}</div>
+                    <div className="text-caption text-muted-foreground mt-1">
+                      {formatAgo(app.lastUsed)}
+                      {i === focusedIdx && (
+                        <>
+                          {" · "}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onPickApp(app.name); }}
+                            className="italic text-foreground/80"
+                          >
+                            open
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {i < apps.length - 1 && <div className="h-px bg-border" />}
