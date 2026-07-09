@@ -110,11 +110,13 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     setNotifications(false);
     setControlCenter(false);
     setUtilityDrawer(false);
+    setLauncher(false);
 
     switch (navigateTo) {
       case "Lock": dispatch({ t: "lock" }); break;
       case "Home": dispatch({ t: "unlock" }); dispatch({ t: "goHome" }); break;
-      case "Launcher": dispatch({ t: "unlock" }); dispatch({ t: "goHome" }); break;
+      case "Launcher": dispatch({ t: "unlock" }); dispatch({ t: "goHome" }); setLauncher(true); break;
+      case "Recents": dispatch({ t: "unlock" }); dispatch({ t: "goHome" }); dispatch({ t: "peekSwitcher" }); break;
       case "Notifications": dispatch({ t: "unlock" }); setNotifications(true); break;
       case "Control Center": dispatch({ t: "unlock" }); setControlCenter(true); break;
       case "Utility": dispatch({ t: "unlock" }); setUtilityDrawer(true); break;
