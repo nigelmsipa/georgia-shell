@@ -14,7 +14,17 @@ export default {
       serif: ["Georgia", "Times New Roman", "serif"],
     },
     extend: {
+      fontSize: {
+        display: ["2.25rem", { lineHeight: "2.75rem", letterSpacing: "-0.01em" }],
+        title:   ["1.5rem",  { lineHeight: "2rem" }],
+        body:    ["1.0625rem", { lineHeight: "1.6rem" }],
+        caption: ["0.8125rem", { lineHeight: "1.15rem", letterSpacing: "0.01em" }],
+      },
+      spacing: {
+        tap: "3rem",
+      },
       colors: {
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

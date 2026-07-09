@@ -21,7 +21,7 @@ const Token: React.FC<{
   return (
     <span
       onClick={handleClick}
-      className="cursor-pointer font-serif italic select-none transition-all duration-200"
+      className="cursor-pointer italic select-none transition-all duration-200"
       style={{
         fontWeight: on ? 700 : 400,
         color: on ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.5)",
@@ -89,7 +89,7 @@ const SliderToken: React.FC<{
           e.stopPropagation();
           setOpen((o) => !o);
         }}
-        className="cursor-pointer font-serif italic font-bold select-none"
+        className="cursor-pointer italic font-bold select-none"
         style={{
           color: "hsl(var(--primary))",
           background: "hsl(var(--primary) / 0.1)",
@@ -295,7 +295,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
       >
         {/* Header */}
         <div className="px-6 pt-14 pb-1 flex justify-between items-baseline">
-          <span className="text-sm text-muted-foreground font-serif">
+          <span className="text-caption text-muted-foreground">
             It's{" "}
             <span className="text-foreground font-bold">
               {hour}:{min}
@@ -305,7 +305,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           </span>
           <button
             onClick={onClose}
-            className="text-sm text-muted-foreground font-serif"
+            className="text-caption text-muted-foreground"
           >
             done
           </button>
@@ -317,7 +317,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           onPointerDown={(e) => e.stopPropagation()}
         >
           <div
-            className="font-serif text-foreground mt-4"
+            className="text-foreground mt-4"
             style={{ fontSize: 17, lineHeight: 1.85, letterSpacing: "-0.01em" }}
           >
             {/* ¶ Connectivity */}
@@ -434,7 +434,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
           />
           <div className="mt-3">
             <span
-              className="text-muted-foreground font-serif block mb-2"
+              className="text-muted-foreground block mb-2"
               style={{ fontSize: 12 }}
             >
               ambience
@@ -453,11 +453,11 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                   <button
                     key={id}
                     onClick={() => setScheme(id)}
-                    className="flex-shrink-0 transition-all duration-200"
-                    style={{ scrollSnapAlign: "start", width: 44 }}
+                    className="tap-target flex-shrink-0 flex-col transition-all duration-200"
+                    style={{ scrollSnapAlign: "start", width: 48, minWidth: 48 }}
                   >
                     <div
-                      className={`w-[44px] h-[44px] rounded-sm overflow-hidden transition-all duration-200 ${
+                      className={`w-[44px] h-[44px] overflow-hidden transition-all duration-200 ${
                         active
                           ? "ring-2 ring-foreground/40 scale-105"
                           : "opacity-50"
@@ -468,7 +468,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                     >
                       <div className="w-full h-full flex items-center justify-center">
                         <div
-                          className="w-2 h-2 rounded-full"
+                          className="w-2 h-2"
                           style={{
                             backgroundColor: meta.colors[2],
                             opacity: 0.9,
@@ -477,7 +477,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                       </div>
                     </div>
                     <span
-                      className={`text-[8px] font-serif block mt-1 text-center leading-tight truncate ${
+                      className={`text-[8px] block mt-1 text-center leading-tight truncate ${
                         active
                           ? "text-foreground"
                           : "text-muted-foreground/50"
@@ -486,6 +486,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                       {meta.label.split(" ")[0]}
                     </span>
                   </button>
+
                 );
               })}
             </div>

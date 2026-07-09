@@ -143,7 +143,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 e.stopPropagation();
                 setTab(t);
               }}
-              className="font-serif"
+              className=""
               style={{
                 fontSize: 13,
                 color: active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)",
@@ -167,7 +167,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             onChange={(e) => setSearch(e.target.value)}
             onPointerDown={(e) => e.stopPropagation()}
             placeholder="Search tracks, artists, albums…"
-            className="w-full bg-transparent outline-none font-serif"
+            className="w-full bg-transparent outline-none"
             style={{
               fontSize: 14,
               color: "hsl(var(--foreground) / 0.9)",
@@ -186,7 +186,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
       >
         {tab === "Search" && !search.trim() && (
           <p
-            className="font-serif italic mt-6"
+            className="italic mt-6"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)" }}
           >
             type to search.
@@ -194,7 +194,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         )}
         {visible.length === 0 && tab === "Search" && search.trim() && (
           <p
-            className="font-serif italic mt-6"
+            className="italic mt-6"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)" }}
           >
             no results.
@@ -215,7 +215,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               <AlbumArt hue={t.hue} size={48} />
               <div className="flex-1 min-w-0">
                 <p
-                  className="font-serif truncate"
+                  className="truncate"
                   style={{
                     fontSize: 14,
                     color: active ? "hsl(var(--primary))" : "hsl(var(--foreground) / 0.95)",
@@ -225,7 +225,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                   {tab === "Albums" ? t.album : tab === "Artists" ? t.artist : t.title}
                 </p>
                 <p
-                  className="font-serif truncate"
+                  className="truncate"
                   style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.7)" }}
                 >
                   {tab === "Albums"
@@ -237,7 +237,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               </div>
               {tab !== "Albums" && tab !== "Artists" && (
                 <span
-                  className="font-serif"
+                  className=""
                   style={{
                     fontSize: 10,
                     color: "hsl(var(--muted-foreground) / 0.5)",
@@ -271,13 +271,13 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           <AlbumArt hue={playing.hue} size={44} />
           <div className="flex-1 min-w-0">
             <p
-              className="font-serif truncate"
+              className="truncate"
               style={{ fontSize: 13, color: "hsl(var(--foreground) / 0.95)" }}
             >
               {playing.title}
             </p>
             <p
-              className="font-serif truncate"
+              className="truncate"
               style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.7)" }}
             >
               {playing.artist}
@@ -303,7 +303,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               e.stopPropagation();
               setPaused((p) => !p);
             }}
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 13,
               color: "hsl(var(--primary))",
@@ -334,7 +334,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 e.stopPropagation();
                 setFullPlayer(false);
               }}
-              className="font-serif"
+              className=""
               style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)" }}
             >
               ↓ Now Playing
@@ -345,7 +345,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           <div className="flex-1 flex flex-col justify-center items-center">
             <AlbumArt hue={playing.hue} size={240} rounded={8} />
             <p
-              className="font-serif text-center mt-8"
+              className="text-center mt-8"
               style={{
                 fontSize: 20,
                 color: "hsl(var(--foreground) / 0.95)",
@@ -355,7 +355,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               {playing.title}
             </p>
             <p
-              className="font-serif italic text-center mt-1"
+              className="italic text-center mt-1"
               style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.75)" }}
             >
               {playing.artist} · {playing.album}
@@ -378,13 +378,13 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             </div>
             <div className="flex justify-between mt-1.5">
               <span
-                className="font-serif"
+                className=""
                 style={{ fontSize: 10, color: "hsl(var(--muted-foreground) / 0.6)" }}
               >
                 {fmtTime(progress, playing.duration)}
               </span>
               <span
-                className="font-serif"
+                className=""
                 style={{ fontSize: 10, color: "hsl(var(--muted-foreground) / 0.6)" }}
               >
                 {playing.duration}
@@ -393,7 +393,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
 
             <div className="flex items-center justify-center gap-8 mt-6">
               <button
-                className="font-serif italic"
+                className="italic"
                 style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)" }}
               >
                 ⏮
@@ -403,7 +403,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                   e.stopPropagation();
                   setPaused((p) => !p);
                 }}
-                className="font-serif italic"
+                className="italic"
                 style={{
                   fontSize: 18,
                   color: "hsl(var(--primary))",
@@ -416,7 +416,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 {paused ? "▶" : "❚❚"}
               </button>
               <button
-                className="font-serif italic"
+                className="italic"
                 style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)" }}
               >
                 ⏭
@@ -429,7 +429,7 @@ export const Music: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                   e.stopPropagation();
                   setSpeed((s) => (s === 1 ? 2 : 1));
                 }}
-                className="font-serif italic"
+                className="italic"
                 style={{
                   fontSize: 12,
                   color: speed === 2 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)",

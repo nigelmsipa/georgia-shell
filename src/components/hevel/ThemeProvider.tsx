@@ -27,13 +27,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     const el = document.documentElement;
-    // Remove all scheme classes
+    // Remove all scheme classes; :root already carries gruvbox-dark by default.
     ALL_SCHEMES.forEach(([s]) => el.classList.remove(s));
-    el.classList.add(scheme);
-    // Toggle dark class for tailwind
-    const isDark = scheme !== "gruvbox-light";
-    el.classList.toggle("dark", isDark);
+    if (scheme !== "gruvbox-dark") {
+      el.classList.add(scheme);
+    }
   }, [scheme]);
+
 
   return (
     <ThemeContext.Provider value={{ scheme, setScheme }}>

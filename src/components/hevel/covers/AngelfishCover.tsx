@@ -14,7 +14,7 @@ export const AngelfishCover: React.FC = () => (
   >
     {/* tiny domain whisper */}
     <span
-      className="font-serif italic"
+      className="italic"
       style={{ fontSize: 7, color: "hsl(var(--muted-foreground) / 0.55)", letterSpacing: "0.04em" }}
     >
       reading
@@ -22,7 +22,7 @@ export const AngelfishCover: React.FC = () => (
 
     {/* site title — large serif */}
     <div
-      className="font-serif"
+      className=""
       style={{
         fontSize: 11,
         fontWeight: 700,
@@ -47,23 +47,23 @@ export const AngelfishCover: React.FC = () => (
 
     {/* prose tab list */}
     <div className="flex flex-col gap-[3px]">
-      <span className="font-serif italic" style={{ fontSize: 6.5, color: "hsl(var(--foreground) / 0.5)" }}>
+      <span className="italic" style={{ fontSize: 6.5, color: "hsl(var(--foreground) / 0.5)" }}>
         are.na · channels
       </span>
-      <span className="font-serif italic" style={{ fontSize: 6.5, color: "hsl(var(--foreground) / 0.5)" }}>
+      <span className="italic" style={{ fontSize: 6.5, color: "hsl(var(--foreground) / 0.5)" }}>
         nigel / hevel
       </span>
-      <span className="font-serif italic" style={{ fontSize: 6.5, color: "hsl(var(--foreground) / 0.35)" }}>
+      <span className="italic" style={{ fontSize: 6.5, color: "hsl(var(--foreground) / 0.35)" }}>
         hacker news
       </span>
     </div>
 
     {/* footer label */}
     <div className="mt-auto flex items-center justify-between">
-      <span className="font-serif" style={{ fontSize: 6, color: "hsl(var(--muted-foreground) / 0.4)" }}>
+      <span className="" style={{ fontSize: 6, color: "hsl(var(--muted-foreground) / 0.4)" }}>
         angelfish
       </span>
-      <span className="font-serif italic" style={{ fontSize: 6, color: "hsl(var(--accent) / 0.7)" }}>
+      <span className="italic" style={{ fontSize: 6, color: "hsl(var(--accent) / 0.7)" }}>
         3 tabs open
       </span>
     </div>

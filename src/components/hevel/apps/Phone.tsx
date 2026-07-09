@@ -56,19 +56,19 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         {calling ? (
           // In-call screen
           <div className="flex-1 flex flex-col items-center justify-center w-full">
-            <span className="font-serif italic" style={{ fontSize: 18, color: "hsl(var(--muted-foreground) / 0.7)" }}>
+            <span className="italic" style={{ fontSize: 18, color: "hsl(var(--muted-foreground) / 0.7)" }}>
               calling
             </span>
-            <span className="font-serif mt-2" style={{ fontSize: 32, color: "hsl(var(--foreground) / 0.9)" }}>
+            <span className="mt-2" style={{ fontSize: 32, color: "hsl(var(--foreground) / 0.9)" }}>
               {number}
             </span>
-            <span className="font-serif italic mt-6" style={{ fontSize: 14, color: "hsl(var(--primary) / 0.8)" }}>
+            <span className="italic mt-6" style={{ fontSize: 14, color: "hsl(var(--primary) / 0.8)" }}>
               {formatTime(callTime)}
             </span>
             
             <button
               onClick={endCall}
-              className="mt-16 w-16 h-16 rounded-full flex items-center justify-center font-serif italic text-lg"
+              className="mt-16 w-16 h-16 rounded-full flex items-center justify-center italic text-body"
               style={{
                 background: "hsl(var(--destructive) / 0.8)",
                 color: "hsl(var(--destructive-foreground))",
@@ -84,13 +84,13 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           <div className="w-full max-w-[280px] flex flex-col items-center">
             {/* Number Display */}
             <div className="w-full flex items-center justify-between mb-8 px-4 h-12">
-              <span className="font-serif" style={{ fontSize: 32, color: "hsl(var(--foreground) / 0.9)", letterSpacing: "2px" }}>
+              <span className="" style={{ fontSize: 32, color: "hsl(var(--foreground) / 0.9)", letterSpacing: "2px" }}>
                 {number}
               </span>
               {number && (
                 <button
                   onClick={handleDelete}
-                  className="font-serif italic text-sm"
+                  className="italic text-caption"
                   style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
                 >
                   del
@@ -106,7 +106,7 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                     <button
                       key={key}
                       onClick={() => handleDial(key)}
-                      className="w-14 h-14 rounded-full flex items-center justify-center font-serif text-2xl transition-colors active:bg-secondary/50"
+                      className="tap-target w-tap h-tap text-title transition-colors active:bg-secondary/50"
                       style={{ color: "hsl(var(--foreground) / 0.8)" }}
                     >
                       {key}
@@ -119,7 +119,7 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 <button
                   onClick={startCall}
                   disabled={!number}
-                  className="w-16 h-16 rounded-full flex items-center justify-center font-serif italic text-lg transition-transform active:scale-95"
+                  className="tap-target w-tap h-tap italic text-body transition-transform active:scale-95"
                   style={{
                     background: "hsl(var(--primary) / 0.8)",
                     color: "hsl(var(--primary-foreground))",
@@ -128,6 +128,7 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 >
                   call
                 </button>
+
               </div>
             </div>
           </div>

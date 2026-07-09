@@ -56,7 +56,7 @@ const Thumb: React.FC<{ v: Video; size?: "list" | "player" }> = ({ v, size = "li
     </div>
     {/* Duration badge */}
     <div
-      className="absolute font-serif"
+      className="absolute"
       style={{
         right: 4,
         bottom: 4,
@@ -115,7 +115,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
             <button
               key={t}
               onClick={() => setTab(t)}
-              className="font-serif"
+              className=""
               style={{
                 fontSize: 13,
                 color: active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)",
@@ -139,7 +139,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search videos…"
-            className="w-full bg-transparent outline-none font-serif"
+            className="w-full bg-transparent outline-none"
             style={{
               fontSize: 14,
               color: "hsl(var(--foreground) / 0.9)",
@@ -154,7 +154,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
       <div className="flex-1 overflow-y-auto px-4 py-3" style={{ scrollbarWidth: "none" }}>
         {tab === "Search" && search.trim() === "" && (
           <p
-            className="font-serif italic mt-6"
+            className="italic mt-6"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)" }}
           >
             type to search.
@@ -162,7 +162,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         )}
         {filtered.length === 0 && tab === "Search" && search.trim() !== "" && (
           <p
-            className="font-serif italic mt-6"
+            className="italic mt-6"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)" }}
           >
             no results.
@@ -187,7 +187,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
             </div>
             <div className="flex-1 min-w-0 pt-0.5">
               <p
-                className="font-serif"
+                className=""
                 style={{
                   fontSize: 13,
                   lineHeight: 1.3,
@@ -201,13 +201,13 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
                 {v.title}
               </p>
               <p
-                className="font-serif mt-1"
+                className="mt-1"
                 style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.7)" }}
               >
                 {v.channel}
               </p>
               <p
-                className="font-serif"
+                className=""
                 style={{ fontSize: 10, color: "hsl(var(--muted-foreground) / 0.5)" }}
               >
                 {v.views} · {v.ago}
@@ -234,7 +234,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
           <div className="flex items-center justify-between px-4 pt-12 pb-3">
             <button
               onClick={() => setPlaying(null)}
-              className="font-serif"
+              className=""
               style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)" }}
             >
               ← Back
@@ -304,7 +304,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
           {/* Meta */}
           <div className="px-4 pt-4 flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
             <p
-              className="font-serif"
+              className=""
               style={{
                 fontSize: 16,
                 lineHeight: 1.3,
@@ -314,7 +314,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
               {playing.title}
             </p>
             <p
-              className="font-serif mt-1"
+              className="mt-1"
               style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.7)" }}
             >
               {playing.views} · {playing.ago}
@@ -333,7 +333,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
                 }}
               />
               <p
-                className="font-serif"
+                className=""
                 style={{ fontSize: 13, color: "hsl(var(--foreground) / 0.9)" }}
               >
                 {playing.channel}
@@ -345,7 +345,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
               {["Like", "Save", "Share", "Queue"].map((a) => (
                 <button
                   key={a}
-                  className="font-serif italic"
+                  className="italic"
                   style={{ fontSize: 12, color: "hsl(var(--primary) / 0.85)" }}
                 >
                   {a}
@@ -354,7 +354,7 @@ export const HavelTube: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
             </div>
 
             <p
-              className="font-serif italic mt-4"
+              className="italic mt-4"
               style={{ fontSize: 10, color: "hsl(var(--muted-foreground) / 0.5)" }}
             >
               {fmtTime(progress, playing.duration)} / {playing.duration}

@@ -38,7 +38,7 @@ const CONTACTS: Contact[] = [
 
 const Avatar: React.FC<{ name: string; hue: number; size?: number }> = ({ name, hue, size = 34 }) => (
   <div
-    className="flex items-center justify-center font-serif"
+    className="flex items-center justify-center"
     style={{
       width: size,
       height: size,
@@ -130,7 +130,7 @@ const ListView: React.FC<{
     <div className="flex-1 flex flex-col overflow-hidden" style={{ touchAction: "auto" }}>
       <div className="px-6 pt-2 pb-3">
         <p
-          className="font-serif"
+          className=""
           style={{ fontSize: 22, lineHeight: 1.25, color: "hsl(var(--foreground) / 0.92)" }}
         >
           {total} people{" "}
@@ -143,7 +143,7 @@ const ListView: React.FC<{
       <div className="px-6 pb-3">
         <div className="flex items-center" style={{ borderBottom: "1px solid hsl(var(--border) / 0.4)", paddingBottom: 6 }}>
           <span
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)", marginRight: 8 }}
           >
             find
@@ -153,7 +153,7 @@ const ListView: React.FC<{
             onChange={(e) => setQuery(e.target.value)}
             placeholder="a name, a city, a thread…"
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex-1 bg-transparent outline-none font-serif"
+            className="flex-1 bg-transparent outline-none"
             style={{ fontSize: 14, color: "hsl(var(--foreground) / 0.9)" }}
           />
         </div>
@@ -168,7 +168,7 @@ const ListView: React.FC<{
         {!query && favList.length > 0 && (
           <div className="px-3 pb-3 pt-1">
             <p
-              className="font-serif italic"
+              className="italic"
               style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.5)", marginBottom: 6, letterSpacing: "0.06em" }}
             >
               close to you
@@ -183,7 +183,7 @@ const ListView: React.FC<{
                 >
                   <Avatar name={c.name} hue={c.hue} size={44} />
                   <span
-                    className="font-serif truncate"
+                    className="truncate"
                     style={{ fontSize: 11, color: "hsl(var(--foreground) / 0.8)", maxWidth: 64 }}
                   >
                     {c.name.split(" ")[0]}
@@ -198,7 +198,7 @@ const ListView: React.FC<{
           <div key={l} className="mb-1">
             <div className="px-3 pt-3 pb-1">
               <span
-                className="font-serif italic"
+                className="italic"
                 style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.45)", letterSpacing: "0.1em" }}
               >
                 {l.toLowerCase()}
@@ -213,7 +213,7 @@ const ListView: React.FC<{
                 <Avatar name={c.name} hue={c.hue} />
                 <div className="flex-1 min-w-0">
                   <p
-                    className="font-serif truncate"
+                    className="truncate"
                     style={{ fontSize: 15, color: "hsl(var(--foreground) / 0.92)" }}
                   >
                     {c.name}
@@ -224,7 +224,7 @@ const ListView: React.FC<{
                     )}
                   </p>
                   <p
-                    className="font-serif italic truncate"
+                    className="italic truncate"
                     style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.55)" }}
                   >
                     {c.city ? `${c.city} · ` : ""}{c.handle}
@@ -237,7 +237,7 @@ const ListView: React.FC<{
 
         {letters.length === 0 && (
           <p
-            className="font-serif italic text-center py-12"
+            className="italic text-center py-12"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)" }}
           >
             no one by that name.
@@ -261,13 +261,13 @@ const DetailView: React.FC<{
     return (
       <div className="px-6 py-3" style={{ borderBottom: "1px solid hsl(var(--border) / 0.25)" }}>
         <p
-          className="font-serif italic"
+          className="italic"
           style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.5)", letterSpacing: "0.06em", marginBottom: 3 }}
         >
           {label}
         </p>
         <p
-          className="font-serif"
+          className=""
           style={{ fontSize: 15, color: "hsl(var(--foreground) / 0.9)", lineHeight: 1.4 }}
         >
           {value}
@@ -293,7 +293,7 @@ const DetailView: React.FC<{
         <button
           onClick={onBack}
           onPointerDown={(e) => e.stopPropagation()}
-          className="font-serif italic"
+          className="italic"
           style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.7)" }}
         >
           ‹ back
@@ -302,7 +302,7 @@ const DetailView: React.FC<{
         <button
           onClick={onToggleFav}
           onPointerDown={(e) => e.stopPropagation()}
-          className="font-serif italic"
+          className="italic"
           style={{
             fontSize: 13,
             color: isFav ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)",
@@ -321,20 +321,20 @@ const DetailView: React.FC<{
         <div className="flex flex-col items-center px-6 pt-6 pb-5">
           <Avatar name={contact.name} hue={contact.hue} size={88} />
           <p
-            className="font-serif"
+            className=""
             style={{ fontSize: 24, color: "hsl(var(--foreground) / 0.95)", marginTop: 14 }}
           >
             {contact.name}
           </p>
           <p
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.6)", marginTop: 2 }}
           >
             {contact.handle}
           </p>
           {contact.relation && (
             <p
-              className="font-serif italic text-center"
+              className="italic text-center"
               style={{
                 fontSize: 14,
                 color: "hsl(var(--foreground) / 0.7)",
@@ -348,7 +348,7 @@ const DetailView: React.FC<{
           )}
           {contact.lastSeen && (
             <p
-              className="font-serif italic"
+              className="italic"
               style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.45)", marginTop: 10, letterSpacing: "0.05em" }}
             >
               last spoke {contact.lastSeen}
@@ -365,7 +365,7 @@ const DetailView: React.FC<{
           }}
         >
           <p
-            className="font-serif"
+            className=""
             style={{ fontSize: 14, lineHeight: 1.6, color: "hsl(var(--foreground) / 0.75)" }}
           >
             you could{" "}
@@ -385,7 +385,7 @@ const DetailView: React.FC<{
 
         <div className="px-6 py-6">
           <p
-            className="font-serif italic text-center"
+            className="italic text-center"
             style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.35)", letterSpacing: "0.08em" }}
           >
             kept since 2024

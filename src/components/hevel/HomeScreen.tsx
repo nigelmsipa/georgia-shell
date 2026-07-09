@@ -249,7 +249,7 @@ export const HomeScreen: React.FC<Props> = ({
         className="flex justify-center items-center px-5 pt-12 pb-3 relative z-10"
       >
         <span
-          className="font-serif tracking-tight"
+          className="tracking-tight"
           style={{
             fontSize: 15,
             fontWeight: 500,
@@ -326,7 +326,7 @@ export const HomeScreen: React.FC<Props> = ({
                       style={{ background: "hsl(var(--secondary))" }}
                     >
                       <span
-                        className="font-serif italic text-sm"
+                        className="italic text-caption"
                         style={{ color: "hsl(var(--foreground) / 0.4)" }}
                       >
                         {app}
@@ -351,7 +351,7 @@ export const HomeScreen: React.FC<Props> = ({
                     }}
                   >
                     <span
-                      className="font-serif"
+                      className=""
                       style={{ fontSize: 12, fontWeight: 700, color: "hsl(var(--destructive-foreground))", lineHeight: 1 }}
                     >
                       ×
@@ -417,7 +417,7 @@ export const HomeScreen: React.FC<Props> = ({
               <>
                 {/* Watermark letter */}
                 <div
-                  className="font-serif italic"
+                  className="italic"
                   style={{
                     fontSize: 96,
                     fontWeight: 700,
@@ -447,7 +447,7 @@ export const HomeScreen: React.FC<Props> = ({
                       }}
                     >
                       <span
-                        className="font-serif italic"
+                        className="italic"
                         style={{
                           fontSize: i === 0 ? 28 : 20,
                           fontWeight: i === 0 ? 700 : 400,
@@ -463,7 +463,7 @@ export const HomeScreen: React.FC<Props> = ({
                       </span>
                       {isOnHome && (
                         <span
-                          className="font-serif"
+                          className=""
                           style={{ fontSize: 8, color: "hsl(var(--muted-foreground) / 0.3)" }}
                         >
                           ●
@@ -491,7 +491,7 @@ export const HomeScreen: React.FC<Props> = ({
               return (
                 <span
                   key={l}
-                  className="font-serif block text-center"
+                  className="block text-center"
                   style={{
                     fontSize: isCur ? 18 : isNear ? 11 : 9,
                     fontWeight: isCur ? 700 : 400,
@@ -528,7 +528,7 @@ export const HomeScreen: React.FC<Props> = ({
             {/* Letter heading watermark */}
             {activeLetter && !search.trim() && (
               <div
-                className="font-serif italic"
+                className="italic"
                 style={{
                   fontSize: 96,
                   fontWeight: 700,
@@ -545,7 +545,7 @@ export const HomeScreen: React.FC<Props> = ({
             {/* Search result count */}
             {search.trim() && (
               <div
-                className="font-serif italic mb-3"
+                className="italic mb-3"
                 style={{
                   fontSize: 13,
                   color: "hsl(var(--muted-foreground) / 0.4)",
@@ -578,7 +578,7 @@ export const HomeScreen: React.FC<Props> = ({
                     }}
                   >
                     <span
-                      className="font-serif italic"
+                      className="italic"
                       style={{
                         fontSize: isFirst ? 28 : 20,
                         fontWeight: isFirst ? 700 : 400,
@@ -594,7 +594,7 @@ export const HomeScreen: React.FC<Props> = ({
                     </span>
                     {isOnHome && (
                       <span
-                        className="font-serif"
+                        className=""
                         style={{ fontSize: 8, color: "hsl(var(--muted-foreground) / 0.3)" }}
                       >
                         ●
@@ -607,7 +607,7 @@ export const HomeScreen: React.FC<Props> = ({
               {/* Resting hint */}
               {!activeLetter && !search.trim() && (
                 <div
-                  className="font-serif italic mt-12"
+                  className="italic mt-12"
                   style={{
                     fontSize: 16,
                     color: "hsl(var(--muted-foreground) / 0.18)",
@@ -618,7 +618,7 @@ export const HomeScreen: React.FC<Props> = ({
               )}
               {search.trim() && filtered.length === 0 && (
                 <div
-                  className="font-serif italic mt-4"
+                  className="italic mt-4"
                   style={{
                     fontSize: 14,
                     color: "hsl(var(--muted-foreground) / 0.2)",
@@ -655,7 +655,7 @@ export const HomeScreen: React.FC<Props> = ({
                   }
                 }}
                 placeholder="search…"
-                className="flex-1 bg-transparent font-serif italic text-sm outline-none"
+                className="flex-1 bg-transparent italic text-caption outline-none"
                 style={{
                   color: "hsl(var(--foreground) / 0.7)",
                   caretColor: "hsl(var(--primary))",
@@ -665,7 +665,7 @@ export const HomeScreen: React.FC<Props> = ({
               {search ? (
                 <button
                   onClick={() => setSearch("")}
-                  className="font-serif text-sm"
+                  className="text-caption"
                   style={{
                     background: "none",
                     border: "none",
@@ -722,7 +722,7 @@ export const HomeScreen: React.FC<Props> = ({
               return (
                 <span
                   key={l}
-                  className="font-serif block text-center"
+                  className="block text-center"
                   style={{
                     fontSize: isCur ? 18 : isNear ? 11 : 9,
                     fontWeight: isCur ? 700 : 400,
