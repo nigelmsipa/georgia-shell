@@ -28,6 +28,7 @@ const EMERGENCY_KEYS = [
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const [time, setTime] = useState(new Date());
   const [entered, setEntered] = useState("");
+  const breathOpacity = useBreathOpacity(0.25, 0.7);
   const [error, setError] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [emergency, setEmergency] = useState(false);
