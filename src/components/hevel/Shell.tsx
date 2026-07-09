@@ -9,7 +9,7 @@ import { UtilityDrawer } from "./UtilityDrawer";
 import { AppSwitcher } from "./AppSwitcher";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { HoldingStation } from "./HoldingStation";
-import { AnimatePresence, useMotionValue, useSpring, useTransform, useMotionTemplate, motion, animate } from "framer-motion";
+import { AnimatePresence, useMotionValue, useSpring, useTransform, motion, animate } from "framer-motion";
 import { HevelBar } from "./HevelBar";
 import { SidePill } from "./SidePill";
 import { DictationOverlay } from "./DictationOverlay";
@@ -55,43 +55,15 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const appDragY = useMotionValue(0);
 
   // --- Side Pill reveal ---
-  // Two springs on the same drag target with different tuning create an
-  // elastic edge: the screen body follows with weight, the leading edge
-  // (at the pill) races ahead and wobbles on release like a stretched sheet.
+  // dragTarget: where the screen wants to be (instantly set by SidePill)
+  // screenX:    what actually renders — a spring, so the screen has weight/lag
   const dragTarget = useMotionValue(0);
-  const screenX = useSpring(dragTarget, { stiffness: 220, damping: 30 });        // body — heavy
-  const edgeLead = useSpring(dragTarget, { stiffness: 320, damping: 12 });       // edge — bouncy, leads
-  const bulge = useTransform(
-    [edgeLead, screenX] as any,
-    ([e, s]: number[]) => Math.max(0, e - s),
-  );
-
-  // 9 sample points along the left edge, sine-weighted so the pull tapers
-  // smoothly to zero at top and bottom.
-  const S = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9].map((t) => Math.sin(Math.PI * t));
-  const b1 = useTransform(bulge, (v) => v * S[0]);
-  const b2 = useTransform(bulge, (v) => v * S[1]);
-  const b3 = useTransform(bulge, (v) => v * S[2]);
-  const b4 = useTransform(bulge, (v) => v * S[3]);
-  const b5 = useTransform(bulge, (v) => v * S[4]);
-  const b6 = useTransform(bulge, (v) => v * S[5]);
-  const b7 = useTransform(bulge, (v) => v * S[6]);
-  const b8 = useTransform(bulge, (v) => v * S[7]);
-  const b9 = useTransform(bulge, (v) => v * S[8]);
-
-  const screenClip = useMotionTemplate`polygon(0px 0%, ${b1}px 10%, ${b2}px 20%, ${b3}px 30%, ${b4}px 40%, ${b5}px 50%, ${b6}px 60%, ${b7}px 70%, ${b8}px 80%, ${b9}px 90%, 0px 100%, 100% 100%, 100% 0%)`;
-
-  const voidOpacity = useTransform(
-    dragTarget,
-    [0, SIDE_PILL_OPEN_DISTANCE * 0.3, SIDE_PILL_OPEN_DISTANCE],
-    [0, 0.35, 1],
-  );
-  const voidX = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [-40, 0]);
-  const voidScale = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [1.04, 1]);
-  const screenDropShadow = useTransform(
+  const screenX = useSpring(dragTarget, { stiffness: 280, damping: 26 });
+  const voidOpacity = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [0, 1]);
+  const screenShadow = useTransform(
     dragTarget,
     [0, SIDE_PILL_OPEN_DISTANCE],
-    ["drop-shadow(0 0 0 rgba(0,0,0,0))", "drop-shadow(-12px 0 24px rgba(0,0,0,0.55))"],
+    ["0 0 0 rgba(0,0,0,0)", "-24px 0 48px rgba(0,0,0,0.55)"],
   );
 
   const isSidePillOpen = state.kind === "SIDE_PILL";
@@ -164,12 +136,9 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-black" style={{ perspective: 1200 }}>
+    <div className="relative w-full h-full overflow-hidden bg-black">
       {/* The void — sits behind the screen. Only visible when pushed aside. */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ opacity: voidOpacity, x: voidX, scale: voidScale }}
-      >
+      <motion.div className="absolute inset-0" style={{ opacity: voidOpacity }}>
         <HoldingStation />
       </motion.div>
 
@@ -178,9 +147,8 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         className="absolute inset-0"
         style={{
           x: screenX,
-          clipPath: screenClip,
-          WebkitClipPath: screenClip,
-          filter: screenDropShadow,
+          boxShadow: screenShadow,
+          // Keep rounded corners of PhoneFrame visible during slide.
           borderRadius: "inherit",
         }}
       >

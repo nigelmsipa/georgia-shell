@@ -1,42 +1,88 @@
-# Natural Side Pill + Peel Reveal
+## Gesture state machine for Shell
 
-Two focused changes, both in `src/components/hevel/`. No new components, no token changes, keep everything on the left edge inside PhoneFrame.
+Refactor `Shell.tsx` from a bag of independent booleans (`locked`, `notifications`, `controlCenter`, `utilityDrawer`, `appSwitcher`, `runningApp`) into a single explicit state machine that owns every transition. Every gesture handler in the shell — HevelBar swipe-up, top-edge pull, SidePill, HomeScreen flick — becomes a request against the machine, not a direct setter. Illegal transitions are silently rejected. This is the spine every other paste hangs off.
 
-## 1. Side Pill — natural edge cutout
+### States
 
-Replace the current floating 4px bar with a shape that reads as *carved into* the screen edge, not stuck onto it.
+One enum, one active state at a time:
 
-Construction (SVG, ~24px wide × ~120px tall, absolute at `left:0, top:50%`):
-- A single path drawing a smooth inward curve — straight edge above and below, bulging concavely into the screen around the pill's midpoint (quadratic bezier, ~18px depth, ~90px tall arc).
-- Fill uses `hsl(var(--background))` so the cutout matches whatever is behind the screen layer — it reads as the screen itself being notched.
-- Inside the notch: a slim vertical tab (3px × 56px, rounded, `hsl(var(--muted-foreground) / 0.45)`) with a soft outer glow (`0 0 10px hsl(var(--foreground) / 0.18)`).
-- Subtle inner shadow along the curve (`filter: drop-shadow(1px 0 1px hsl(var(--foreground) / 0.08))`) to give the notch a hair of depth.
+```text
+LOCK_CLOCK        clock + whisper, pre-PIN
+LOCK_PIN          PIN keypad visible
+HOME              cover grid, idle
+CONTROL_CENTER    top sheet over HOME
+NOTIFICATIONS     horizontal page from HOME
+LAUNCHER_FOCUS    scrub/search launcher over HOME
+APP_FOREGROUND    a running app (carries appName)
+SIDE_PILL         side pill quick-panel open
+```
 
-Idle micro-motion: the tab breathes on a 3.2s ease-in-out cycle (opacity 0.75 ↔ 1, scaleY 1 ↔ 1.04) — matches the project's organic-motion rule.
+Utility drawer stays as-is for now (it's an app-level affordance triggered by the bottom-60px swipe inside HOME / APP_FOREGROUND — it doesn't need its own top-level state). SOS/emergency stays local to LockScreen.
 
-While dragging: tab brightens to full opacity and the notch depth grows subtly with drag distance (depth = 18 + progress × 6) so the edge feels like it's being pulled open. Pure visual — no change to hit region or gesture logic.
+### Legal transitions
 
-Gesture behavior (tap vs. pan, TAP_SLOP, onTap → dictation) stays exactly as-is.
+```text
+LOCK_CLOCK       --swipe up-->             LOCK_PIN
+LOCK_PIN         --swipe down-->           LOCK_CLOCK
+LOCK_PIN         --correct code-->         HOME
+HOME             --top-edge pull-->        CONTROL_CENTER
+HOME             --horizontal page-->      NOTIFICATIONS
+HOME             --flick up-->             LAUNCHER_FOCUS
+HOME             --launch app-->           APP_FOREGROUND(name)
+HOME             --side pill tap-->        SIDE_PILL
+APP_FOREGROUND   --Hevel Bar swipe up-->   HOME          (must always work)
+APP_FOREGROUND   --launch other app-->     APP_FOREGROUND(name)
+APP_FOREGROUND   --side pill tap-->        SIDE_PILL
+CONTROL_CENTER   --dismiss-->              HOME
+NOTIFICATIONS    --dismiss / page back-->  HOME
+LAUNCHER_FOCUS   --dismiss-->              HOME
+LAUNCHER_FOCUS   --pick app-->             APP_FOREGROUND(name)
+SIDE_PILL        --dismiss / pick-->       previous (HOME or APP_FOREGROUND)
+```
 
-## 2. Reveal — peel with parallax
+Explicitly forbidden:
+- Any transition **into** `LOCK_CLOCK` or `LOCK_PIN` from a post-unlock state. Once unlocked, the shell cannot re-lock via gesture. (Re-locking is a future explicit action, not a swipe.)
+- Any panel-to-panel jump (e.g. CONTROL_CENTER → NOTIFICATIONS). Panels dismiss to their origin first.
+- APP_FOREGROUND → CONTROL_CENTER via top-edge pull is out of scope for this paste; top-edge pull is HOME-only until we revisit.
 
-Currently the screen slides 1:1 with the finger, spring-followed. Upgrade `Shell.tsx` so the reveal feels like lifting a page off the void:
+### Why this fixes "swipe home doesn't work"
 
-- **Perspective**: wrap the screen layer's parent in `style={{ perspective: 1200 }}`.
-- **Screen layer transform**: combine `x: screenX` with `rotateY: screenRotate` and `transformOrigin: "left center"`. `screenRotate` is `useTransform(dragTarget, [0, OPEN], [0, -6])` — negative so the right edge tips away as it slides right… wait, pill is on left, so screen slides right. `transformOrigin` stays `"left center"` and rotateY is a small positive angle (~5°) so the far edge lifts toward the viewer.
-- **Edge shadow**: current `-24px 0 48px` becomes a layered shadow that deepens with progress: `-8px 0 16px rgba(0,0,0,0.35), -32px 0 56px rgba(0,0,0,0.55)`.
-- **Parallax on the void**: `HoldingStation` sits in a wrapper whose `x` is `useTransform(dragTarget, [0, OPEN], [-40, 0])` and `scale` is `[1.04, 1]`. The void appears to settle into place as the screen peels away, instead of being statically revealed.
-- **Void opacity curve**: swap linear `[0,1]` for a snappier `[0, 0.35, 1]` at `[0, OPEN*0.3, OPEN]` so the vapor stays hidden until the peel commits.
-- **Spring**: soften the follow-spring on `screenX` to `{ stiffness: 220, damping: 30 }` — slightly heavier, more page-like.
-- Snap thresholds and open-distance constant (`SIDE_PILL_OPEN_DISTANCE = 240`) unchanged.
+Today `HevelBar` calls `onCloseApp` which sets `runningApp = null`. But the bar is only mounted when `!locked && !anyOverlay`, and `appDragY` is shared across screens, so a stale drag value or a race with `AnimatePresence` exit can swallow the gesture. With the machine, HevelBar's swipe-up always dispatches `REQUEST_HOME`; the reducer resolves it deterministically from any state that lists HOME as a legal target (currently APP_FOREGROUND, CONTROL_CENTER, NOTIFICATIONS, LAUNCHER_FOCUS, SIDE_PILL). No mounting condition can suppress it.
 
-## Files touched
+### Implementation
 
-- `src/components/hevel/SidePill.tsx` — new SVG notch + tab, breathing animation, drag-linked depth. Gesture logic untouched.
-- `src/components/hevel/Shell.tsx` — perspective wrapper, rotateY on screen layer, layered shadow, parallax wrapper around `HoldingStation`, adjusted opacity curve and spring.
+**New file: `src/components/hevel/shellMachine.ts`**
+- `ShellState` discriminated union (`{ kind: "APP_FOREGROUND"; app: string }` etc.).
+- `ShellEvent` union: `UNLOCK`, `LOCK_ENTER_PIN`, `LOCK_BACK_TO_CLOCK`, `OPEN_CONTROL_CENTER`, `OPEN_NOTIFICATIONS`, `OPEN_LAUNCHER`, `LAUNCH_APP(name)`, `REQUEST_HOME`, `OPEN_SIDE_PILL`, `DISMISS_SIDE_PILL`.
+- `reduce(state, event): ShellState` — pure, table-driven, returns the same state reference when a transition is illegal (so React skips renders).
+- `useShellMachine()` hook wrapping `useReducer`, exposing `state` and a typed `dispatch`.
 
-No changes to `HoldingStation`, `UtilityDrawer`, `AtmosphericBg`, `PhoneFrame`, `shellMachine`, `DictationOverlay`, or `index.css`.
+**Edit `src/components/hevel/Shell.tsx`**
+- Replace all `useState` booleans with `useShellMachine()`.
+- Derive render flags from `state.kind` (`locked = kind === "LOCK_*"`, `anyOverlay = kind === "CONTROL_CENTER" | "SIDE_PILL"`, etc.).
+- Keep `recents` and `appDragY` as-is — they're orthogonal to the machine.
+- Every child callback becomes a `dispatch(...)`:
+  - `HomeScreen.onOpenApp` → `dispatch({ type: "LAUNCH_APP", name })`
+  - `HomeScreen.onSwipeToNotifications` → `dispatch({ type: "OPEN_NOTIFICATIONS" })`
+  - `HomeScreen.onOpenControlCenter` → `dispatch({ type: "OPEN_CONTROL_CENTER" })`
+  - `HevelBar.onCloseApp` → `dispatch({ type: "REQUEST_HOME" })`
+  - `LockScreen.onUnlock` → `dispatch({ type: "UNLOCK" })`
+  - Panel `onClose` → `dispatch({ type: "REQUEST_HOME" })`
+- Remove the `!locked` guards on HevelBar / SidePill / top-edge hitbox in favor of `state.kind !== "LOCK_CLOCK" && state.kind !== "LOCK_PIN"`.
+- Handle `navigateTo` (debug nav) by translating each label to the correct event, not by poking booleans.
 
-## Verification
+**No changes** to LockScreen internals, HomeScreen internals, panel components, apps, AtmosphericBg, PhoneFrame, tokens, or motion physics. The refactor is entirely at the Shell level plus one new file.
 
-After build, drive Playwright: screenshot the pill idle, mid-drag (~120px), and fully open. Confirm the notch reads as carved into the edge and the screen tilts as it slides.
+### Verification
+
+- Manual: from every non-lock state, Hevel Bar swipe-up returns to HOME.
+- Manual: after unlock, no gesture (top-edge pull, side pill, notifications swipe, HevelBar) can produce LOCK_CLOCK/LOCK_PIN.
+- Manual: debug nav sidebar still jumps to every screen.
+- Build passes; no new deps.
+
+### Out of scope
+
+- Utility drawer / app switcher promotion to top-level states.
+- Re-lock action.
+- Persisting state across reloads.
+- Animating transitions differently based on source/target — motion stays as it is.
