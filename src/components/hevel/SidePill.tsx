@@ -45,7 +45,7 @@ export const SidePill: React.FC<Props> = ({
 
   const handlePanEnd = (_: unknown, info: PanInfo) => {
     if (movedRef.current < TAP_SLOP) {
-      onTap();
+      // treat as tap — but also let onTap handle the click path
       return;
     }
     const current = dragTarget.get();
@@ -58,14 +58,17 @@ export const SidePill: React.FC<Props> = ({
 
   return (
     <motion.div
-      className="absolute left-0 top-1/2 z-[95] touch-none"
+      className="absolute left-0 top-1/2 z-[95] touch-none cursor-pointer"
       style={{ width: 22, height: 96, y: "-50%" }}
       onPanStart={handlePanStart}
       onPan={handlePan}
       onPanEnd={handlePanEnd}
+      onTap={() => {
+        if (movedRef.current < TAP_SLOP) onTap();
+      }}
     >
       <div
-        className="absolute left-0 top-1/2 rounded-r-md"
+        className="absolute left-0 top-1/2 rounded-r-md pointer-events-none"
         style={{
           width: 4,
           height: 64,
@@ -77,4 +80,5 @@ export const SidePill: React.FC<Props> = ({
     </motion.div>
   );
 };
+
 
