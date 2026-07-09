@@ -7,6 +7,7 @@ import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AppSwitcher } from "./AppSwitcher";
+import { ProseLauncher } from "./ProseLauncher";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { AnimatePresence, useMotionValue, motion } from "framer-motion";
 import { HevelBar } from "./HevelBar";
