@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { motion, PanInfo, MotionValue } from "framer-motion";
+import { motion, PanInfo, MotionValue, useMotionValue, animate } from "framer-motion";
+import { Breath } from "./Breath";
+import { BREATH_GATHER_SPRING } from "./breathRhythm";
 
 interface Props {
   onCloseApp: () => void;
@@ -10,21 +12,21 @@ interface Props {
 
 export const HevelBar: React.FC<Props> = ({ onCloseApp, appDragY, onScrubLeft, onScrubRight }) => {
   const [listening, setListening] = useState(false);
+  const gather = useMotionValue(0);
+
+  const setGather = (v: number) =>
+    animate(gather, v, { type: "spring", ...BREATH_GATHER_SPRING });
 
   const handleDragEnd = (e: any, info: PanInfo) => {
-    // Swipe up (close)
     if (info.offset.y < -60 || info.velocity.y < -500) {
       onCloseApp();
-    }
-    // Scrub left/right
-    else if (info.offset.x < -60 || info.velocity.x < -500) {
+    } else if (info.offset.x < -60 || info.velocity.x < -500) {
       onScrubLeft();
     } else if (info.offset.x > 60 || info.velocity.x > 500) {
       onScrubRight();
     }
-
-    // Always snap back
     appDragY.set(0);
+    setGather(0);
   };
 
   return (
@@ -40,27 +42,29 @@ export const HevelBar: React.FC<Props> = ({ onCloseApp, appDragY, onScrubLeft, o
         </motion.div>
       )}
       <motion.div
-        className="w-32 h-[4px] rounded-full bg-[hsl(var(--muted-foreground)/0.3)] shadow-lg"
+        className="relative flex items-center justify-center"
+        style={{ width: 140, height: 28 }}
         drag
         dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
         dragElastic={0.4}
+        onPointerEnter={() => setGather(1)}
+        onPointerLeave={() => setGather(0)}
+        onPointerDown={() => setGather(1)}
+        onPointerUp={() => setGather(0)}
+        onDragStart={() => setGather(1)}
         onDrag={(e, info) => {
-          // Only pass negative Y (pulling up) to the app container
-          if (info.offset.y < 0) {
-            appDragY.set(info.offset.y);
-          }
+          if (info.offset.y < 0) appDragY.set(info.offset.y);
         }}
         onDragEnd={handleDragEnd}
         onClick={() => {
           if (!listening) {
             setListening(true);
-            setTimeout(() => {
-              setListening(false);
-              // In a real app we'd trigger a toast here
-            }, 2000);
+            setTimeout(() => setListening(false), 2000);
           }
         }}
-      />
+      >
+        <Breath orientation="horizontal" gather={gather} length={120} thickness={14} />
+      </motion.div>
     </div>
   );
 };
