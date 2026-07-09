@@ -1,44 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence, useMotionValue, animate, PanInfo } from "framer-motion";
+import React, { useState } from "react";
+import { motion, useMotionValue, animate, PanInfo } from "framer-motion";
 
 /**
- * Tap-to-dictate mini overlay. Blooms out of the SidePill, streams a mocked
- * transcription in its own center. Accept commits (to the Holding Station),
- * Delete vaporizes.
+ * Tap-to-dictate mini overlay. Blooms out of the SidePill.
+ * Phases: recording (pulsing orb) → processing (on accept) → dismiss.
+ * Delete cancels immediately.
  */
-
-const SCRIPT =
-  "remind me to water the fig tree before sunset and call mom afterwards";
 
 interface Props {
   onDismiss: (mode: "accept" | "delete") => void;
-  /** Vertical anchor (any CSS value) — usually the pill's Y center. */
   anchorY: number | string;
 }
 
+type Phase = "recording" | "processing";
+
 export const DictationOverlay: React.FC<Props> = ({ onDismiss, anchorY }) => {
-  const [pending, setPending] = useState("");
+  const [phase, setPhase] = useState<Phase>("recording");
   const dragY = useMotionValue(0);
 
-  useEffect(() => {
-    const tokens = SCRIPT.split(" ");
-    let i = 0;
-    const id = window.setInterval(() => {
-      i += 1;
-      setPending(tokens.slice(0, i).join(" "));
-      if (i >= tokens.length) window.clearInterval(id);
-    }, 220);
-    return () => window.clearInterval(id);
-  }, []);
+  const commit = () => {
+    if (phase !== "recording") return;
+    setPhase("processing");
+    // brief processing beat, then hand off to Holding Station
+    window.setTimeout(() => onDismiss("accept"), 900);
+  };
 
-  const commit = () => onDismiss("accept");
-  const discard = () => onDismiss("delete");
+  const discard = () => {
+    if (phase !== "recording") return;
+    onDismiss("delete");
+  };
 
   const handlePanEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y > 40 || info.velocity.y > 500) commit();
     else if (info.offset.y < -40 || info.velocity.y < -500) discard();
     else animate(dragY, 0, { type: "spring", stiffness: 280, damping: 26 });
   };
+
+  const isProcessing = phase === "processing";
 
   return (
     <motion.div
@@ -55,7 +53,7 @@ export const DictationOverlay: React.FC<Props> = ({ onDismiss, anchorY }) => {
       transition={{ type: "spring", stiffness: 280, damping: 26 }}
     >
       <motion.div
-        drag="y"
+        drag={isProcessing ? false : "y"}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.25}
         style={{ y: dragY }}
@@ -65,26 +63,27 @@ export const DictationOverlay: React.FC<Props> = ({ onDismiss, anchorY }) => {
         {/* DELETE — top */}
         <button
           onClick={discard}
+          disabled={isProcessing}
           aria-label="delete dictation"
-          className="w-10 h-10 rounded-full flex items-center justify-center italic text-[11px]"
+          className="w-10 h-10 rounded-full flex items-center justify-center italic text-[11px] transition-opacity"
           style={{
             color: "hsl(var(--foreground) / 0.5)",
             background: "hsl(var(--foreground) / 0.04)",
             border: "1px solid hsl(var(--foreground) / 0.08)",
             backdropFilter: "blur(8px)",
+            opacity: isProcessing ? 0.25 : 1,
           }}
         >
           erase
         </button>
 
-        {/* LISTENING core with transcript */}
+        {/* Core — pulsing orb (recording) or slow breath (processing) */}
         <div
-          className="relative flex items-center gap-3"
+          className="relative flex items-center justify-center"
           style={{
-            padding: "10px 14px",
-            minHeight: 44,
-            maxWidth: 240,
-            borderRadius: 22,
+            width: 64,
+            height: 64,
+            borderRadius: 32,
             background: "hsl(var(--foreground) / 0.045)",
             border: "1px solid hsl(var(--foreground) / 0.09)",
             backdropFilter: "blur(10px)",
@@ -92,36 +91,43 @@ export const DictationOverlay: React.FC<Props> = ({ onDismiss, anchorY }) => {
           }}
         >
           <motion.div
-            className="rounded-full shrink-0"
+            className="rounded-full"
             style={{
-              width: 12,
-              height: 12,
-              background:
-                "radial-gradient(circle at 35% 30%, hsl(var(--foreground) / 0.7), hsl(var(--foreground) / 0.2))",
-              boxShadow: "0 0 14px hsl(var(--foreground) / 0.35)",
+              width: 16,
+              height: 16,
+              background: isProcessing
+                ? "radial-gradient(circle at 35% 30%, hsl(var(--foreground) / 0.45), hsl(var(--foreground) / 0.1))"
+                : "radial-gradient(circle at 35% 30%, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.2))",
+              boxShadow: "0 0 18px hsl(var(--foreground) / 0.35)",
             }}
-            animate={{ scale: [1, 1.25, 1], opacity: [0.75, 1, 0.75] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            animate={
+              isProcessing
+                ? { scale: [1, 1.08, 1], opacity: [0.5, 0.8, 0.5] }
+                : { scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }
+            }
+            transition={{
+              duration: isProcessing ? 2.2 : 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           />
-          <div
-            className="italic text-[12px] leading-snug"
-            style={{ color: "hsl(var(--foreground) / 0.78)" }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={pending}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {pending || "listening…"}
-              </motion.span>
-            </AnimatePresence>
-          </div>
+          {isProcessing && (
+            <motion.div
+              className="absolute rounded-full"
+              style={{
+                inset: 8,
+                border: "1px solid hsl(var(--foreground) / 0.15)",
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3.4, repeat: Infinity, ease: "linear" }}
+            />
+          )}
         </div>
 
         {/* ACCEPT — bottom */}
         <button
           onClick={commit}
+          disabled={isProcessing}
           aria-label="accept dictation"
           className="w-12 h-12 rounded-full flex items-center justify-center italic text-[12px]"
           style={{
@@ -132,7 +138,7 @@ export const DictationOverlay: React.FC<Props> = ({ onDismiss, anchorY }) => {
             boxShadow: "0 0 20px hsl(var(--foreground) / 0.1)",
           }}
         >
-          keep
+          {isProcessing ? "…" : "keep"}
         </button>
       </motion.div>
     </motion.div>
