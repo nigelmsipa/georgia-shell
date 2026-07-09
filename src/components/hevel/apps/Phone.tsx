@@ -106,7 +106,7 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                     <button
                       key={key}
                       onClick={() => handleDial(key)}
-                      className="w-14 h-14 rounded-full flex items-center justify-center text-title transition-colors active:bg-secondary/50"
+                      className="tap-target w-tap h-tap text-title transition-colors active:bg-secondary/50"
                       style={{ color: "hsl(var(--foreground) / 0.8)" }}
                     >
                       {key}
@@ -119,7 +119,7 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 <button
                   onClick={startCall}
                   disabled={!number}
-                  className="w-16 h-16 rounded-full flex items-center justify-center italic text-body transition-transform active:scale-95"
+                  className="tap-target w-tap h-tap italic text-body transition-transform active:scale-95"
                   style={{
                     background: "hsl(var(--primary) / 0.8)",
                     color: "hsl(var(--primary-foreground))",
@@ -128,6 +128,7 @@ export const Phone: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 >
                   call
                 </button>
+
               </div>
             </div>
           </div>
