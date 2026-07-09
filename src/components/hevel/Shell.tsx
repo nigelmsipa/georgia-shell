@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useReducer } from "react";
 import { HomeScreen } from "./HomeScreen";
 import { NotificationsPane } from "./NotificationsPane";
 import { AppOverlay } from "./AppOverlay";
@@ -19,86 +19,150 @@ import { Contacts } from "./apps/Contacts";
 import { Angelfish } from "./apps/Angelfish";
 import { Voice } from "./apps/Voice";
 import { Phone } from "./apps/Phone";
+import { TOP_ZONE_HEIGHT_DP, isDebugGesturesEnabled } from "./nav-contract";
+import { GestureDebugOverlay, registerGestureZone } from "./GestureDebugOverlay";
 
-type MockAppProps = { 
-  onClose: () => void; 
+type MockAppProps = {
+  onClose: () => void;
   onOpenUtilityDrawer?: () => void;
   appDragY?: any;
 };
 const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
   "AI Chat": AIChat,
-  "HavelTube": HavelTube,
-  "Music": Music,
-  "Signal": Signal,
-  "Contacts": Contacts,
-  "Angelfish": Angelfish,
-  "Voice": Voice,
-  "Phone": Phone,
+  HavelTube,
+  Music,
+  Signal,
+  Contacts,
+  Angelfish,
+  Voice,
+  Phone,
 };
 
+/* ── Navigation state machine ────────────────────────────────────────── */
+
+type NavState =
+  | { kind: "lock" }
+  | { kind: "home" }
+  | { kind: "app"; name: string }
+  | { kind: "switcher"; from: "home" | { app: string } };
+
+type NavEvent =
+  | { t: "unlock" }
+  | { t: "lock" }
+  | { t: "openApp"; name: string }
+  | { t: "goHome" }
+  | { t: "peekSwitcher" }
+  | { t: "pickApp"; name: string }
+  | { t: "back" }
+  | { t: "clearAll" };
+
+const navReducer = (state: NavState, ev: NavEvent): NavState => {
+  switch (ev.t) {
+    case "unlock": return state.kind === "lock" ? { kind: "home" } : state;
+    case "lock": return { kind: "lock" };
+    case "openApp": return { kind: "app", name: ev.name };
+    case "goHome": return { kind: "home" };
+    case "peekSwitcher":
+      if (state.kind === "app") return { kind: "switcher", from: { app: state.name } };
+      if (state.kind === "home") return { kind: "switcher", from: "home" };
+      return state;
+    case "pickApp": return { kind: "app", name: ev.name };
+    case "back":
+      if (state.kind === "switcher") {
+        return state.from === "home"
+          ? { kind: "home" }
+          : { kind: "app", name: state.from.app };
+      }
+      if (state.kind === "app") return { kind: "home" };
+      return state;
+    case "clearAll":
+      return { kind: "home" };
+    default: return state;
+  }
+};
 
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
-  const [locked, setLocked] = useState(true);
-  const [notifications, setNotifications] = useState(false);
-  const [controlCenter, setControlCenter] = useState(false);
-  const [utilityDrawer, setUtilityDrawer] = useState(false);
-  const [appSwitcher, setAppSwitcher] = useState(false);
-  const [runningApp, setRunningApp] = useState<string | null>(null);
-  const [recents, setRecents] = useState<string[]>([]);
-  
+  const [nav, dispatch] = useReducer(navReducer, { kind: "lock" } as NavState);
+  const [notifications, setNotifications] = React.useState(false);
+  const [controlCenter, setControlCenter] = React.useState(false);
+  const [utilityDrawer, setUtilityDrawer] = React.useState(false);
+  const [recents, setRecents] = React.useState<string[]>([]);
+  const [debug, setDebug] = React.useState<boolean>(() => isDebugGesturesEnabled());
+
   const appDragY = useMotionValue(0);
 
-  React.useEffect(() => {
+  // Poll debug flag when tab regains focus (toggling from /spec updates it)
+  useEffect(() => {
+    const onFocus = () => setDebug(isDebugGesturesEnabled());
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("storage", onFocus);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("storage", onFocus);
+    };
+  }, []);
+
+  // Debug-toolbar navigation from PhoneFrame
+  useEffect(() => {
     if (!navigateTo) return;
-    setLocked(false);
     setNotifications(false);
     setControlCenter(false);
     setUtilityDrawer(false);
-    setRunningApp(null);
 
     switch (navigateTo) {
-      case "Lock": setLocked(true); break;
-      case "Launcher": break;
-      case "Notifications": setNotifications(true); break;
-      case "Control Center": setControlCenter(true); break;
-      case "Utility": setUtilityDrawer(true); break;
-      case "Settings": setRunningApp("Settings"); break;
-      case "Home": break;
+      case "Lock": dispatch({ t: "lock" }); break;
+      case "Home": dispatch({ t: "unlock" }); dispatch({ t: "goHome" }); break;
+      case "Launcher": dispatch({ t: "unlock" }); dispatch({ t: "goHome" }); break;
+      case "Notifications": dispatch({ t: "unlock" }); setNotifications(true); break;
+      case "Control Center": dispatch({ t: "unlock" }); setControlCenter(true); break;
+      case "Utility": dispatch({ t: "unlock" }); setUtilityDrawer(true); break;
+      case "Settings": dispatch({ t: "openApp", name: "Settings" }); break;
     }
   }, [navigateTo]);
 
   const openApp = (name: string) => {
-    setRunningApp(name);
-    setRecents(prev => [name, ...prev.filter(app => app !== name)]);
+    setRecents((prev) => [name, ...prev.filter((a) => a !== name)]);
+    dispatch({ t: "openApp", name });
   };
-  const closeApp = () => setRunningApp(null);
+
+  const pickFromSwitcher = (name: string) => {
+    setRecents((prev) => [name, ...prev.filter((a) => a !== name)]);
+    dispatch({ t: "pickApp", name });
+  };
+
+  const currentApp = nav.kind === "app" ? nav.name : nav.kind === "switcher" && nav.from !== "home" ? nav.from.app : null;
 
   const handleScrubLeft = () => {
-    // Next recent app
-    if (recents.length > 1) {
-      const idx = runningApp ? recents.indexOf(runningApp) : -1;
-      if (idx !== -1 && idx + 1 < recents.length) {
-        setRunningApp(recents[idx + 1]);
-      }
-    }
+    if (nav.kind !== "app" || recents.length < 2) return;
+    const idx = recents.indexOf(nav.name);
+    if (idx !== -1 && idx + 1 < recents.length) dispatch({ t: "pickApp", name: recents[idx + 1] });
   };
-
   const handleScrubRight = () => {
-    // Prev recent app
-    if (recents.length > 1) {
-      const idx = runningApp ? recents.indexOf(runningApp) : -1;
-      if (idx > 0) {
-        setRunningApp(recents[idx - 1]);
-      }
-    }
+    if (nav.kind !== "app" || recents.length < 2) return;
+    const idx = recents.indexOf(nav.name);
+    if (idx > 0) dispatch({ t: "pickApp", name: recents[idx - 1] });
   };
 
-  const anyOverlay = controlCenter || utilityDrawer || appSwitcher;
+  const anyOverlay = controlCenter || utilityDrawer || nav.kind === "switcher";
+  const locked = nav.kind === "lock";
+
+  // Top-edge gesture zone ref registration
+  const topEdgeRef = React.useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    registerGestureZone("top-edge", topEdgeRef.current);
+    return () => registerGestureZone("top-edge", null);
+  }, [locked]);
+
+  const focusAppForSwitcher = useMemo(
+    () => (nav.kind === "switcher" && nav.from !== "home" ? nav.from.app : null),
+    [nav]
+  );
 
   return (
     <div className="relative w-full h-full overflow-hidden">
       <AtmosphericBg />
-      {/* Base layer: Home */}
+
+      {/* Base: Home */}
       <div
         className="absolute inset-0 transition-all duration-350"
         style={{
@@ -116,65 +180,85 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       </div>
 
       <AnimatePresence>
-        {notifications && <NotificationsPane key="notifications" open={true} onClose={() => setNotifications(false)} />}
+        {notifications && <NotificationsPane key="notifications" open onClose={() => setNotifications(false)} />}
       </AnimatePresence>
       <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
-      <AppSwitcher open={appSwitcher} onClose={() => setAppSwitcher(false)} onOpenApp={openApp} />
 
+      {/* Running app — stays mounted under the switcher when peeked from-app */}
       <AnimatePresence>
-        {runningApp && runningApp === "Settings" && <SettingsApp key="settings" onClose={closeApp} />}
-        {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
+        {currentApp && currentApp === "Settings" && (
+          <SettingsApp key="settings" onClose={() => dispatch({ t: "back" })} />
+        )}
+        {currentApp && currentApp !== "Settings" && MOCK_APPS[currentApp] && (
           (() => {
-            const App = MOCK_APPS[runningApp];
-            return <App key={runningApp} onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} appDragY={appDragY} />;
+            const App = MOCK_APPS[currentApp];
+            return (
+              <App
+                key={currentApp}
+                onClose={() => dispatch({ t: "back" })}
+                onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+                appDragY={appDragY}
+              />
+            );
           })()
         )}
-        {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
+        {currentApp && currentApp !== "Settings" && !MOCK_APPS[currentApp] && (
           <AppOverlay
-            key={runningApp}
-            appName={runningApp}
-            onClose={closeApp}
+            key={currentApp}
+            appName={currentApp}
+            onClose={() => dispatch({ t: "back" })}
             onOpenUtilityDrawer={() => setUtilityDrawer(true)}
             appDragY={appDragY}
           />
         )}
       </AnimatePresence>
 
-      {/* Top Edge Hitbox - Global pull-down for Control Center */}
+      {/* Switcher — overlays whatever is behind (home or the from-app) */}
+      <AppSwitcher
+        open={nav.kind === "switcher"}
+        focusApp={focusAppForSwitcher}
+        onPickApp={pickFromSwitcher}
+        onBack={() => dispatch({ t: "back" })}
+        onClearAll={() => dispatch({ t: "clearAll" })}
+      />
+
+      {/* Top-edge hitbox for Control Center */}
       {!locked && (
         <motion.div
-          className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
+          ref={topEdgeRef}
+          className="absolute top-0 left-0 right-0 z-[100] touch-none"
+          style={{ height: TOP_ZONE_HEIGHT_DP }}
           drag="y"
           dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
           dragElastic={0.1}
-          onDragEnd={(e, info) => {
-            if (info.offset.y > 30 || info.velocity.y > 300) {
-              setControlCenter(true);
-            }
+          onDragEnd={(_, info) => {
+            if (info.offset.y > 30 || info.velocity.y > 300) setControlCenter(true);
           }}
         />
       )}
 
-      {/* Hevel Bar - Global bottom hit box */}
-      {!locked && !anyOverlay && (
-        <HevelBar 
-          onCloseApp={closeApp} 
-          appDragY={appDragY} 
+      {/* Nav bar — always reserved while unlocked */}
+      {!locked && !controlCenter && !utilityDrawer && (
+        <HevelBar
+          onGoHome={() => dispatch({ t: "goHome" })}
+          onPeekSwitcher={() => dispatch({ t: "peekSwitcher" })}
+          appDragY={appDragY}
           onScrubLeft={handleScrubLeft}
           onScrubRight={handleScrubRight}
         />
       )}
 
-      {/* Side Pill - Global edge panel */}
       {!locked && !anyOverlay && (
-        <SidePill 
-          onOpenUtilityDrawer={() => setUtilityDrawer(true)} 
-          onOpenAppSwitcher={() => setAppSwitcher(true)} 
+        <SidePill
+          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+          onOpenAppSwitcher={() => dispatch({ t: "peekSwitcher" })}
         />
       )}
 
-      {locked && <LockScreen onUnlock={() => setLocked(false)} />}
+      {locked && <LockScreen onUnlock={() => dispatch({ t: "unlock" })} />}
+
+      {debug && <GestureDebugOverlay />}
     </div>
   );
 };
