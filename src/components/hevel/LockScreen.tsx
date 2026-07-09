@@ -252,16 +252,17 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           className="flex flex-col items-center justify-center"
           style={{ height: containerH }}
         >
-          <span
-            className="font-serif italic animate-breathe"
+          <motion.span
+            className="font-serif italic"
             style={{
               fontSize: 14,
               color: "hsl(var(--muted-foreground) / 0.35)",
               letterSpacing: "0.04em",
+              opacity: breathOpacity,
             }}
           >
             enter passcode or use fingerprint
-          </span>
+          </motion.span>
 
           <div
             className={`flex items-center justify-center gap-5 mt-8 ${error ? "animate-shake" : ""}`}
