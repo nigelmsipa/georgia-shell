@@ -7,6 +7,7 @@ import { LockScreen } from "./LockScreen";
 import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AppSwitcher } from "./AppSwitcher";
+import { ProseLauncher } from "./ProseLauncher";
 import { AtmosphericBg } from "./AtmosphericBg";
 import { AnimatePresence, useMotionValue, motion } from "framer-motion";
 import { HevelBar } from "./HevelBar";
@@ -87,6 +88,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [controlCenter, setControlCenter] = React.useState(false);
   const [utilityDrawer, setUtilityDrawer] = React.useState(false);
   const [recents, setRecents] = React.useState<string[]>([]);
+  const [launcher, setLauncher] = React.useState(false);
   const [debug, setDebug] = React.useState<boolean>(() => isDebugGesturesEnabled());
 
   const appDragY = useMotionValue(0);
@@ -143,7 +145,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     if (idx > 0) dispatch({ t: "pickApp", name: recents[idx - 1] });
   };
 
-  const anyOverlay = controlCenter || utilityDrawer || nav.kind === "switcher";
+  const anyOverlay = controlCenter || utilityDrawer || nav.kind === "switcher" || launcher;
   const locked = nav.kind === "lock";
 
   // Top-edge gesture zone ref registration
@@ -176,8 +178,18 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
           onSwipeToNotifications={() => setNotifications(true)}
           onOpenControlCenter={() => setControlCenter(true)}
           onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+          onOpenLauncher={() => setLauncher(true)}
         />
       </div>
+
+      <ProseLauncher
+        open={launcher}
+        onClose={() => setLauncher(false)}
+        onOpenApp={(name) => {
+          setLauncher(false);
+          openApp(name);
+        }}
+      />
 
       <AnimatePresence>
         {notifications && <NotificationsPane key="notifications" open onClose={() => setNotifications(false)} />}
@@ -241,8 +253,8 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       {/* Nav bar — always reserved while unlocked */}
       {!locked && !controlCenter && !utilityDrawer && (
         <HevelBar
-          onGoHome={() => dispatch({ t: "goHome" })}
-          onPeekSwitcher={() => dispatch({ t: "peekSwitcher" })}
+          onGoHome={() => { setLauncher(false); dispatch({ t: "goHome" }); }}
+          onPeekSwitcher={() => { setLauncher(false); dispatch({ t: "peekSwitcher" }); }}
           appDragY={appDragY}
           onScrubLeft={handleScrubLeft}
           onScrubRight={handleScrubRight}
