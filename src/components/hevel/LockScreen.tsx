@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import { PhoneCall } from "lucide-react";
 import { AtmosphericBg } from "./AtmosphericBg";
+import { useBreathOpacity } from "./breathRhythm";
 
 interface Props {
   onUnlock: () => void;
