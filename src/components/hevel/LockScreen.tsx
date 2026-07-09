@@ -477,16 +477,17 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </span>
 
           {calling ? (
-            <span
-              className="font-serif italic mt-8 animate-breathe"
+            <motion.span
+              className="font-serif italic mt-8"
               style={{
                 fontSize: 15,
                 color: "hsl(var(--destructive) / 0.85)",
                 letterSpacing: "0.05em",
+                opacity: breathOpacity,
               }}
             >
               calling {emergencyDigits}…
-            </span>
+            </motion.span>
           ) : (
             <>
               <div className="mt-4 flex items-center gap-6">
