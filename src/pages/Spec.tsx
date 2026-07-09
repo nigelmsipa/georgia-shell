@@ -188,14 +188,15 @@ const Spec: React.FC = () => {
               </div>
               <div
                 ref={navContainerRef}
-                className="relative h-16 flex flex-col items-center justify-end"
-                style={{ width: 390, background: "hsl(var(--card))" }}
+                className="relative flex flex-col items-center justify-end"
+                style={{ width: PHONE_W_DP, height: NAV_ZONE_HEIGHT_DP, background: "hsl(var(--card))" }}
               >
                 <div
                   ref={pillRef}
-                  className="w-32 h-[4px] rounded-full bg-[hsl(var(--muted-foreground)/0.3)]"
+                  className="w-32 h-[4px] mb-3 rounded-full bg-[hsl(var(--muted-foreground)/0.3)]"
                 />
               </div>
+
             </div>
 
             {/* PIN key replica: matches LockScreen keypad button */}
