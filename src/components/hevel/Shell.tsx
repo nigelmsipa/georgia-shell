@@ -58,12 +58,22 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   // dragTarget: where the screen wants to be (instantly set by SidePill)
   // screenX:    what actually renders — a spring, so the screen has weight/lag
   const dragTarget = useMotionValue(0);
-  const screenX = useSpring(dragTarget, { stiffness: 280, damping: 26 });
-  const voidOpacity = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [0, 1]);
+  const screenX = useSpring(dragTarget, { stiffness: 220, damping: 30 });
+  const screenRotate = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [0, 5]);
+  const voidOpacity = useTransform(
+    dragTarget,
+    [0, SIDE_PILL_OPEN_DISTANCE * 0.3, SIDE_PILL_OPEN_DISTANCE],
+    [0, 0.35, 1],
+  );
+  const voidX = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [-40, 0]);
+  const voidScale = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [1.04, 1]);
   const screenShadow = useTransform(
     dragTarget,
     [0, SIDE_PILL_OPEN_DISTANCE],
-    ["0 0 0 rgba(0,0,0,0)", "-24px 0 48px rgba(0,0,0,0.55)"],
+    [
+      "0 0 0 rgba(0,0,0,0)",
+      "-8px 0 16px rgba(0,0,0,0.35), -32px 0 56px rgba(0,0,0,0.55)",
+    ],
   );
 
   const isSidePillOpen = state.kind === "SIDE_PILL";
@@ -136,9 +146,12 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-black">
+    <div className="relative w-full h-full overflow-hidden bg-black" style={{ perspective: 1200 }}>
       {/* The void — sits behind the screen. Only visible when pushed aside. */}
-      <motion.div className="absolute inset-0" style={{ opacity: voidOpacity }}>
+      <motion.div
+        className="absolute inset-0"
+        style={{ opacity: voidOpacity, x: voidX, scale: voidScale }}
+      >
         <HoldingStation />
       </motion.div>
 
@@ -147,6 +160,8 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
         className="absolute inset-0"
         style={{
           x: screenX,
+          rotateY: screenRotate,
+          transformOrigin: "left center",
           boxShadow: screenShadow,
           // Keep rounded corners of PhoneFrame visible during slide.
           borderRadius: "inherit",
