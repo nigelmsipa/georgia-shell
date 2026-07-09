@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RECENT_APPS, type AppEntry } from "./types";
 import { NAV_ZONE_HEIGHT_DP } from "./nav-contract";
+import { COVER_COMPONENTS } from "./covers/registry";
 
 interface Props {
   open: boolean;
