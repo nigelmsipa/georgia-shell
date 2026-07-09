@@ -46,7 +46,11 @@ export const GestureDebugOverlay: React.FC = () => {
     <div className="absolute inset-0 z-[9999] pointer-events-none">
       {zones.map((z) => {
         if (!z.measured) return null;
-        const overSize = z.measured.w > MAX_ZONE_DP || z.measured.h > MAX_ZONE_DP;
+        // Reserved rects legitimately span the full edge; oversize check
+        // targets only the edge-facing dimension (height for top/bottom, width for side).
+        const edgeDim = z.edge === "left" ? z.measured.w : z.measured.h;
+        const overSize = edgeDim > MAX_ZONE_DP;
+
         // Overlay is a sibling of the phone contents (which are all absolutely
         // positioned inside the same relative frame), so we can use the phone-
         // frame-relative box we measure against ourselves.
