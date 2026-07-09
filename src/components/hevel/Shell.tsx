@@ -87,6 +87,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [controlCenter, setControlCenter] = React.useState(false);
   const [utilityDrawer, setUtilityDrawer] = React.useState(false);
   const [recents, setRecents] = React.useState<string[]>([]);
+  const [launcher, setLauncher] = React.useState(false);
   const [debug, setDebug] = React.useState<boolean>(() => isDebugGesturesEnabled());
 
   const appDragY = useMotionValue(0);
