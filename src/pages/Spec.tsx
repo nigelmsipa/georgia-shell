@@ -1,4 +1,18 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  NAV_ZONE_HEIGHT_DP,
+  TOP_ZONE_HEIGHT_DP,
+  SIDE_ZONE_WIDTH_DP,
+  SWIPE_UP_HOME_DP,
+  SWIPE_UP_PEEK_DP,
+  SWIPE_SIDE_SCRUB_DP,
+  MAX_ZONE_DP,
+  PHONE_W_DP,
+  PHONE_H_DP,
+  isDebugGesturesEnabled,
+  setDebugGesturesEnabled,
+} from "../components/hevel/nav-contract";
+
 
 /* ── token list, mirrors :root in index.css ───────────────────────────── */
 const TOKENS = [
