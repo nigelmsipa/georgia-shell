@@ -50,7 +50,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   const [recents, setRecents] = useState<string[]>([]);
   const [dictating, setDictating] = useState(false);
   // Pill sits at vertical center of the screen; overlay blooms from there.
-  const dictationAnchorY = typeof window !== "undefined" ? window.innerHeight / 2 : 400;
+  const dictationAnchorY = "50%";
 
   const appDragY = useMotionValue(0);
 
