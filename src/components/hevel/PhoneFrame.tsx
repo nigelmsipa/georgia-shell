@@ -6,7 +6,7 @@ export const PhoneFrame: React.FC<{
   onNavigate?: (screen: string) => void;
 }> = ({ children, onNavigate }) => {
   const isMobile = useIsMobile();
-  const screens = ["Lock", "Home", "Launcher", "Recents", "Notifications", "Control Center", "Utility", "Settings"];
+  const screens = ["Lock", "Home", "Launcher", "Notifications", "Control Center", "Utility", "Settings"];
 
   // On mobile: fullscreen, no frame chrome
   if (isMobile) {
@@ -47,7 +47,7 @@ export const PhoneFrame: React.FC<{
             <button
               key={s}
               onClick={() => onNavigate(s)}
-              className="text-left text-caption font-mono px-3 py-1.5 rounded transition-colors text-foreground hover:bg-secondary"
+              className="text-left text-xs font-mono px-3 py-1.5 rounded transition-colors text-foreground hover:bg-secondary"
             >
               {s}
             </button>

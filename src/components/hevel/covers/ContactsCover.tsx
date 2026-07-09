@@ -11,7 +11,7 @@ export const ContactsCover: React.FC = () => {
     <div className="w-full h-full flex flex-col bg-card px-3 py-3 justify-between">
       <div>
         <p
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 7,
             color: "hsl(var(--muted-foreground) / 0.55)",
@@ -21,7 +21,7 @@ export const ContactsCover: React.FC = () => {
           CONTACTS
         </p>
         <p
-          className=""
+          className="font-serif"
           style={{
             fontSize: 9,
             marginTop: 8,
@@ -40,7 +40,7 @@ export const ContactsCover: React.FC = () => {
         {people.map((p) => (
           <div
             key={p.name}
-            className="flex items-center justify-center"
+            className="flex items-center justify-center font-serif"
             style={{
               width: 22,
               height: 22,
@@ -57,7 +57,7 @@ export const ContactsCover: React.FC = () => {
       </div>
 
       <p
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 7,
           color: "hsl(var(--accent) / 0.7)",

@@ -1,7 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { motion, PanInfo } from "framer-motion";
-import { SIDE_ZONE_WIDTH_DP } from "./nav-contract";
-import { registerGestureZone } from "./GestureDebugOverlay";
 
 interface Props {
   onOpenUtilityDrawer: () => void;
@@ -9,27 +7,29 @@ interface Props {
 }
 
 export const SidePill: React.FC<Props> = ({ onOpenUtilityDrawer, onOpenAppSwitcher }) => {
-  const zoneRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    registerGestureZone("side-left", zoneRef.current);
-    return () => registerGestureZone("side-left", null);
-  }, []);
-
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (e: any, info: PanInfo) => {
+    // We only care about inward (right) swipes from the left edge
     if (info.offset.x > 30 || info.velocity.x > 300) {
-      const angle = Math.atan2(info.offset.y, info.offset.x) * (180 / Math.PI);
-      if (angle > 30) onOpenAppSwitcher();
-      else onOpenUtilityDrawer();
+      // Calculate angle
+      // dx is positive, dy is positive if swiping down
+      const dx = info.offset.x;
+      const dy = info.offset.y;
+      
+      // Angle in degrees below horizontal (0 is straight right, 90 is straight down)
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      
+      if (angle > 30) {
+        // Diagonal down
+        onOpenAppSwitcher();
+      } else {
+        // Straight inward
+        onOpenUtilityDrawer();
+      }
     }
   };
 
   return (
-    <div
-      ref={zoneRef}
-      className="absolute left-0 top-[40%] bottom-[40%] flex items-center justify-start z-[90] touch-none"
-      style={{ width: SIDE_ZONE_WIDTH_DP }}
-    >
+    <div className="absolute left-0 top-[40%] bottom-[40%] w-4 flex items-center justify-start z-[90] touch-none">
       <motion.div
         className="w-1 h-16 rounded-r-md bg-[hsl(var(--muted-foreground)/0.3)] shadow-lg"
         drag

@@ -48,7 +48,7 @@ export const AppScreen: React.FC<Props> = ({
       {/* Status bar — time on left, whisper app name centered */}
       <div className="relative z-10 flex items-center justify-between px-5 pt-12 pb-3">
         <span
-          className="tracking-tight"
+          className="font-serif tracking-tight"
           style={{
             fontSize: 13,
             color: "hsl(var(--foreground) / 0.45)",
@@ -58,7 +58,7 @@ export const AppScreen: React.FC<Props> = ({
           {hours}:{minutes}
         </span>
         <span
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 11,
             color: "hsl(var(--muted-foreground) / 0.35)",

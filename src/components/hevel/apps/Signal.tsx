@@ -112,7 +112,7 @@ const Avatar: React.FC<{ name: string; hue: number; size?: number }> = ({ name, 
   const initial = name.trim().charAt(0).toUpperCase();
   return (
     <div
-      className="flex items-center justify-center"
+      className="flex items-center justify-center font-serif"
       style={{
         width: size,
         height: size,
@@ -215,7 +215,7 @@ const InboxView: React.FC<{
       {/* Heading prose */}
       <div className="px-6 pt-2 pb-3">
         <p
-          className=""
+          className="font-serif"
           style={{
             fontSize: 22,
             lineHeight: 1.25,
@@ -239,7 +239,7 @@ const InboxView: React.FC<{
           }}
         >
           <span
-            className="italic"
+            className="font-serif italic"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.5)", marginRight: 8 }}
           >
             find
@@ -249,7 +249,7 @@ const InboxView: React.FC<{
             onChange={(e) => setQuery(e.target.value)}
             placeholder="a name, a word…"
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex-1 bg-transparent outline-none"
+            className="flex-1 bg-transparent outline-none font-serif"
             style={{
               fontSize: 14,
               color: "hsl(var(--foreground) / 0.9)",
@@ -277,7 +277,7 @@ const InboxView: React.FC<{
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline justify-between gap-2">
                 <span
-                  className="truncate"
+                  className="font-serif truncate"
                   style={{
                     fontSize: 15,
                     color: "hsl(var(--foreground) / 0.92)",
@@ -287,7 +287,7 @@ const InboxView: React.FC<{
                   {c.name}
                 </span>
                 <span
-                  className="italic"
+                  className="font-serif italic"
                   style={{
                     fontSize: 11,
                     color: "hsl(var(--muted-foreground) / 0.55)",
@@ -298,7 +298,7 @@ const InboxView: React.FC<{
                 </span>
               </div>
               <p
-                className="truncate"
+                className="font-serif truncate"
                 style={{
                   fontSize: 13,
                   lineHeight: 1.4,
@@ -314,7 +314,7 @@ const InboxView: React.FC<{
             </div>
             {c.unread > 0 && (
               <span
-                className=""
+                className="font-serif"
                 style={{
                   fontSize: 10,
                   color: "hsl(var(--primary-foreground) / 0.95)",
@@ -333,7 +333,7 @@ const InboxView: React.FC<{
 
         {convos.length === 0 && (
           <p
-            className="italic text-center py-12"
+            className="font-serif italic text-center py-12"
             style={{
               fontSize: 13,
               color: "hsl(var(--muted-foreground) / 0.5)",
@@ -347,7 +347,7 @@ const InboxView: React.FC<{
       {/* Footer prose — new message hint */}
       <div className="px-6 py-3" style={{ borderTop: "1px solid hsl(var(--border) / 0.25)" }}>
         <p
-          className="italic"
+          className="font-serif italic"
           style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.55)" }}
         >
           tap a name to talk. swipe down to leave.
@@ -377,7 +377,7 @@ const ThreadView: React.FC<{
         <button
           onClick={onBack}
           onPointerDown={(e) => e.stopPropagation()}
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 13,
             color: "hsl(var(--muted-foreground) / 0.7)",
@@ -388,13 +388,13 @@ const ThreadView: React.FC<{
         <Avatar name={convo.name} hue={convo.hue} size={30} />
         <div className="flex-1 min-w-0">
           <p
-            className="truncate"
+            className="font-serif truncate"
             style={{ fontSize: 15, color: "hsl(var(--foreground) / 0.92)" }}
           >
             {convo.name}
           </p>
           <p
-            className="italic truncate"
+            className="font-serif italic truncate"
             style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.55)" }}
           >
             {convo.handle}
@@ -416,7 +416,7 @@ const ThreadView: React.FC<{
             style={{ alignItems: m.from === "me" ? "flex-end" : "flex-start" }}
           >
             <div
-              className=""
+              className="font-serif"
               style={{
                 maxWidth: "78%",
                 padding: "8px 12px",
@@ -435,7 +435,7 @@ const ThreadView: React.FC<{
               {m.text}
             </div>
             <span
-              className="italic"
+              className="font-serif italic"
               style={{
                 fontSize: 10,
                 color: "hsl(var(--muted-foreground) / 0.45)",
@@ -467,7 +467,7 @@ const ThreadView: React.FC<{
           }}
           placeholder="say something…"
           rows={1}
-          className="flex-1 bg-transparent outline-none resize-none"
+          className="flex-1 bg-transparent outline-none font-serif resize-none"
           style={{
             fontSize: 14,
             color: "hsl(var(--foreground) / 0.92)",
@@ -479,7 +479,7 @@ const ThreadView: React.FC<{
         <button
           onClick={onSend}
           disabled={!draft.trim()}
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 13,
             color: draft.trim()

@@ -43,14 +43,14 @@ export const AppOverlay: React.FC<Props> = ({ appName, onClose, onOpenUtilityDra
     >
       <AtmosphericBg />
       <span
-        className="text-display mb-8"
+        className="text-3xl font-serif mb-8"
         style={{ color: "hsl(var(--foreground) / 0.85)", textShadow: "0 0 40px rgba(215, 153, 33, 0.08)" }}
       >
         {appName}
       </span>
       <button
         onClick={onClose}
-        className="text-body transition-colors duration-200"
+        className="font-serif text-lg transition-colors duration-200"
         style={{ color: "hsl(var(--muted-foreground) / 0.4)" }}
       >
         ← back

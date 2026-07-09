@@ -26,7 +26,7 @@ export const HavelTubeCover: React.FC = () => (
         />
       </div>
       <div
-        className="absolute"
+        className="absolute font-serif"
         style={{
           right: 4,
           bottom: 4,
@@ -45,7 +45,7 @@ export const HavelTubeCover: React.FC = () => (
     <div className="flex-1 px-3 py-2.5 flex flex-col justify-between">
       <div>
         <p
-          className=""
+          className="font-serif"
           style={{
             fontSize: 9,
             lineHeight: 1.3,
@@ -59,20 +59,20 @@ export const HavelTubeCover: React.FC = () => (
           What we lose when we stop walking
         </p>
         <p
-          className="mt-1"
+          className="font-serif mt-1"
           style={{ fontSize: 7, color: "hsl(var(--muted-foreground) / 0.7)" }}
         >
           Slow Channel
         </p>
         <p
-          className=""
+          className="font-serif"
           style={{ fontSize: 6.5, color: "hsl(var(--muted-foreground) / 0.5)" }}
         >
           84K views · 2 days ago
         </p>
       </div>
       <p
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 6,
           color: "hsl(var(--accent) / 0.7)",

@@ -110,7 +110,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
     <div className="flex-1 flex flex-col overflow-y-auto px-6" style={{ paddingBottom: 100 }}>
       {/* whisper above title */}
       <span
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 11,
           color: "hsl(var(--muted-foreground) / 0.6)",
@@ -123,7 +123,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
 
       {/* large serif title */}
       <h1
-        className=""
+        className="font-serif"
         style={{
           fontSize: 30,
           fontWeight: 700,
@@ -138,7 +138,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
 
       {/* domain pill — prose style */}
       <div
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 11,
           color: "hsl(var(--accent) / 0.85)",
@@ -163,7 +163,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         {active.body.map((p, i) => (
           <p
             key={i}
-            className=""
+            className="font-serif"
             style={{
               fontSize: reader ? 18 : 15,
               lineHeight: 1.55,
@@ -177,12 +177,12 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
 
       {/* reader toggle as inline prose */}
       <div className="mt-6 flex items-center gap-2 flex-wrap">
-        <span className="italic" style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.6)" }}>
+        <span className="font-serif italic" style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.6)" }}>
           reading at
         </span>
         <button
           onClick={() => setReader(false)}
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 13,
             color: reader ? "hsl(var(--muted-foreground) / 0.5)" : "hsl(var(--primary))",
@@ -194,12 +194,12 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         >
           page width
         </button>
-        <span className="italic" style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.4)" }}>
+        <span className="font-serif italic" style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.4)" }}>
           ·
         </span>
         <button
           onClick={() => setReader(true)}
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 13,
             color: reader ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.5)",
@@ -211,7 +211,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         >
           comfortable
         </button>
-        <span className="italic" style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.6)" }}>
+        <span className="font-serif italic" style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.6)" }}>
           .
         </span>
       </div>
@@ -222,13 +222,13 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
   const TabsView = (
     <div className="flex-1 flex flex-col overflow-y-auto px-6" style={{ paddingBottom: 100 }}>
       <span
-        className="italic"
+        className="font-serif italic"
         style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.55)", marginTop: 12 }}
       >
         you have {tabs.length} {tabs.length === 1 ? "page" : "pages"} open.
       </span>
       <h2
-        className=""
+        className="font-serif"
         style={{ fontSize: 26, fontWeight: 700, lineHeight: 1.15, marginTop: 4, color: "hsl(var(--foreground) / 0.9)" }}
       >
         wander between them.
@@ -243,7 +243,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
             <div key={t.id} className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
                 <span
-                  className="italic"
+                  className="font-serif italic"
                   style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.4)" }}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -253,7 +253,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
                     setActiveId(t.id);
                     setView("reading");
                   }}
-                  className="text-left"
+                  className="font-serif text-left"
                   style={{
                     fontSize: 19,
                     fontWeight: isActive ? 700 : 500,
@@ -269,21 +269,21 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
                 </button>
               </div>
               <span
-                className="italic"
+                className="font-serif italic"
                 style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.55)", paddingLeft: 22 }}
               >
                 {t.whisper}.
               </span>
               <div className="flex items-center gap-3" style={{ paddingLeft: 22, marginTop: 2 }}>
                 <span
-                  className=""
+                  className="font-serif"
                   style={{ fontSize: 10, color: "hsl(var(--accent) / 0.7)" }}
                 >
                   {t.domain}
                 </span>
                 <button
                   onClick={() => closeTab(t.id)}
-                  className="italic"
+                  className="font-serif italic"
                   style={{
                     fontSize: 11,
                     color: "hsl(var(--destructive) / 0.7)",
@@ -306,13 +306,13 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
   const ElsewhereView = (
     <div className="flex-1 flex flex-col overflow-y-auto px-6" style={{ paddingBottom: 100 }}>
       <span
-        className="italic"
+        className="font-serif italic"
         style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.55)", marginTop: 12 }}
       >
         somewhere to go?
       </span>
       <h2
-        className=""
+        className="font-serif"
         style={{ fontSize: 26, fontWeight: 700, lineHeight: 1.15, marginTop: 4, color: "hsl(var(--foreground) / 0.9)" }}
       >
         type, or pick a familiar place.
@@ -327,7 +327,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         }}
       >
         <span
-          className="italic"
+          className="font-serif italic"
           style={{ fontSize: 14, color: "hsl(var(--muted-foreground) / 0.55)" }}
         >
           go to
@@ -339,7 +339,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
             if (e.key === "Enter" && draftUrl.trim()) openNewTab(draftUrl.trim());
           }}
           placeholder="somewhere quiet…"
-          className="flex-1 italic bg-transparent outline-none"
+          className="flex-1 font-serif italic bg-transparent outline-none"
           style={{
             fontSize: 16,
             color: "hsl(var(--foreground) / 0.9)",
@@ -350,7 +350,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
       <div style={{ height: 1, background: "hsl(var(--foreground) / 0.08)", margin: "24px 0 16px" }} />
 
       <span
-        className="italic"
+        className="font-serif italic"
         style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.5)", letterSpacing: "0.04em" }}
       >
         places you keep
@@ -361,7 +361,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
           <div key={b.label} className="flex flex-col">
             <button
               onClick={() => openNewTab(b.label)}
-              className="text-left"
+              className="font-serif text-left"
               style={{
                 fontSize: 17,
                 fontWeight: 600,
@@ -376,7 +376,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
               {b.label}
             </button>
             <span
-              className="italic"
+              className="font-serif italic"
               style={{ fontSize: 12, color: "hsl(var(--muted-foreground) / 0.55)" }}
             >
               {b.whisper}.
@@ -388,7 +388,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
       <div style={{ height: 1, background: "hsl(var(--foreground) / 0.08)", margin: "24px 0 16px" }} />
 
       <span
-        className="italic"
+        className="font-serif italic"
         style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.5)", letterSpacing: "0.04em" }}
       >
         where you've been
@@ -397,7 +397,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         {HISTORY.map((h, i) => (
           <span
             key={i}
-            className="italic"
+            className="font-serif italic"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground) / 0.6)", lineHeight: 1.5 }}
           >
             {h}.
@@ -423,7 +423,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         }}
       >
         <div
-          className="flex items-baseline justify-center gap-2 flex-wrap italic"
+          className="flex items-baseline justify-center gap-2 flex-wrap font-serif italic"
           style={{
             fontSize: 14,
             color: "hsl(var(--muted-foreground) / 0.7)",
@@ -437,7 +437,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
         >
           <button
             onClick={() => setView("reading")}
-            className="italic"
+            className="font-serif italic"
             style={{
               fontSize: 14,
               fontWeight: view === "reading" ? 700 : 400,
@@ -452,7 +452,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
           <span style={{ color: "hsl(var(--muted-foreground) / 0.35)" }}>·</span>
           <button
             onClick={() => setView("tabs")}
-            className="italic"
+            className="font-serif italic"
             style={{
               fontSize: 14,
               fontWeight: view === "tabs" ? 700 : 400,
@@ -467,7 +467,7 @@ export const Angelfish: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => 
           <span style={{ color: "hsl(var(--muted-foreground) / 0.35)" }}>·</span>
           <button
             onClick={() => setView("elsewhere")}
-            className="italic"
+            className="font-serif italic"
             style={{
               fontSize: 14,
               fontWeight: view === "elsewhere" ? 700 : 400,

@@ -14,7 +14,7 @@ const Toggle: React.FC<{
 }> = ({ label, active, onToggle }) => (
   <span
     onClick={(e) => { e.stopPropagation(); onToggle(); }}
-    className="italic cursor-pointer select-none"
+    className="font-serif italic cursor-pointer select-none"
     style={{
       fontWeight: active ? 600 : 400,
       color: active
@@ -37,7 +37,7 @@ const Toggle: React.FC<{
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
-    className=""
+    className="font-serif"
     style={{
       fontSize: 10,
       letterSpacing: "0.12em",
@@ -55,7 +55,7 @@ const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 const Prose: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
-    className=""
+    className="font-serif"
     style={{
       fontSize: 15,
       lineHeight: 1.7,
@@ -81,14 +81,14 @@ export const SettingsApp: React.FC<Props> = ({ onClose }) => {
       {/* Header */}
       <div className="px-6 pt-14 pb-2 flex justify-between items-baseline">
         <span
-          className=""
+          className="font-serif"
           style={{ fontSize: 28, fontWeight: 300, color: "hsl(var(--foreground))" }}
         >
           Settings
         </span>
         <button
           onClick={onClose}
-          className="italic"
+          className="font-serif italic"
           style={{
             fontSize: 13,
             color: "hsl(var(--muted-foreground) / 0.4)",
@@ -114,7 +114,7 @@ export const SettingsApp: React.FC<Props> = ({ onClose }) => {
         <Prose>
           Your shell is wearing{" "}
           <span
-            className="italic"
+            className="font-serif italic"
             style={{ fontWeight: 600, color: "hsl(var(--primary))" }}
           >
             {ALL_SCHEMES.find(([s]) => s === scheme)?.[1].label}
@@ -191,7 +191,7 @@ export const SettingsApp: React.FC<Props> = ({ onClose }) => {
         </Prose>
 
         <div
-          className="italic mt-6"
+          className="font-serif italic mt-6"
           style={{ fontSize: 11, color: "hsl(var(--muted-foreground) / 0.2)" }}
         >
           v0.1 — a thing that is still becoming

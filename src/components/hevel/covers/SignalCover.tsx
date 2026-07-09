@@ -4,7 +4,7 @@ export const SignalCover: React.FC = () => (
   <div className="w-full h-full flex flex-col bg-card px-3 py-3 justify-between">
     <div>
       <p
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 7,
           color: "hsl(var(--muted-foreground) / 0.55)",
@@ -14,7 +14,7 @@ export const SignalCover: React.FC = () => (
         SIGNAL
       </p>
       <p
-        className=""
+        className="font-serif"
         style={{
           fontSize: 9,
           marginTop: 8,
@@ -26,7 +26,7 @@ export const SignalCover: React.FC = () => (
         <span style={{ color: "hsl(var(--muted-foreground) / 0.55)" }}> · 2m</span>
       </p>
       <p
-        className=""
+        className="font-serif"
         style={{
           fontSize: 7.5,
           marginTop: 3,
@@ -47,7 +47,7 @@ export const SignalCover: React.FC = () => (
         }}
       />
       <p
-        className=""
+        className="font-serif"
         style={{
           fontSize: 7,
           color: "hsl(var(--muted-foreground) / 0.55)",
@@ -57,7 +57,7 @@ export const SignalCover: React.FC = () => (
         <span style={{ color: "hsl(var(--foreground) / 0.8)" }}>jonas</span> · golden hour around 7.
       </p>
       <p
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 6.5,
           marginTop: 6,

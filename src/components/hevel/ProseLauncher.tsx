@@ -119,7 +119,7 @@ const Scrubber: React.FC<{
         return (
           <span
             key={l}
-            className="block text-center"
+            className="font-serif block text-center"
             style={{
               fontSize: isCur ? 18 : isNear ? 11 : 9,
               fontWeight: isCur ? 700 : 400,
@@ -194,7 +194,7 @@ const AppItem: React.FC<{
       }}
     >
       <span
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 18,
           fontWeight: 500,
@@ -304,7 +304,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
           >
             <div className="px-6 mb-1">
               <div
-                className="italic mb-3"
+                className="font-serif italic mb-3"
                 style={{
                   fontSize: 10,
                   letterSpacing: "0.08em",
@@ -322,7 +322,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                       onOpenApp(app);
                       dismiss();
                     }}
-                    className="italic font-bold cursor-pointer select-none"
+                    className="font-serif italic font-bold cursor-pointer select-none"
                     style={{
                       fontSize: 21,
                       color: "hsl(var(--primary))",
@@ -344,7 +344,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
               {/* Letter heading */}
               {showLetter && (
                 <div
-                  className="italic"
+                  className="font-serif italic"
                   style={{
                     fontSize: 64,
                     fontWeight: 700,
@@ -361,7 +361,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
               {/* Search result count */}
               {showSearch && (
                 <div
-                  className="italic mb-3"
+                  className="font-serif italic mb-3"
                   style={{
                     fontSize: 13,
                     color: "hsl(var(--muted-foreground) / 0.4)",
@@ -389,7 +389,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                 {/* Resting hint */}
                 {showFavs && visibleApps.length === 0 && (
                   <div
-                    className="italic mt-8"
+                    className="font-serif italic mt-8"
                     style={{
                       fontSize: 14,
                       color: "hsl(var(--muted-foreground) / 0.2)",
@@ -400,7 +400,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                 )}
                 {showSearch && filtered.length === 0 && (
                   <div
-                    className="italic mt-4"
+                    className="font-serif italic mt-4"
                     style={{
                       fontSize: 14,
                       color: "hsl(var(--muted-foreground) / 0.2)",
@@ -457,7 +457,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
                 }
               }}
               placeholder="search…"
-              className="flex-1 bg-transparent italic text-caption outline-none"
+              className="flex-1 bg-transparent font-serif italic text-sm outline-none"
               style={{
                 color: "hsl(var(--foreground) / 0.7)",
                 caretColor: "hsl(var(--primary))",
@@ -467,7 +467,7 @@ export const ProseLauncher: React.FC<Props> = ({ open, onClose, onOpenApp }) => 
             {search ? (
               <button
                 onClick={() => setSearch("")}
-                className="text-caption"
+                className="font-serif text-sm"
                 style={{
                   background: "none",
                   border: "none",

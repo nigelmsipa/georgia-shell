@@ -3,7 +3,7 @@ import React from "react";
 export const AIChatCover: React.FC = () => (
   <div className="w-full h-full flex flex-col justify-between px-3 py-4 bg-card">
     <span
-      className="italic"
+      className="font-serif italic"
       style={{
         fontSize: 7,
         color: "hsl(var(--muted-foreground) / 0.5)",
@@ -14,7 +14,7 @@ export const AIChatCover: React.FC = () => (
     </span>
     <div className="flex flex-col gap-1.5">
       <p
-        className="italic text-right"
+        className="font-serif italic text-right"
         style={{
           fontSize: 8,
           lineHeight: 1.4,
@@ -24,7 +24,7 @@ export const AIChatCover: React.FC = () => (
         i can't focus today.
       </p>
       <p
-        className=""
+        className="font-serif"
         style={{
           fontSize: 8,
           lineHeight: 1.5,

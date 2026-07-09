@@ -32,7 +32,7 @@ export const MusicCover: React.FC = () => (
     <div className="flex-1 px-3 py-2.5 flex flex-col justify-between">
       <div>
         <p
-          className=""
+          className="font-serif"
           style={{
             fontSize: 9,
             lineHeight: 1.3,
@@ -42,20 +42,20 @@ export const MusicCover: React.FC = () => (
           So What
         </p>
         <p
-          className=""
+          className="font-serif"
           style={{ fontSize: 7, color: "hsl(var(--muted-foreground) / 0.7)" }}
         >
           Miles Davis
         </p>
         <p
-          className="italic"
+          className="font-serif italic"
           style={{ fontSize: 6.5, color: "hsl(var(--accent) / 0.7)" }}
         >
           now playing
         </p>
       </div>
       <p
-        className="italic"
+        className="font-serif italic"
         style={{
           fontSize: 6,
           color: "hsl(var(--muted-foreground) / 0.5)",

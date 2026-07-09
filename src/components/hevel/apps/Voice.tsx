@@ -126,7 +126,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         {/* Mode prose line at top */}
         <div className="mb-6">
           <p
-            className="italic"
+            className="font-serif italic"
             style={{
               fontSize: 14,
               lineHeight: 1.7,
@@ -138,7 +138,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               <React.Fragment key={t}>
                 <button
                   onClick={() => setTarget(t)}
-                  className="italic transition-colors active:opacity-70"
+                  className="font-serif italic transition-colors active:opacity-70"
                   style={{
                     color:
                       target === t
@@ -162,7 +162,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
         <div className="flex-1 flex flex-col justify-start overflow-y-auto" style={{ scrollbarWidth: "none" }}>
           {phase === "idle" && (
             <p
-              className="italic"
+              className="font-serif italic"
               style={{
                 fontSize: 22,
                 lineHeight: 1.5,
@@ -175,7 +175,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
 
           {(phase === "listening" || phase === "thinking") && (
             <p
-              className=""
+              className="font-serif"
               style={{
                 fontSize: 22,
                 lineHeight: 1.55,
@@ -220,7 +220,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             <div>
               {/* faded "before" */}
               <p
-                className="italic mb-4"
+                className="font-serif italic mb-4"
                 style={{
                   fontSize: 13,
                   lineHeight: 1.6,
@@ -232,7 +232,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
                 {words.join(" ")}
               </p>
               <p
-                className=""
+                className="font-serif"
                 style={{
                   fontSize: 22,
                   lineHeight: 1.55,
@@ -262,7 +262,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
             <div className="flex items-center gap-5">
               <button
                 onClick={handleRetry}
-                className="italic active:opacity-60 transition-opacity"
+                className="font-serif italic active:opacity-60 transition-opacity"
                 style={{
                   fontSize: 13,
                   color: "hsl(var(--muted-foreground) / 0.55)",
@@ -273,7 +273,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
               </button>
               <button
                 onClick={handleSend}
-                className="italic active:opacity-60 transition-opacity"
+                className="font-serif italic active:opacity-60 transition-opacity"
                 style={{
                   fontSize: 15,
                   color: "hsl(var(--primary))",
@@ -290,7 +290,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
 
           {phase === "sent" && (
             <p
-              className="italic"
+              className="font-serif italic"
               style={{
                 fontSize: 13,
                 color: "hsl(var(--accent, var(--primary)))",
@@ -371,7 +371,7 @@ export const Voice: React.FC<Props> = ({ onClose, onOpenUtilityDrawer }) => {
           </button>
 
           <p
-            className="italic text-center"
+            className="font-serif italic text-center"
             style={{
               fontSize: 11,
               color: "hsl(var(--muted-foreground) / 0.4)",

@@ -5,7 +5,7 @@ export const NotesCover: React.FC = () => (
     <span className="text-[7px] tracking-[0.15em] font-bold uppercase mb-1.5 text-primary">
       idea — 03:14
     </span>
-    <p className="text-[8px] leading-[1.5] text-foreground">
+    <p className="text-[8px] leading-[1.5] font-serif text-foreground">
       the shell as paragraph. nothing is a button until you read it.
     </p>
   </div>
