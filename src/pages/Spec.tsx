@@ -1,4 +1,18 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  NAV_ZONE_HEIGHT_DP,
+  TOP_ZONE_HEIGHT_DP,
+  SIDE_ZONE_WIDTH_DP,
+  SWIPE_UP_HOME_DP,
+  SWIPE_UP_PEEK_DP,
+  SWIPE_SIDE_SCRUB_DP,
+  MAX_ZONE_DP,
+  PHONE_W_DP,
+  PHONE_H_DP,
+  isDebugGesturesEnabled,
+  setDebugGesturesEnabled,
+} from "../components/hevel/nav-contract";
+
 
 /* ── token list, mirrors :root in index.css ───────────────────────────── */
 const TOKENS = [
@@ -174,14 +188,15 @@ const Spec: React.FC = () => {
               </div>
               <div
                 ref={navContainerRef}
-                className="relative h-16 flex flex-col items-center justify-end"
-                style={{ width: 390, background: "hsl(var(--card))" }}
+                className="relative flex flex-col items-center justify-end"
+                style={{ width: PHONE_W_DP, height: NAV_ZONE_HEIGHT_DP, background: "hsl(var(--card))" }}
               >
                 <div
                   ref={pillRef}
-                  className="w-32 h-[4px] rounded-full bg-[hsl(var(--muted-foreground)/0.3)]"
+                  className="w-32 h-[4px] mb-3 rounded-full bg-[hsl(var(--muted-foreground)/0.3)]"
                 />
               </div>
+
             </div>
 
             {/* PIN key replica: matches LockScreen keypad button */}
@@ -238,9 +253,90 @@ const Spec: React.FC = () => {
             )}
           </div>
         </section>
+
+        {/* ── (4) Navigation reservation ─────────────────────────── */}
+        <NavigationSection />
       </div>
     </main>
+
+  );
+};
+
+/* ── Navigation reservation section ─────────────────────────────────── */
+
+const NAV_CONTRACT_ROWS: [string, string][] = [
+  ["NAV_ZONE_HEIGHT_DP", `${NAV_ZONE_HEIGHT_DP} dp`],
+  ["TOP_ZONE_HEIGHT_DP", `${TOP_ZONE_HEIGHT_DP} dp`],
+  ["SIDE_ZONE_WIDTH_DP", `${SIDE_ZONE_WIDTH_DP} dp`],
+  ["SWIPE_UP_HOME_DP",   `${SWIPE_UP_HOME_DP} dp`],
+  ["SWIPE_UP_PEEK_DP",   `${SWIPE_UP_PEEK_DP} dp`],
+  ["SWIPE_SIDE_SCRUB_DP",`${SWIPE_SIDE_SCRUB_DP} dp`],
+  ["MAX_ZONE_DP",        `${MAX_ZONE_DP} dp (warning threshold)`],
+];
+
+const NavigationSection: React.FC = () => {
+  const [debug, setDebug] = useState<boolean>(() => isDebugGesturesEnabled());
+
+  const toggleDebug = () => {
+    const next = !debug;
+    setDebugGesturesEnabled(next);
+    setDebug(next);
+  };
+
+  // Reserved-area math (from contract)
+  const bottomArea = PHONE_W_DP * NAV_ZONE_HEIGHT_DP;
+  const topArea = PHONE_W_DP * TOP_ZONE_HEIGHT_DP;
+  const sideArea = SIDE_ZONE_WIDTH_DP * Math.round(PHONE_H_DP * 0.2);
+  const reservedTotal = bottomArea + topArea + sideArea;
+  const totalPhone = PHONE_W_DP * PHONE_H_DP;
+  const pct = ((reservedTotal / totalPhone) * 100).toFixed(1);
+
+  return (
+    <section className="mb-16">
+      <h2 className="text-title mb-6">Navigation reservation</h2>
+
+      <div className="flex flex-col gap-2 font-mono text-caption mb-6">
+        {NAV_CONTRACT_ROWS.map(([k, v]) => (
+          <div key={k} className="flex gap-6">
+            <span className="w-56 text-muted-foreground">{k}</span>
+            <span>{v}</span>
+          </div>
+        ))}
+        <div className="flex gap-6 mt-2">
+          <span className="w-56 text-muted-foreground">Reserved area</span>
+          <span>
+            {reservedTotal.toLocaleString()} dp² ({pct}% of {PHONE_W_DP}×{PHONE_H_DP})
+          </span>
+        </div>
+        <div className="flex gap-6">
+          <span className="w-56 text-muted-foreground">bottom rect</span>
+          <span>{PHONE_W_DP} × {NAV_ZONE_HEIGHT_DP} dp</span>
+        </div>
+        <div className="flex gap-6">
+          <span className="w-56 text-muted-foreground">top rect</span>
+          <span>{PHONE_W_DP} × {TOP_ZONE_HEIGHT_DP} dp</span>
+        </div>
+        <div className="flex gap-6">
+          <span className="w-56 text-muted-foreground">side rect</span>
+          <span>{SIDE_ZONE_WIDTH_DP} × {Math.round(PHONE_H_DP * 0.2)} dp</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <button
+          onClick={toggleDebug}
+          className="tap-target px-4 border border-border text-caption"
+          style={{ background: debug ? "hsl(var(--primary) / 0.2)" : "transparent" }}
+        >
+          {debug ? "hide" : "show"} gesture overlay
+        </button>
+        <span className="text-caption text-muted-foreground">
+          persists in localStorage · also enable via <span className="font-mono">?debug=gestures</span>
+        </span>
+      </div>
+    </section>
   );
 };
 
 export default Spec;
+
