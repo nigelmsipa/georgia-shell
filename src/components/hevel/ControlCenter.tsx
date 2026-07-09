@@ -453,11 +453,11 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                   <button
                     key={id}
                     onClick={() => setScheme(id)}
-                    className="flex-shrink-0 transition-all duration-200"
-                    style={{ scrollSnapAlign: "start", width: 44 }}
+                    className="tap-target flex-shrink-0 flex-col transition-all duration-200"
+                    style={{ scrollSnapAlign: "start", width: 48, minWidth: 48 }}
                   >
                     <div
-                      className={`w-[44px] h-[44px] rounded-sm overflow-hidden transition-all duration-200 ${
+                      className={`w-[44px] h-[44px] overflow-hidden transition-all duration-200 ${
                         active
                           ? "ring-2 ring-foreground/40 scale-105"
                           : "opacity-50"
@@ -468,7 +468,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                     >
                       <div className="w-full h-full flex items-center justify-center">
                         <div
-                          className="w-2 h-2 rounded-full"
+                          className="w-2 h-2"
                           style={{
                             backgroundColor: meta.colors[2],
                             opacity: 0.9,
@@ -486,6 +486,7 @@ export const ControlCenter: React.FC<Props> = ({ open, onClose }) => {
                       {meta.label.split(" ")[0]}
                     </span>
                   </button>
+
                 );
               })}
             </div>
