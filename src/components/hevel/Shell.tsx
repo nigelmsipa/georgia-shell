@@ -238,8 +238,20 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
               isOpen={isSidePillOpen}
               onOpen={() => dispatch({ type: "OPEN_SIDE_PILL" })}
               onClose={closeSidePill}
+              onTap={() => setDictating(true)}
             />
           )}
+
+          <AnimatePresence>
+            {dictating && (
+              <DictationOverlay
+                key="dictation"
+                anchorY={dictationAnchorY}
+                onDismiss={() => setDictating(false)}
+              />
+            )}
+          </AnimatePresence>
+
 
           {locked && <LockScreen onUnlock={() => dispatch({ type: "UNLOCK" })} />}
 
