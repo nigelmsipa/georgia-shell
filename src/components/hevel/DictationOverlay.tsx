@@ -17,8 +17,8 @@ const SCRIPT =
 
 interface Props {
   onDismiss: (mode: "accept" | "delete") => void;
-  /** Vertical anchor in px from top — usually pill's Y center. */
-  anchorY: number;
+  /** Vertical anchor (any CSS value) — usually the pill's Y center. */
+  anchorY: number | string;
 }
 
 export const DictationOverlay: React.FC<Props> = ({ onDismiss, anchorY }) => {
