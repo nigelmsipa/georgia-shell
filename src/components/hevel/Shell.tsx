@@ -253,8 +253,8 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       {/* Nav bar — always reserved while unlocked */}
       {!locked && !controlCenter && !utilityDrawer && (
         <HevelBar
-          onGoHome={() => dispatch({ t: "goHome" })}
-          onPeekSwitcher={() => dispatch({ t: "peekSwitcher" })}
+          onGoHome={() => { setLauncher(false); dispatch({ t: "goHome" }); }}
+          onPeekSwitcher={() => { setLauncher(false); dispatch({ t: "peekSwitcher" }); }}
           appDragY={appDragY}
           onScrubLeft={handleScrubLeft}
           onScrubRight={handleScrubRight}
