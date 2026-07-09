@@ -8,7 +8,8 @@ import { SettingsApp } from "./SettingsApp";
 import { UtilityDrawer } from "./UtilityDrawer";
 import { AppSwitcher } from "./AppSwitcher";
 import { AtmosphericBg } from "./AtmosphericBg";
-import { AnimatePresence, useMotionValue, motion } from "framer-motion";
+import { HoldingStation } from "./HoldingStation";
+import { AnimatePresence, useMotionValue, useSpring, useTransform, motion, animate } from "framer-motion";
 import { HevelBar } from "./HevelBar";
 import { SidePill } from "./SidePill";
 import { AIChat } from "./apps/AIChat";
@@ -20,6 +21,9 @@ import { Angelfish } from "./apps/Angelfish";
 import { Voice } from "./apps/Voice";
 import { Phone } from "./apps/Phone";
 import { useShellMachine, type ShellState } from "./shellMachine";
+
+/** How far the screen slides aside when the Side Pill reveal is fully open. */
+const SIDE_PILL_OPEN_DISTANCE = 240;
 
 type MockAppProps = {
   onClose: () => void;
@@ -40,16 +44,39 @@ const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
   const { state, dispatch } = useShellMachine();
 
-  // Orthogonal overlays — not part of the top-level state machine.
   const [utilityDrawer, setUtilityDrawer] = useState(false);
   const [appSwitcher, setAppSwitcher] = useState(false);
   const [recents, setRecents] = useState<string[]>([]);
 
   const appDragY = useMotionValue(0);
 
+  // --- Side Pill reveal ---
+  // dragTarget: where the screen wants to be (instantly set by SidePill)
+  // screenX:    what actually renders — a spring, so the screen has weight/lag
+  const dragTarget = useMotionValue(0);
+  const screenX = useSpring(dragTarget, { stiffness: 280, damping: 26 });
+  const voidOpacity = useTransform(dragTarget, [0, SIDE_PILL_OPEN_DISTANCE], [0, 1]);
+  const screenShadow = useTransform(
+    dragTarget,
+    [0, SIDE_PILL_OPEN_DISTANCE],
+    ["0 0 0 rgba(0,0,0,0)", "-24px 0 48px rgba(0,0,0,0.55)"],
+  );
+
+  const isSidePillOpen = state.kind === "SIDE_PILL";
+
+  const closeSidePill = () => {
+    animate(dragTarget, 0, { type: "spring", stiffness: 280, damping: 26 });
+    if (isSidePillOpen) dispatch({ type: "DISMISS_SIDE_PILL" });
+  };
+
   // Derived render flags
   const locked = state.kind === "LOCK_CLOCK" || state.kind === "LOCK_PIN";
-  const runningApp = state.kind === "APP_FOREGROUND" ? state.app : null;
+  const runningApp =
+    state.kind === "APP_FOREGROUND"
+      ? state.app
+      : state.kind === "SIDE_PILL" && state.previous === "APP_FOREGROUND"
+      ? state.app ?? null
+      : null;
   const notifications = state.kind === "NOTIFICATIONS";
   const controlCenter = state.kind === "CONTROL_CENTER";
   const anyOverlay = controlCenter || utilityDrawer || appSwitcher;
@@ -59,6 +86,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     if (!navigateTo) return;
     setUtilityDrawer(false);
     setAppSwitcher(false);
+    closeSidePill();
 
     const targets: Record<string, ShellState> = {
       Lock: { kind: "LOCK_CLOCK" },
@@ -74,6 +102,7 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       dispatch({ type: "DEBUG_GOTO", target: { kind: "HOME" } });
       setUtilityDrawer(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigateTo, dispatch]);
 
   const openApp = (name: string) => {
@@ -81,7 +110,10 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
     setRecents((prev) => [name, ...prev.filter((a) => a !== name)]);
   };
 
-  const requestHome = () => dispatch({ type: "REQUEST_HOME" });
+  const requestHome = () => {
+    closeSidePill();
+    dispatch({ type: "REQUEST_HOME" });
+  };
 
   const handleScrubLeft = () => {
     if (!runningApp || recents.length <= 1) return;
@@ -100,96 +132,128 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <AtmosphericBg />
-      {/* Base layer: Home */}
-      <div
-        className="absolute inset-0 transition-all duration-350"
+    <div className="relative w-full h-full overflow-hidden bg-black">
+      {/* The void — sits behind the screen. Only visible when pushed aside. */}
+      <motion.div className="absolute inset-0" style={{ opacity: voidOpacity }}>
+        <HoldingStation />
+      </motion.div>
+
+      {/* The screen layer — everything the user normally sees. Slides as one piece. */}
+      <motion.div
+        className="absolute inset-0"
         style={{
-          filter: anyOverlay ? "blur(12px) brightness(0.7)" : "none",
-          transform: anyOverlay ? "scale(1.02)" : "scale(1)",
-          transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+          x: screenX,
+          boxShadow: screenShadow,
+          // Keep rounded corners of PhoneFrame visible during slide.
+          borderRadius: "inherit",
         }}
       >
-        <HomeScreen
-          onOpenApp={openApp}
-          onSwipeToNotifications={() => dispatch({ type: "OPEN_NOTIFICATIONS" })}
-          onOpenControlCenter={() => dispatch({ type: "OPEN_CONTROL_CENTER" })}
-          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
-        />
-      </div>
+        <div className="relative w-full h-full overflow-hidden">
+          <AtmosphericBg />
 
-      <AnimatePresence>
-        {notifications && (
-          <NotificationsPane key="notifications" open={true} onClose={requestHome} />
-        )}
-      </AnimatePresence>
-      <ControlCenter open={controlCenter} onClose={requestHome} />
-      <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
-      <AppSwitcher open={appSwitcher} onClose={() => setAppSwitcher(false)} onOpenApp={openApp} />
+          {/* Base layer: Home */}
+          <div
+            className="absolute inset-0 transition-all duration-350"
+            style={{
+              filter: anyOverlay ? "blur(12px) brightness(0.7)" : "none",
+              transform: anyOverlay ? "scale(1.02)" : "scale(1)",
+              transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <HomeScreen
+              onOpenApp={openApp}
+              onSwipeToNotifications={() => dispatch({ type: "OPEN_NOTIFICATIONS" })}
+              onOpenControlCenter={() => dispatch({ type: "OPEN_CONTROL_CENTER" })}
+              onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+            />
+          </div>
 
-      <AnimatePresence>
-        {runningApp && runningApp === "Settings" && (
-          <SettingsApp key="settings" onClose={requestHome} />
-        )}
-        {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
-          (() => {
-            const App = MOCK_APPS[runningApp];
-            return (
-              <App
+          <AnimatePresence>
+            {notifications && (
+              <NotificationsPane key="notifications" open={true} onClose={requestHome} />
+            )}
+          </AnimatePresence>
+          <ControlCenter open={controlCenter} onClose={requestHome} />
+          <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
+          <AppSwitcher open={appSwitcher} onClose={() => setAppSwitcher(false)} onOpenApp={openApp} />
+
+          <AnimatePresence>
+            {runningApp && runningApp === "Settings" && (
+              <SettingsApp key="settings" onClose={requestHome} />
+            )}
+            {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
+              (() => {
+                const App = MOCK_APPS[runningApp];
+                return (
+                  <App
+                    key={runningApp}
+                    onClose={requestHome}
+                    onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+                    appDragY={appDragY}
+                  />
+                );
+              })()
+            )}
+            {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
+              <AppOverlay
                 key={runningApp}
+                appName={runningApp}
                 onClose={requestHome}
                 onOpenUtilityDrawer={() => setUtilityDrawer(true)}
                 appDragY={appDragY}
               />
-            );
-          })()
-        )}
-        {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
-          <AppOverlay
-            key={runningApp}
-            appName={runningApp}
-            onClose={requestHome}
-            onOpenUtilityDrawer={() => setUtilityDrawer(true)}
-            appDragY={appDragY}
-          />
-        )}
-      </AnimatePresence>
+            )}
+          </AnimatePresence>
 
-      {/* Top Edge Hitbox — HOME-only per the machine. */}
-      {state.kind === "HOME" && (
-        <motion.div
-          className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-          dragElastic={0.1}
-          onDragEnd={(e, info) => {
-            if (info.offset.y > 30 || info.velocity.y > 300) {
-              dispatch({ type: "OPEN_CONTROL_CENTER" });
-            }
-          }}
-        />
-      )}
+          {/* Top Edge Hitbox — HOME-only per the machine. */}
+          {state.kind === "HOME" && (
+            <motion.div
+              className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+              dragElastic={0.1}
+              onDragEnd={(e, info) => {
+                if (info.offset.y > 30 || info.velocity.y > 300) {
+                  dispatch({ type: "OPEN_CONTROL_CENTER" });
+                }
+              }}
+            />
+          )}
 
-      {/* Hevel Bar — always mounted post-unlock. Swipe-up always requests HOME. */}
-      {!locked && !anyOverlay && (
-        <HevelBar
-          onCloseApp={requestHome}
-          appDragY={appDragY}
-          onScrubLeft={handleScrubLeft}
-          onScrubRight={handleScrubRight}
-        />
-      )}
+          {/* Hevel Bar */}
+          {!locked && !anyOverlay && (
+            <HevelBar
+              onCloseApp={requestHome}
+              appDragY={appDragY}
+              onScrubLeft={handleScrubLeft}
+              onScrubRight={handleScrubRight}
+            />
+          )}
 
-      {/* Side Pill */}
-      {!locked && !anyOverlay && (
-        <SidePill
-          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
-          onOpenAppSwitcher={() => setAppSwitcher(true)}
-        />
-      )}
+          {/* Side Pill — grabs the edge of the screen. */}
+          {!locked && !anyOverlay && (
+            <SidePill
+              dragTarget={dragTarget}
+              openDistance={SIDE_PILL_OPEN_DISTANCE}
+              isOpen={isSidePillOpen}
+              onOpen={() => dispatch({ type: "OPEN_SIDE_PILL" })}
+              onClose={closeSidePill}
+            />
+          )}
 
-      {locked && <LockScreen onUnlock={() => dispatch({ type: "UNLOCK" })} />}
+          {locked && <LockScreen onUnlock={() => dispatch({ type: "UNLOCK" })} />}
+
+          {/* Tap-to-close scrim: when the screen is pushed aside, tapping the
+              visible screen surface snaps it back. */}
+          {isSidePillOpen && (
+            <div
+              className="absolute inset-0 z-[120]"
+              style={{ background: "transparent" }}
+              onClick={closeSidePill}
+            />
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };
