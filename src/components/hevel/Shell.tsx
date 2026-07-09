@@ -19,9 +19,10 @@ import { Contacts } from "./apps/Contacts";
 import { Angelfish } from "./apps/Angelfish";
 import { Voice } from "./apps/Voice";
 import { Phone } from "./apps/Phone";
+import { useShellMachine, type ShellState } from "./shellMachine";
 
-type MockAppProps = { 
-  onClose: () => void; 
+type MockAppProps = {
+  onClose: () => void;
   onOpenUtilityDrawer?: () => void;
   appDragY?: any;
 };
@@ -36,64 +37,67 @@ const MOCK_APPS: Record<string, React.FC<MockAppProps>> = {
   "Phone": Phone,
 };
 
-
 export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) => {
-  const [locked, setLocked] = useState(true);
-  const [notifications, setNotifications] = useState(false);
-  const [controlCenter, setControlCenter] = useState(false);
+  const { state, dispatch } = useShellMachine();
+
+  // Orthogonal overlays — not part of the top-level state machine.
   const [utilityDrawer, setUtilityDrawer] = useState(false);
   const [appSwitcher, setAppSwitcher] = useState(false);
-  const [runningApp, setRunningApp] = useState<string | null>(null);
   const [recents, setRecents] = useState<string[]>([]);
-  
+
   const appDragY = useMotionValue(0);
 
+  // Derived render flags
+  const locked = state.kind === "LOCK_CLOCK" || state.kind === "LOCK_PIN";
+  const runningApp = state.kind === "APP_FOREGROUND" ? state.app : null;
+  const notifications = state.kind === "NOTIFICATIONS";
+  const controlCenter = state.kind === "CONTROL_CENTER";
+  const anyOverlay = controlCenter || utilityDrawer || appSwitcher;
+
+  // Debug nav (PhoneFrame sidebar) → translate labels to explicit targets.
   React.useEffect(() => {
     if (!navigateTo) return;
-    setLocked(false);
-    setNotifications(false);
-    setControlCenter(false);
     setUtilityDrawer(false);
-    setRunningApp(null);
+    setAppSwitcher(false);
 
-    switch (navigateTo) {
-      case "Lock": setLocked(true); break;
-      case "Launcher": break;
-      case "Notifications": setNotifications(true); break;
-      case "Control Center": setControlCenter(true); break;
-      case "Utility": setUtilityDrawer(true); break;
-      case "Settings": setRunningApp("Settings"); break;
-      case "Home": break;
+    const targets: Record<string, ShellState> = {
+      Lock: { kind: "LOCK_CLOCK" },
+      Home: { kind: "HOME" },
+      Launcher: { kind: "HOME" },
+      Notifications: { kind: "NOTIFICATIONS" },
+      "Control Center": { kind: "CONTROL_CENTER" },
+      Settings: { kind: "APP_FOREGROUND", app: "Settings" },
+    };
+    const target = targets[navigateTo];
+    if (target) dispatch({ type: "DEBUG_GOTO", target });
+    if (navigateTo === "Utility") {
+      dispatch({ type: "DEBUG_GOTO", target: { kind: "HOME" } });
+      setUtilityDrawer(true);
     }
-  }, [navigateTo]);
+  }, [navigateTo, dispatch]);
 
   const openApp = (name: string) => {
-    setRunningApp(name);
-    setRecents(prev => [name, ...prev.filter(app => app !== name)]);
+    dispatch({ type: "LAUNCH_APP", name });
+    setRecents((prev) => [name, ...prev.filter((a) => a !== name)]);
   };
-  const closeApp = () => setRunningApp(null);
+
+  const requestHome = () => dispatch({ type: "REQUEST_HOME" });
 
   const handleScrubLeft = () => {
-    // Next recent app
-    if (recents.length > 1) {
-      const idx = runningApp ? recents.indexOf(runningApp) : -1;
-      if (idx !== -1 && idx + 1 < recents.length) {
-        setRunningApp(recents[idx + 1]);
-      }
+    if (!runningApp || recents.length <= 1) return;
+    const idx = recents.indexOf(runningApp);
+    if (idx !== -1 && idx + 1 < recents.length) {
+      dispatch({ type: "LAUNCH_APP", name: recents[idx + 1] });
     }
   };
 
   const handleScrubRight = () => {
-    // Prev recent app
-    if (recents.length > 1) {
-      const idx = runningApp ? recents.indexOf(runningApp) : -1;
-      if (idx > 0) {
-        setRunningApp(recents[idx - 1]);
-      }
+    if (!runningApp || recents.length <= 1) return;
+    const idx = recents.indexOf(runningApp);
+    if (idx > 0) {
+      dispatch({ type: "LAUNCH_APP", name: recents[idx - 1] });
     }
   };
-
-  const anyOverlay = controlCenter || utilityDrawer || appSwitcher;
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -109,40 +113,51 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
       >
         <HomeScreen
           onOpenApp={openApp}
-          onSwipeToNotifications={() => setNotifications(true)}
-          onOpenControlCenter={() => setControlCenter(true)}
+          onSwipeToNotifications={() => dispatch({ type: "OPEN_NOTIFICATIONS" })}
+          onOpenControlCenter={() => dispatch({ type: "OPEN_CONTROL_CENTER" })}
           onOpenUtilityDrawer={() => setUtilityDrawer(true)}
         />
       </div>
 
       <AnimatePresence>
-        {notifications && <NotificationsPane key="notifications" open={true} onClose={() => setNotifications(false)} />}
+        {notifications && (
+          <NotificationsPane key="notifications" open={true} onClose={requestHome} />
+        )}
       </AnimatePresence>
-      <ControlCenter open={controlCenter} onClose={() => setControlCenter(false)} />
+      <ControlCenter open={controlCenter} onClose={requestHome} />
       <UtilityDrawer open={utilityDrawer} onClose={() => setUtilityDrawer(false)} />
       <AppSwitcher open={appSwitcher} onClose={() => setAppSwitcher(false)} onOpenApp={openApp} />
 
       <AnimatePresence>
-        {runningApp && runningApp === "Settings" && <SettingsApp key="settings" onClose={closeApp} />}
+        {runningApp && runningApp === "Settings" && (
+          <SettingsApp key="settings" onClose={requestHome} />
+        )}
         {runningApp && runningApp !== "Settings" && MOCK_APPS[runningApp] && (
           (() => {
             const App = MOCK_APPS[runningApp];
-            return <App key={runningApp} onClose={closeApp} onOpenUtilityDrawer={() => setUtilityDrawer(true)} appDragY={appDragY} />;
+            return (
+              <App
+                key={runningApp}
+                onClose={requestHome}
+                onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+                appDragY={appDragY}
+              />
+            );
           })()
         )}
         {runningApp && runningApp !== "Settings" && !MOCK_APPS[runningApp] && (
           <AppOverlay
             key={runningApp}
             appName={runningApp}
-            onClose={closeApp}
+            onClose={requestHome}
             onOpenUtilityDrawer={() => setUtilityDrawer(true)}
             appDragY={appDragY}
           />
         )}
       </AnimatePresence>
 
-      {/* Top Edge Hitbox - Global pull-down for Control Center */}
-      {!locked && (
+      {/* Top Edge Hitbox — HOME-only per the machine. */}
+      {state.kind === "HOME" && (
         <motion.div
           className="absolute top-0 left-0 right-0 h-8 z-[100] touch-none"
           drag="y"
@@ -150,31 +165,31 @@ export const Shell: React.FC<{ navigateTo?: string | null }> = ({ navigateTo }) 
           dragElastic={0.1}
           onDragEnd={(e, info) => {
             if (info.offset.y > 30 || info.velocity.y > 300) {
-              setControlCenter(true);
+              dispatch({ type: "OPEN_CONTROL_CENTER" });
             }
           }}
         />
       )}
 
-      {/* Hevel Bar - Global bottom hit box */}
+      {/* Hevel Bar — always mounted post-unlock. Swipe-up always requests HOME. */}
       {!locked && !anyOverlay && (
-        <HevelBar 
-          onCloseApp={closeApp} 
-          appDragY={appDragY} 
+        <HevelBar
+          onCloseApp={requestHome}
+          appDragY={appDragY}
           onScrubLeft={handleScrubLeft}
           onScrubRight={handleScrubRight}
         />
       )}
 
-      {/* Side Pill - Global edge panel */}
+      {/* Side Pill */}
       {!locked && !anyOverlay && (
-        <SidePill 
-          onOpenUtilityDrawer={() => setUtilityDrawer(true)} 
-          onOpenAppSwitcher={() => setAppSwitcher(true)} 
+        <SidePill
+          onOpenUtilityDrawer={() => setUtilityDrawer(true)}
+          onOpenAppSwitcher={() => setAppSwitcher(true)}
         />
       )}
 
-      {locked && <LockScreen onUnlock={() => setLocked(false)} />}
+      {locked && <LockScreen onUnlock={() => dispatch({ type: "UNLOCK" })} />}
     </div>
   );
 };
