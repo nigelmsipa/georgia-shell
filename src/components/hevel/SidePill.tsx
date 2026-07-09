@@ -1,18 +1,18 @@
 import React, { useRef } from "react";
-import { motion, MotionValue, animate, PanInfo } from "framer-motion";
+import { motion, MotionValue, animate, useMotionValue, PanInfo } from "framer-motion";
+import { Breath } from "./Breath";
+import { BREATH_GATHER_SPRING } from "./breathRhythm";
 
 interface Props {
-  /** Where the screen currently wants to be (0 = closed, OPEN_DISTANCE = fully revealed). */
   dragTarget: MotionValue<number>;
   openDistance: number;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  /** Tap (no meaningful drag) — starts dictation. */
   onTap: () => void;
 }
 
-const TAP_SLOP = 6; // px — below this, treat gesture as tap
+const TAP_SLOP = 6;
 
 export const SidePill: React.FC<Props> = ({
   dragTarget,
@@ -24,10 +24,15 @@ export const SidePill: React.FC<Props> = ({
 }) => {
   const startRef = useRef(0);
   const movedRef = useRef(0);
+  const gather = useMotionValue(0);
+
+  const setGather = (v: number) =>
+    animate(gather, v, { type: "spring", ...BREATH_GATHER_SPRING });
 
   const handlePanStart = () => {
     startRef.current = dragTarget.get();
     movedRef.current = 0;
+    setGather(1);
   };
 
   const handlePan = (_: unknown, info: PanInfo) => {
@@ -35,7 +40,7 @@ export const SidePill: React.FC<Props> = ({
       movedRef.current,
       Math.abs(info.offset.x) + Math.abs(info.offset.y),
     );
-    if (movedRef.current < TAP_SLOP) return; // don't slide on tiny jitter
+    if (movedRef.current < TAP_SLOP) return;
     const next = Math.max(
       0,
       Math.min(openDistance * 1.15, startRef.current + info.offset.x),
@@ -45,7 +50,7 @@ export const SidePill: React.FC<Props> = ({
 
   const handlePanEnd = (_: unknown, info: PanInfo) => {
     if (movedRef.current < TAP_SLOP) {
-      // treat as tap — but also let onTap handle the click path
+      setGather(0);
       return;
     }
     const current = dragTarget.get();
@@ -54,31 +59,25 @@ export const SidePill: React.FC<Props> = ({
     animate(dragTarget, target, { type: "spring", stiffness: 280, damping: 26 });
     if (shouldOpen && !isOpen) onOpen();
     else if (!shouldOpen && isOpen) onClose();
+    setGather(0);
   };
 
   return (
     <motion.div
-      className="absolute left-0 top-1/2 z-[95] touch-none cursor-pointer"
-      style={{ width: 22, height: 96, y: "-50%" }}
+      className="absolute left-0 top-1/2 z-[95] touch-none cursor-pointer flex items-center justify-center"
+      style={{ width: 28, height: 120, y: "-50%" }}
       onPanStart={handlePanStart}
       onPan={handlePan}
       onPanEnd={handlePanEnd}
+      onPointerEnter={() => setGather(1)}
+      onPointerLeave={() => setGather(0)}
+      onPointerDown={() => setGather(1)}
+      onPointerUp={() => setGather(0)}
       onTap={() => {
         if (movedRef.current < TAP_SLOP) onTap();
       }}
     >
-      <div
-        className="absolute left-0 top-1/2 rounded-r-md pointer-events-none"
-        style={{
-          width: 4,
-          height: 64,
-          transform: "translateY(-50%)",
-          background: "hsl(var(--muted-foreground) / 0.4)",
-          boxShadow: "0 0 8px hsl(var(--foreground) / 0.15)",
-        }}
-      />
+      <Breath orientation="vertical" gather={gather} length={96} thickness={14} />
     </motion.div>
   );
 };
-
-

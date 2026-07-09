@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import { PhoneCall } from "lucide-react";
 import { AtmosphericBg } from "./AtmosphericBg";
+import { useBreathOpacity } from "./breathRhythm";
 
 interface Props {
   onUnlock: () => void;
@@ -26,6 +28,7 @@ const EMERGENCY_KEYS = [
 export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
   const [time, setTime] = useState(new Date());
   const [entered, setEntered] = useState("");
+  const breathOpacity = useBreathOpacity(0.25, 0.7);
   const [error, setError] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [emergency, setEmergency] = useState(false);
@@ -224,22 +227,23 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </div>
 
           <div
-            className="absolute bottom-12 animate-breathe"
+            className="absolute bottom-12"
             style={{
               opacity: Math.max(0, 0.3 - scrollY * 2),
               transition: isAnimating ? "opacity 0.6s ease" : "none",
             }}
           >
-            <span
+            <motion.span
               className="font-serif italic"
               style={{
                 fontSize: 12,
                 color: "hsl(var(--muted-foreground) / 0.4)",
                 letterSpacing: "0.06em",
+                opacity: breathOpacity,
               }}
             >
               swipe up
-            </span>
+            </motion.span>
           </div>
         </div>
 
@@ -248,16 +252,17 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           className="flex flex-col items-center justify-center"
           style={{ height: containerH }}
         >
-          <span
-            className="font-serif italic animate-breathe"
+          <motion.span
+            className="font-serif italic"
             style={{
               fontSize: 14,
               color: "hsl(var(--muted-foreground) / 0.35)",
               letterSpacing: "0.04em",
+              opacity: breathOpacity,
             }}
           >
             enter passcode or use fingerprint
-          </span>
+          </motion.span>
 
           <div
             className={`flex items-center justify-center gap-5 mt-8 ${error ? "animate-shake" : ""}`}
@@ -472,16 +477,17 @@ export const LockScreen: React.FC<Props> = ({ onUnlock }) => {
           </span>
 
           {calling ? (
-            <span
-              className="font-serif italic mt-8 animate-breathe"
+            <motion.span
+              className="font-serif italic mt-8"
               style={{
                 fontSize: 15,
                 color: "hsl(var(--destructive) / 0.85)",
                 letterSpacing: "0.05em",
+                opacity: breathOpacity,
               }}
             >
               calling {emergencyDigits}…
-            </span>
+            </motion.span>
           ) : (
             <>
               <div className="mt-4 flex items-center gap-6">
